@@ -78,6 +78,11 @@ function splitHeadings(): void {
       linesClass: 'split-line',
       autoSplit: true,
       onSplit(self) {
+        // Маска строки режет всё выше её верхнего края — дать место бревису Й и точкам Ё.
+        self.masks.forEach((m) => {
+          (m as HTMLElement).style.paddingTop = '0.16em';
+          (m as HTMLElement).style.marginTop = '-0.16em';
+        });
         return gsap.from(self.lines, {
           yPercent: 105,
           duration: 1.05,

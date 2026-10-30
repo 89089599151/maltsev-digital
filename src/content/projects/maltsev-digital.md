@@ -25,7 +25,7 @@ gallery:
     caption: Тарифы, сравнение и калькулятор стоимости
   - src: ../../assets/case/portfolio-desktop.png
     alt: Страница «Работы» с витриной этого кейса
-    caption: Сначала — сетка и порядок блоков
+    caption: Единственный кейс — крупной витриной, без пустых мест под будущие работы
 responsive:
   desktop: ../../assets/case/home-desktop.png
   tablet: ../../assets/case/home-tablet.png

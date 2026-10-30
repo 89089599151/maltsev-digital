@@ -225,8 +225,8 @@ const steps = [
 
   .wf__screen {
     aspect-ratio: 1425 / 900;
-    padding: 1.6%;
-    border-radius: 14px 14px 0 0;
+    padding: 0.8%;
+    border-radius: 12px 12px 0 0;
     background: #151515;
     overflow: hidden;
     box-shadow: 0 40px 60px -30px rgba(21, 21, 21, 0.45);
@@ -253,8 +253,8 @@ const steps = [
     bottom: 0;
     width: 22%;
     aspect-ratio: 376 / 814;
-    padding: 2.4%;
-    border-radius: 22px;
+    padding: 1.2%;
+    border-radius: 18px;
     background: #151515;
     overflow: hidden;
     box-shadow: 0 30px 50px -20px rgba(21, 21, 21, 0.5);
@@ -266,6 +266,10 @@ const steps = [
     object-fit: cover;
     object-position: top;
     border-radius: 14px;
+  }
+
+  .wf__base {
+    height: clamp(8px, 0.9vw, 14px);
   }
 
   /* Шаги кейса */

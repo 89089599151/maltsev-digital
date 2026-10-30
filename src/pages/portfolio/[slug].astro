@@ -41,7 +41,7 @@ const schema = {
 };
 ---
 
-<Base title={`${d.title} — ${d.isConcept ? 'концепт' : 'проект'}`} description={d.summary} schema={schema}>
+<Base title={isSelf ? 'Кейс: этот сайт, сделанный с ИИ' : `${d.title} — ${d.isConcept ? 'концепт' : 'проект'}`} description={d.summary} schema={schema}>
   <article>
     <PageHero
       id="pj-title"
@@ -343,13 +343,13 @@ const schema = {
   .device__frame {
     border-radius: var(--radius);
     overflow: hidden;
-    background: var(--surface-2);
-    padding: 10px;
+    background: var(--night);
+    padding: 4px;
   }
 
   .device--mobile .device__frame {
-    border-radius: 22px;
-    padding: 8px;
+    border-radius: 20px;
+    padding: 4px;
   }
 
   .device__frame img {
