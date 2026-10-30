@@ -79,31 +79,6 @@ const schema = {
               {p.includes.slice(0, 4).map((x) => <li>{x}</li>)}
             </ul>
 
-            <dl class="col__terms">
-              <div><dt>Срок</dt><dd>{p.timeline}</dd></div>
-              <div><dt>Правки</dt><dd>{p.revisions}</dd></div>
-            </dl>
-
-            {/* Полный состав — по запросу: на первом взгляде только то, что отличает пакет. */}
-            <details class="col__more">
-              <summary>
-                Весь состав и что не входит <span class="col__more-ico" aria-hidden="true"><Icon name="arrow" /></span>
-              </summary>
-              <div class="col__more-body">
-                {p.includes.length > 4 && (
-                  <ul class="col__list col__list--yes">
-                    {p.includes.slice(4).map((x) => <li>{x}</li>)}
-                  </ul>
-                )}
-                <div>
-                  <h4 class="col__h">Не входит</h4>
-                  <ul class="col__list col__list--no">
-                    {p.excludes.map((x) => <li>{x}</li>)}
-                  </ul>
-                </div>
-                <p class="col__result"><strong>Результат.</strong> {p.result}</p>
-              </div>
-            </details>
             <a class={`btn ${i === 1 ? 'btn--accent' : 'btn--ink'} col__btn`} href={url(`/contacts/?plan=${p.id}`)}>
               Заказать {p.name} <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
             </a>
@@ -265,12 +240,6 @@ const schema = {
     color: var(--night-muted);
   }
 
-  .col__h {
-    margin-bottom: 16px;
-    font-size: 1.125rem;
-    letter-spacing: -0.01em;
-  }
-
   .col__list {
     list-style: none;
     padding: 0;
@@ -295,118 +264,9 @@ const schema = {
     transform: translateY(-1px);
   }
 
-  .col__list--no li::before {
-    content: '';
-    width: 8px;
-    height: 2px;
-    background: currentColor;
-    transform: translateY(-4px);
-  }
-
-  .col__list--no li {
-    color: var(--muted);
-  }
-
-  .tile--deep .col__list--no li {
-    color: var(--night-muted);
-  }
-
-  .col__terms {
-    display: grid;
-    gap: 16px;
-    margin-top: auto;
-    padding-top: clamp(24px, 2.4vw, 32px);
-    border-top: 1px solid rgba(21, 21, 21, 0.08);
-  }
-
-  .tile--deep .col__terms {
-    border-color: rgba(246, 245, 241, 0.12);
-  }
-
-  .col__terms dt {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 0.8125rem;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .tile--deep .col__terms dt {
-    color: var(--night-muted);
-  }
-
-  .col__terms dd {
-    margin-top: 4px;
-    font-size: 1rem;
-    line-height: 1.45;
-  }
-
   .col__btn {
     width: 100%;
-  }
-
-  .col__more {
-    margin-top: -8px;
-  }
-
-  .col__more summary {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    min-height: 44px;
-    font-family: var(--font-display);
-    font-weight: 650;
-    font-size: 0.9375rem;
-    list-style: none;
-    cursor: pointer;
-  }
-
-  .col__more summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .col__more summary:hover {
-    color: var(--accent-deep);
-  }
-
-  .tile--deep .col__more summary:hover {
-    color: var(--accent);
-  }
-
-  .col__more-ico {
-    display: inline-grid;
-    transition: transform var(--dur) var(--ease-out);
-    transform: rotate(90deg);
-  }
-
-  .col__more[open] .col__more-ico {
-    transform: rotate(-90deg);
-  }
-
-  .col__more-body {
-    display: grid;
-    gap: 24px;
-    padding-block: 16px 4px;
-  }
-
-  .col__result {
-    font-size: 0.9375rem;
-    line-height: 1.5;
-    color: var(--muted);
-  }
-
-  .tile--deep .col__result {
-    color: var(--night-muted);
-  }
-
-  .col__result strong {
-    color: var(--ink);
-  }
-
-  .tile--deep .col__result strong {
-    color: var(--night-ink);
+    margin-top: auto;
   }
 
   /* Сравнение */
