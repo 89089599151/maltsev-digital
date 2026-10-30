@@ -1,0 +1,381 @@
+---
+import { Image } from 'astro:assets';
+import Base from '@/layouts/Base.astro';
+import { site } from '@/config/site';
+import { url } from '@/lib/url';
+import bunker from '@/assets/photos/bunker.jpg';
+
+const split: [string, string][] = [
+  ['Черновики текстов и заголовков', 'Смысл, тон и финальные тексты под ваш бизнес'],
+  ['Варианты композиции и структуры', 'Выбор концепции и каждое дизайн-решение'],
+  ['Рутинный код и рефакторинг', 'Архитектура проекта и проверка каждого изменения'],
+  ['Поиск ошибок и черновые тесты', 'Проверка в настоящих браузерах и на телефонах'],
+  ['Подготовка вариантов изображений', 'Отбор, обработка и законность использования'],
+];
+
+const principles = [
+  { t: 'Честность вместо витрины', d: 'Никаких выдуманных отзывов, логотипов и цифр. Только то, что можно проверить.' },
+  { t: 'Цена до старта', d: 'Состав работ и сумма фиксируются письменно до начала.' },
+  { t: 'Сайт ваш', d: 'Код, домен и доступы передаются вам. Без привязки к конструктору.' },
+  { t: 'Скорость — часть дизайна', d: 'Медленный сайт теряет клиентов, поэтому скорость проверяется на каждом этапе.' },
+  { t: 'Понятный язык', d: 'Объясняю решения без жаргона, чтобы вы понимали, за что платите.' },
+];
+
+const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'WebGL и анимации', 'Playwright для тестов', 'GitHub и автоматическая публикация', 'ИИ-ассистенты для кода и текста', 'Formspree, Яндекс Метрика'];
+---
+
+<Base
+  title="Обо мне — независимый веб-разработчик"
+  description="Независимый разработчик сайтов: веду проект лично от идеи до запуска и использую ИИ-инструменты, чтобы делать это быстрее и аккуратнее."
+>
+  <section class="ab-hero" aria-labelledby="ab-title" data-stagger>
+    <div class="ab-hero__title tile tile--paper">
+      <h1 id="ab-title" class="ab-hero__h1">Обо мне</h1>
+      <p class="ab-hero__lead">
+        Меня зовут {site.brand.owner.value}. Делаю сайты один, без отделов и посредников.
+      </p>
+    </div>
+    <div class="ab-hero__photo tile tile--photo" data-shutter>
+      <Image src={bunker} alt="Бетонное здание на фоне светлого неба" widths={[400, 700, 1000]} sizes="(max-width: 1023px) 100vw, 40vw" loading="eager" />
+    </div>
+  </section>
+
+  <section class="section ab-text" aria-labelledby="ab-why">
+    <h2 id="ab-why" class="head">Почему один</h2>
+    <div class="ab-text__body prose" data-stagger>
+      <p>
+        В агентстве между вами и тем, кто делает сайт, стоят менеджер, дизайнер, верстальщик и тестировщик.
+        Каждый передаёт задачу следующему, и часть смысла теряется по дороге.
+      </p>
+      <p>
+        Я веду проект целиком: разговариваю с вами, проектирую структуру, рисую дизайн, пишу код, проверяю и
+        запускаю. Решения принимает один человек, который помнит всю историю проекта, — поэтому меньше
+        согласований и испорченного телефона.
+      </p>
+      <p>
+        Раньше такой объём работы в одиночку означал долгие сроки. Сегодня часть рутины берут на себя
+        ИИ-инструменты, и это позволяет делать индивидуальный сайт за недели, а не за месяцы.
+      </p>
+    </div>
+  </section>
+
+  <section class="section ai" aria-labelledby="ai-title">
+    <div class="ai__side">
+      <h2 id="ai-title" class="head">Как я использую ИИ</h2>
+      <p>
+        Не скрываю: ИИ — часть моей работы. Но он инструмент, а не автор. Вот как распределены роли.
+      </p>
+    </div>
+    <div class="ai__wrap tile">
+      <table class="ai__table">
+        <thead>
+          <tr>
+            <th scope="col">Что делают ИИ-инструменты</th>
+            <th scope="col">Что делаю я</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            split.map(([a, b]) => (
+              <tr>
+                <td>{a}</td>
+                <td>{b}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section pr" aria-labelledby="pr-title">
+    <div class="pr__head tile tile--accent">
+      <h2 id="pr-title" class="head">Принципы</h2>
+    </div>
+    {
+      principles.map((p, i) => (
+        <div class={`pr__item pr__item--${i} tile ${i % 2 ? 'tile--raised' : ''}`} data-reveal style={`--i:${i}`}>
+          <h3 class="pr__t">{p.t}</h3>
+          <p>{p.d}</p>
+        </div>
+      ))
+    }
+  </section>
+
+  <section class="section honest" aria-labelledby="honest-title">
+    <div class="honest__card tile tile--paper">
+      <h2 id="honest-title" class="head">Чего здесь пока нет</h2>
+      <p class="lead">
+        Здесь нет отзывов, логотипов клиентов и цифр вроде «сто довольных заказчиков». Я не стану их
+        выдумывать. Портфолио пополняется, и каждый проект появится с разбором и ссылкой на живой сайт.
+      </p>
+      <p>А пока судите по этому сайту: он сделан тем же способом, каким я сделаю ваш.</p>
+    </div>
+    <div class="honest__tools tile">
+      <h2 class="head-sm">Инструменты</h2>
+      <ul class="tools">
+        {tools.map((t) => <li>{t}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section ab-cta" aria-labelledby="ab-cta-title">
+    <h2 id="ab-cta-title" class="head">Давайте познакомимся</h2>
+    <p class="lead">Расскажите, что за бизнес и какой сайт нужен — начнём с разговора, он ни к чему не обязывает.</p>
+    <div class="ab-cta__btns">
+      <a class="btn btn--accent" href={url('/contacts/')}>Написать <span class="arrow" aria-hidden="true">→</span></a>
+      <a class="btn btn--ghost" href={url('/services/')}>Тарифы <span class="arrow" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .ab-hero {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+    margin-top: var(--gap);
+    min-height: min(78svh, 760px);
+  }
+
+  .ab-hero__title {
+    grid-column: 1 / 8;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 40px;
+  }
+
+  .ab-hero__h1 {
+    font-size: clamp(3.5rem, 1rem + 8vw, 9rem);
+    line-height: 0.88;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+  }
+
+  .ab-hero__lead {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: clamp(1.375rem, 1rem + 1.1vw, 2rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    max-width: 26ch;
+  }
+
+  .ab-hero__photo {
+    grid-column: 8 / 13;
+  }
+
+  .ab-text {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+
+  .ab-text h2 {
+    grid-column: 1 / 5;
+  }
+
+  .ab-text__body {
+    grid-column: 6 / 12;
+    font-size: clamp(1.125rem, 1rem + 0.35vw, 1.3125rem);
+  }
+
+  .ai {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+    align-items: start;
+  }
+
+  .ai__side {
+    grid-column: 1 / 5;
+    display: grid;
+    gap: 20px;
+    padding-right: 24px;
+  }
+
+  .ai__wrap {
+    grid-column: 5 / 13;
+    padding: 0;
+    overflow-x: auto;
+  }
+
+  .ai__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .ai__table th,
+  .ai__table td {
+    width: 50%;
+    padding: 18px 24px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid rgba(13, 27, 51, 0.1);
+  }
+
+  .ai__table tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .ai__table th {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.125rem;
+  }
+
+  .ai__table th:last-child,
+  .ai__table td:last-child {
+    background: rgba(36, 87, 230, 0.08);
+    font-family: var(--font-display);
+    font-weight: 560;
+  }
+
+  .ai__table td:first-child {
+    color: var(--muted);
+  }
+
+  .pr {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-auto-rows: minmax(180px, auto);
+    gap: var(--gap);
+  }
+
+  .pr__head {
+    grid-column: 1 / 5;
+    grid-row: span 2;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .pr__item {
+    display: grid;
+    gap: 12px;
+    align-content: start;
+  }
+
+  .pr__item--0 { grid-column: 5 / 9; }
+  .pr__item--1 { grid-column: 9 / 13; }
+  .pr__item--2 { grid-column: 5 / 9; }
+  .pr__item--3 { grid-column: 9 / 13; }
+  .pr__item--4 { grid-column: 1 / 13; min-height: 0; }
+
+  .pr__t {
+    font-size: clamp(1.375rem, 1rem + 1vw, 2rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+
+  .honest {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+
+  .honest__card {
+    grid-column: 1 / 8;
+    display: grid;
+    gap: 22px;
+    padding: clamp(24px, 3vw, 48px);
+  }
+
+  .honest__tools {
+    grid-column: 8 / 13;
+    display: grid;
+    gap: 20px;
+    align-content: start;
+    padding: clamp(24px, 3vw, 40px);
+  }
+
+  .tools {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tools li {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: inset 0 0 0 1px var(--glass-edge);
+    font-family: var(--font-display);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .ab-cta {
+    display: grid;
+    gap: 24px;
+    max-width: 900px;
+  }
+
+  .ab-cta__btns {
+    display: flex;
+    gap: var(--gap);
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 1023px) {
+    .ab-hero__title,
+    .ab-hero__photo,
+    .ab-text h2,
+    .ab-text__body,
+    .ai__side,
+    .ai__wrap,
+    .honest__card,
+    .honest__tools {
+      grid-column: 1 / -1;
+    }
+
+    .ab-hero__photo {
+      aspect-ratio: 16 / 9;
+    }
+
+    .ab-text,
+    .ai {
+      gap: 24px;
+    }
+
+    .pr__head { grid-column: 1 / -1; grid-row: auto; min-height: 200px; }
+    .pr__item--0, .pr__item--2 { grid-column: 1 / 7; }
+    .pr__item--1, .pr__item--3 { grid-column: 7 / 13; }
+  }
+
+  @media (max-width: 767px) {
+    .ab-hero,
+    .ab-text,
+    .ai,
+    .pr,
+    .honest {
+      grid-template-columns: 1fr;
+    }
+
+    .ab-hero__title {
+      min-height: 52svh;
+    }
+
+    .ab-hero__h1 {
+      font-size: 17vw;
+    }
+
+    .pr__head,
+    .pr__item--0,
+    .pr__item--1,
+    .pr__item--2,
+    .pr__item--3,
+    .pr__item--4 {
+      grid-column: 1 / -1;
+      min-height: 0;
+    }
+
+    .ai__table th,
+    .ai__table td {
+      padding: 14px 16px;
+      font-size: 0.9375rem;
+    }
+  }
+</style>

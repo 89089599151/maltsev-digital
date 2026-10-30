@@ -1,0 +1,368 @@
+---
+import LogoMark from './LogoMark.astro';
+import { url, isActive } from '@/lib/url';
+import { site } from '@/config/site';
+
+const nav = [
+  { href: '/portfolio/', label: 'Работы' },
+  { href: '/services/', label: 'Услуги и цены' },
+  { href: '/about/', label: 'Обо мне' },
+  { href: '/faq/', label: 'Вопросы' },
+];
+const current = Astro.url.pathname;
+---
+
+<header class="hdr" data-header>
+  <div class="hdr__row">
+    <a class="hdr__logo" href={url('/')} aria-label={`${site.brand.name.value} — на главную`}>
+      <LogoMark size={26} />
+    </a>
+    <nav class="hdr__nav" aria-label="Основная навигация">
+      <a class="hdr__home" href={url('/')}>{site.brand.short}<span> {site.brand.second}</span></a>
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={url(item.href)} aria-current={isActive(current, item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <a class="hdr__cta" href={url('/contacts/')}>
+      Обсудить проект <span class="arrow" aria-hidden="true">→</span>
+    </a>
+    <button class="hdr__menu" type="button" aria-haspopup="dialog" aria-controls="site-menu" data-menu-open>
+      Меню
+    </button>
+  </div>
+
+  <dialog class="menu" id="site-menu" aria-label="Меню сайта" data-menu>
+    <div class="menu__board">
+      <div class="menu__top">
+        <a class="menu__logo" href={url('/')} aria-label="На главную"><LogoMark size={24} /></a>
+        <button class="menu__close" type="button" data-menu-close>Закрыть</button>
+      </div>
+      <ul class="menu__list">
+        <li><a href={url('/')}>Главная</a></li>
+        {nav.map((item) => (
+          <li>
+            <a href={url(item.href)} aria-current={isActive(current, item.href) ? 'page' : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a class="menu__cta" href={url('/contacts/')}>Обсудить проект <span aria-hidden="true">→</span></a>
+    </div>
+  </dialog>
+</header>
+
+<script>
+  // Шапка прячется при прокрутке вниз и возвращается при прокрутке вверх.
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  if (header) {
+    let lastY = window.scrollY;
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const y = window.scrollY;
+      const hide = y > lastY && y > 240 && !header.contains(document.activeElement);
+      header.classList.toggle('is-hidden', hide);
+      lastY = y;
+    };
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    }, { passive: true });
+    header.addEventListener('focusin', () => header.classList.remove('is-hidden'));
+  }
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-menu]');
+  const openBtn = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+  const closeBtn = document.querySelector<HTMLButtonElement>('[data-menu-close]');
+  if (dialog && openBtn && closeBtn) {
+    openBtn.addEventListener('click', () => {
+      dialog.showModal();
+      openBtn.setAttribute('aria-expanded', 'true');
+    });
+    closeBtn.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('close', () => {
+      openBtn.setAttribute('aria-expanded', 'false');
+      openBtn.focus();
+    });
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    window.matchMedia('(min-width: 1024px)').addEventListener('change', (e) => {
+      if (e.matches && dialog.open) dialog.close();
+    });
+  }
+</script>
+
+<style>
+  .hdr {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding-block: var(--margin) 0;
+    background: transparent;
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .hdr.is-hidden {
+    transform: translateY(-110%);
+  }
+
+  .hdr__row {
+    display: grid;
+    grid-template-columns: var(--header-h) 1fr auto;
+    gap: var(--gap);
+    height: var(--header-h);
+  }
+
+  .hdr__logo,
+  .hdr__nav,
+  .hdr__cta,
+  .hdr__menu {
+    border-radius: 999px;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: inset 0 0 0 1px var(--glass-edge), var(--glass-shadow);
+    display: flex;
+    align-items: center;
+  }
+
+  .hdr__logo {
+    justify-content: center;
+    background: var(--paper);
+    color: var(--paper-ink);
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .hdr__logo:hover {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .hdr__nav {
+    background: var(--surface);
+    padding-inline: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+
+  .hdr__home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28em;
+    min-height: 44px;
+    justify-self: start;
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    font-size: 1rem;
+  }
+
+  .hdr__home span {
+    color: var(--muted);
+  }
+
+  .hdr__nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: clamp(16px, 2vw, 32px);
+  }
+
+  .hdr__nav ul a {
+    position: relative;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.975rem;
+    text-decoration: none;
+    padding-block: 8px;
+    white-space: nowrap;
+  }
+
+  .hdr__nav ul a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 2px;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .hdr__nav ul a:hover::after,
+  .hdr__nav ul a[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+
+  .hdr__cta {
+    gap: 12px;
+    padding-inline: 22px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .hdr__cta:hover {
+    background: var(--accent-hover);
+  }
+
+  .hdr__cta .arrow {
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .hdr__cta:hover .arrow {
+    transform: translateX(4px);
+  }
+
+  .hdr__menu {
+    display: none;
+  }
+
+  /* Меню для телефона и планшета */
+  .menu {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: var(--margin);
+    border: 0;
+    background: rgba(232, 238, 248, 0.82);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    backdrop-filter: blur(28px) saturate(160%);
+    color: var(--ink);
+  }
+
+  .menu::backdrop {
+    background: rgba(232, 238, 248, 0.4);
+  }
+
+  .menu__board {
+    display: grid;
+    gap: var(--gap);
+    grid-template-rows: var(--header-h) 1fr auto;
+    height: 100%;
+  }
+
+  .menu__top {
+    display: grid;
+    grid-template-columns: var(--header-h) 1fr;
+    gap: var(--gap);
+  }
+
+  .menu__logo,
+  .menu__close {
+    display: flex;
+    align-items: center;
+    border-radius: 999px;
+  }
+
+  .menu__logo {
+    justify-content: center;
+    background: var(--paper);
+    color: var(--paper-ink);
+  }
+
+  .menu__close {
+    justify-content: flex-end;
+    padding-inline: 20px;
+    background: var(--surface);
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  .menu__list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--gap);
+    align-content: start;
+  }
+
+  .menu__list a {
+    display: block;
+    padding: 18px 20px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+    letter-spacing: -0.035em;
+    text-decoration: none;
+  }
+
+  .menu__list a[aria-current='page'] {
+    background: var(--surface-3);
+  }
+
+  .menu__cta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 72px;
+    padding-inline: 20px;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    text-decoration: none;
+  }
+
+  @media (max-width: 1023px) {
+    .hdr__row {
+      grid-template-columns: var(--header-h) 1fr auto;
+    }
+
+    .hdr__nav {
+      grid-template-columns: 1fr;
+    }
+
+    .hdr__nav ul {
+      display: none;
+    }
+
+    .hdr__cta {
+      display: none;
+    }
+
+    .hdr__menu {
+      display: flex;
+      padding-inline: 22px;
+      background: var(--surface-2);
+      font-family: var(--font-display);
+      font-weight: 600;
+      transition: background-color var(--dur-fast) var(--ease-out);
+    }
+
+    .hdr__menu:hover {
+      background: var(--surface-3);
+    }
+  }
+
+  @media (max-width: 380px) {
+    .hdr__home span {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,274 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import { categories } from '@/config/portfolio';
+import { url } from '@/lib/url';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const used = categories.filter((c) => projects.some((p) => p.data.category === c.id));
+// Ритм карточек: широкая, обычная, высокая, обычная, обычная...
+const pattern = ['wide', 'normal', 'tall', 'normal', 'normal', 'wide', 'normal'] as const;
+
+const hints: Record<string, string> = {
+  landing: 'Одностраничные сайты под услугу, запуск или мероприятие.',
+  business: 'Многостраничные сайты компаний с услугами и портфолио.',
+  catalog: 'Каталоги товаров и услуг с карточками и заказом.',
+  personal: 'Личные сайты врачей, юристов, тренеров, дизайнеров.',
+  concept: 'Демонстрационные проекты для разных сфер — честно помечены как концепты.',
+};
+---
+
+<Base
+  title="Работы — портфолио веб-разработчика"
+  description="Портфолио MALTSEV DIGITAL: лендинги, сайты для бизнеса, каталоги и концепты — с разбором задачи, решений и ссылками на работающие сайты."
+>
+  <section class="pf-hero" aria-labelledby="pf-title" data-stagger>
+    <div class="pf-hero__title tile">
+      <h1 id="pf-title" class="pf-hero__h1">Работы</h1>
+    </div>
+    <div class="pf-hero__note tile tile--paper">
+      <p class="statement">
+        Каждый проект — с задачей, решениями и ссылкой на живой сайт.
+      </p>
+    </div>
+  </section>
+
+  {
+    projects.length > 0 ? (
+      <section class="section" aria-labelledby="pf-list-title">
+        <h2 id="pf-list-title" class="sr-only">Проекты</h2>
+        {used.length > 1 && (
+          <div class="filters" role="group" aria-label="Фильтр по категориям" data-filters>
+            <button type="button" class="filter" aria-pressed="true" data-filter="all">Все</button>
+            {used.map((c) => (
+              <button type="button" class="filter" aria-pressed="false" data-filter={c.id}>
+                {c.label}
+              </button>
+            ))}
+          </div>
+        )}
+        <div class="grid" data-grid>
+          {projects.map((p, i) => (
+            <ProjectCard project={p} size={pattern[i % pattern.length]} />
+          ))}
+        </div>
+        <p class="filters__empty" data-filter-empty hidden>В этой категории пока нет проектов.</p>
+      </section>
+    ) : (
+      <section class="section empty" aria-labelledby="pf-empty-title">
+        <div class="empty__main tile tile--raised">
+          <h2 id="pf-empty-title" class="head">Портфолио наполняется</h2>
+          <p class="lead">
+            Сейчас готовлю первые кейсы к публикации. Здесь они появятся с подробным разбором — без
+            выдуманных клиентов и цифр.
+          </p>
+          <div class="empty__btns">
+            <a class="btn btn--accent" href={url('/contacts/')}>
+              Обсудить ваш проект <span class="arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="btn btn--ghost" href={url('/services/')}>
+              Тарифы <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+        <ul class="empty__cats" aria-label="Какие разделы появятся">
+          {categories.map((c, i) => (
+            <li class={`empty__cat tile ${i === 4 ? 'tile--accent' : ''}`} data-reveal style={`--i:${i}`}>
+              <span class="empty__cat-name">{c.label}</span>
+              <span class="empty__cat-hint">{hints[c.id]}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</Base>
+
+<script>
+  const wrap = document.querySelector<HTMLElement>('[data-filters]');
+  const grid = document.querySelector<HTMLElement>('[data-grid]');
+  const empty = document.querySelector<HTMLElement>('[data-filter-empty]');
+  if (wrap && grid) {
+    const buttons = Array.from(wrap.querySelectorAll<HTMLButtonElement>('[data-filter]'));
+    buttons.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const f = btn.dataset.filter;
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        let shown = 0;
+        grid.querySelectorAll<HTMLElement>('[data-category]').forEach((card) => {
+          const on = f === 'all' || card.dataset.category === f;
+          card.hidden = !on;
+          if (on) shown++;
+        });
+        if (empty) empty.hidden = shown > 0;
+      }),
+    );
+  }
+</script>
+
+<style>
+  .pf-hero {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+    margin-top: var(--gap);
+    min-height: 440px;
+  }
+
+  .pf-hero__title {
+    grid-column: 1 / 9;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .pf-hero__h1 {
+    font-size: clamp(4rem, 1rem + 11vw, 12.5rem);
+    line-height: 0.82;
+    letter-spacing: -0.06em;
+    text-transform: uppercase;
+  }
+
+  .pf-hero__note {
+    grid-column: 9 / 13;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap);
+    margin-bottom: 24px;
+  }
+
+  .filter {
+    min-height: 48px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--glass-edge);
+    font-family: var(--font-display);
+    font-weight: 600;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .filter:hover {
+    background: var(--surface-2);
+  }
+
+  .filter[aria-pressed='true'] {
+    background: var(--night);
+    color: var(--night-ink);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+    grid-auto-flow: dense;
+  }
+
+  .grid > :global(.pc:only-child) {
+    grid-column: 1 / -1;
+  }
+
+  .filters__empty {
+    padding: 40px 0;
+    color: var(--muted);
+  }
+
+  .empty {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+
+  .empty__main {
+    grid-column: 1 / 7;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 28px;
+    min-height: 520px;
+    padding: clamp(24px, 3vw, 44px);
+  }
+
+  .empty__main .lead {
+    max-width: 36ch;
+  }
+
+  .empty__btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap);
+  }
+
+  .empty__main .btn--ghost {
+    background: #ffffff;
+  }
+
+  .empty__cats {
+    grid-column: 7 / 13;
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--gap);
+  }
+
+  .empty__cat {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .empty__cat-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.25rem, 1rem + 0.7vw, 1.625rem);
+    letter-spacing: -0.025em;
+  }
+
+  .empty__cat-hint {
+    font-size: 1rem;
+  }
+
+  .empty__cat:not(.tile--accent) .empty__cat-hint {
+    color: var(--muted);
+  }
+
+  @media (max-width: 1023px) {
+    .pf-hero__title,
+    .pf-hero__note,
+    .empty__main,
+    .empty__cats {
+      grid-column: 1 / -1;
+    }
+
+    .pf-hero__title {
+      min-height: 300px;
+    }
+
+    .empty__main {
+      min-height: 0;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .pf-hero,
+    .grid,
+    .empty {
+      grid-template-columns: 1fr;
+    }
+
+    .pf-hero__h1 {
+      font-size: 19vw;
+    }
+
+    .empty__cat {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+</style>

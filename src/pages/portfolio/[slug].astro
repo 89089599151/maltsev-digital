@@ -1,0 +1,509 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import { categoryLabel } from '@/config/portfolio';
+import { url } from '@/lib/url';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: { project, next: projects[(i + 1) % projects.length] },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  next: CollectionEntry<'projects'>;
+}
+
+const { project, next } = Astro.props;
+const d = project.data;
+const { Content } = await render(project);
+const hasNext = next.id !== project.id;
+const devices = [
+  { key: 'desktop', label: 'Десктоп', img: d.responsive.desktop },
+  { key: 'tablet', label: 'Планшет', img: d.responsive.tablet },
+  { key: 'mobile', label: 'Телефон', img: d.responsive.mobile },
+].filter((x) => x.img);
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: d.title,
+  description: d.summary,
+  dateCreated: String(d.year),
+  ...(d.liveUrl ? { url: d.liveUrl } : {}),
+};
+---
+
+<Base title={`${d.title} — ${d.isConcept ? 'концепт' : 'проект'}`} description={d.summary} schema={schema}>
+  <article>
+    <header class="pj-hero">
+      <div class="pj-hero__title tile tile--paper">
+        <p class="pj-hero__crumbs">
+          <a href={url('/portfolio/')}>Работы</a>
+          <span aria-hidden="true">/</span>
+          <span>{categoryLabel(d.category)}</span>
+        </p>
+        <h1 class="pj-hero__h1">{d.title}</h1>
+        <p class="pj-hero__sum">{d.summary}</p>
+      </div>
+      <dl class="pj-hero__facts">
+        <div class="tile"><dt>Тип</dt><dd>{d.isConcept ? 'Концепт — демонстрационный проект' : categoryLabel(d.category)}</dd></div>
+        <div class="tile"><dt>Год</dt><dd>{d.year}</dd></div>
+        <div class="tile pj-hero__stack"><dt>Технологии</dt><dd>{d.stack.join(', ')}</dd></div>
+        {
+          d.liveUrl ? (
+            <a class="tile tile--accent pj-hero__live" href={d.liveUrl} target="_blank" rel="noopener">
+              Открыть сайт <span aria-hidden="true">↗</span>
+            </a>
+          ) : (
+            <div class="tile pj-hero__live pj-hero__live--off">Живая версия недоступна</div>
+          )
+        }
+      </dl>
+      <figure class="pj-hero__cover tile tile--photo" data-shutter>
+        <Image src={d.cover} alt={d.coverAlt} widths={[640, 1000, 1600, 2000]} sizes="100vw" loading="eager" fetchpriority="high" />
+      </figure>
+    </header>
+
+    <section class="section pj-task" aria-labelledby="task-title">
+      <h2 id="task-title" class="head">Задача</h2>
+      <p class="lead">{d.task}</p>
+    </section>
+
+    {
+      d.results.length > 0 && (
+        <section class="section pj-results" aria-labelledby="res-title">
+          <h2 id="res-title" class="sr-only">Результаты</h2>
+          {d.results.map((r, i) => (
+            <div class={`tile ${i === 0 ? 'tile--accent' : 'tile--raised'}`} data-reveal style={`--i:${i}`}>
+              <p class="pj-results__v">{r.value}</p>
+              <p>{r.label}</p>
+            </div>
+          ))}
+        </section>
+      )
+    }
+
+    {
+      d.designNotes.length > 0 && (
+        <section class="section pj-design" aria-labelledby="design-title">
+          <div class="pj-design__head tile tile--raised">
+            <h2 id="design-title" class="head">Решения в дизайне</h2>
+          </div>
+          <ul class="pj-design__list" data-stagger>
+            {d.designNotes.map((n) => (
+              <li class="tile">{n}</li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      d.gallery.length > 0 && (
+        <section class="section pj-gallery" aria-labelledby="gal-title">
+          <h2 id="gal-title" class="head">Экраны</h2>
+          <div class="pj-gallery__grid">
+            {d.gallery.map((g, i) => (
+              <figure
+                class={`pj-gallery__item ${i % 3 === 0 || (i % 3 === 1 && i === d.gallery.length - 1) ? 'is-wide' : ''}`}
+                data-reveal
+              >
+                <Image src={g.src} alt={g.alt} widths={[600, 1000, 1600]} sizes="(max-width: 767px) 100vw, 66vw" loading="lazy" />
+                {g.caption && <figcaption>{g.caption}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      devices.length > 0 && (
+        <section class="section pj-devices" aria-labelledby="dev-title">
+          <h2 id="dev-title" class="head">На разных экранах</h2>
+          <div class="pj-devices__row">
+            {devices.map((dv) => (
+              <figure class={`device device--${dv.key}`} data-reveal>
+                <div class="device__frame">
+                  <Image src={dv.img!} alt={`${d.title}: версия — ${dv.label.toLowerCase()}`} widths={[400, 800, 1200]} sizes="(max-width: 767px) 100vw, 40vw" loading="lazy" />
+                </div>
+                <figcaption>{dv.label}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <section class="section pj-story">
+      <div class="prose">
+        <Content />
+      </div>
+    </section>
+
+    <nav class="section pj-next" aria-label="Другие проекты">
+      {
+        hasNext ? (
+          <a class="pj-next__link tile tile--paper" href={url(`/portfolio/${next.id}/`)}>
+            <span class="pj-next__k">Следующий проект</span>
+            <span class="pj-next__t">{next.data.title}</span>
+            <span class="pj-next__arrow" aria-hidden="true">→</span>
+          </a>
+        ) : (
+          <a class="pj-next__link tile tile--paper" href={url('/portfolio/')}>
+            <span class="pj-next__k">Все работы</span>
+            <span class="pj-next__t">Вернуться в портфолио</span>
+            <span class="pj-next__arrow" aria-hidden="true">→</span>
+          </a>
+        )
+      }
+      <a class="pj-next__cta tile tile--accent" href={url('/contacts/')}>
+        <span class="pj-next__k">Хотите похожий сайт?</span>
+        <span class="pj-next__t">Обсудить проект</span>
+      </a>
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .pj-hero {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+    margin-top: var(--gap);
+  }
+
+  .pj-hero__title {
+    grid-column: 1 / 9;
+    display: grid;
+    gap: 24px;
+    align-content: space-between;
+    min-height: 420px;
+  }
+
+  .pj-hero__crumbs {
+    display: flex;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: var(--step-small);
+  }
+
+  .pj-hero__h1 {
+    font-size: clamp(2.75rem, 1rem + 5vw, 6.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+  }
+
+  .pj-hero__sum {
+    font-size: var(--step-lead);
+    line-height: 1.35;
+    max-width: 44ch;
+  }
+
+  .pj-hero__facts {
+    grid-column: 9 / 13;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap);
+  }
+
+  .pj-hero__facts dt {
+    font-size: var(--step-small);
+    color: var(--muted);
+  }
+
+  .pj-hero__facts dd {
+    margin-top: 6px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.0625rem;
+    line-height: 1.3;
+  }
+
+  .pj-hero__stack,
+  .pj-hero__live {
+    grid-column: 1 / -1;
+  }
+
+  .pj-hero__live {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  a.pj-hero__live:hover {
+    background: var(--accent-hover);
+  }
+
+  .pj-hero__live--off {
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 1rem;
+  }
+
+  .pj-hero__cover {
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 8;
+  }
+
+  .pj-task {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+
+  .pj-task h2 {
+    grid-column: 1 / 5;
+  }
+
+  .pj-task .lead {
+    grid-column: 5 / 12;
+  }
+
+  .pj-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--gap);
+  }
+
+  .pj-results .tile {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .pj-results__v {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(3rem, 1.6rem + 3vw, 5rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+  }
+
+  .pj-design {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+
+  .pj-design__head {
+    grid-column: 1 / 5;
+    display: flex;
+    align-items: flex-end;
+    min-height: 260px;
+  }
+
+  .pj-design__list {
+    grid-column: 5 / 13;
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--gap);
+  }
+
+  .pj-design__list li {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: clamp(1.125rem, 1rem + 0.5vw, 1.5rem);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+  }
+
+  .pj-gallery h2,
+  .pj-devices h2 {
+    margin-bottom: 32px;
+  }
+
+  .pj-gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+
+  .pj-gallery__item {
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .pj-gallery__item.is-wide {
+    grid-column: 1 / -1;
+  }
+
+  .pj-gallery__item img {
+    width: 100%;
+    height: auto;
+  }
+
+  .pj-gallery__item figcaption,
+  .device figcaption {
+    padding: 14px 18px;
+    font-family: var(--font-display);
+    font-size: var(--step-small);
+    color: var(--muted);
+  }
+
+  .pj-devices__row {
+    display: grid;
+    grid-template-columns: 6fr 3.4fr 1.8fr;
+    gap: var(--gap);
+    align-items: end;
+  }
+
+  .device__frame {
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface-2);
+    padding: 10px;
+  }
+
+  .device--mobile .device__frame {
+    border-radius: 22px;
+    padding: 8px;
+  }
+
+  .device__frame img {
+    width: 100%;
+    border-radius: 4px;
+  }
+
+  .device--desktop img { aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+  .device--tablet img { aspect-ratio: 3 / 4; object-fit: cover; object-position: top; }
+  .device--mobile img { aspect-ratio: 9 / 19; object-fit: cover; object-position: top; border-radius: 16px; }
+
+  .pj-story {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .pj-story .prose {
+    grid-column: 5 / 12;
+  }
+
+  .pj-next {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+
+  .pj-next__link,
+  .pj-next__cta {
+    display: grid;
+    gap: 12px;
+    min-height: 260px;
+    align-content: space-between;
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .pj-next__link {
+    grid-column: 1 / 9;
+    position: relative;
+  }
+
+  .pj-next__link:hover {
+    background: var(--paper-2);
+  }
+
+  .pj-next__cta {
+    grid-column: 9 / 13;
+  }
+
+  .pj-next__cta:hover {
+    background: var(--accent-hover);
+  }
+
+  .pj-next__k {
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
+
+  .pj-next__t {
+    font-family: var(--font-display);
+    font-weight: 750;
+    font-size: clamp(2rem, 1rem + 3vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+
+  .pj-next__arrow {
+    position: absolute;
+    right: var(--pad);
+    top: var(--pad);
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .pj-next__link:hover .pj-next__arrow {
+    transform: translateX(8px);
+  }
+
+  @media (max-width: 1023px) {
+    .pj-hero__title,
+    .pj-hero__facts,
+    .pj-task h2,
+    .pj-task .lead,
+    .pj-design__head,
+    .pj-design__list,
+    .pj-story .prose,
+    .pj-next__link,
+    .pj-next__cta {
+      grid-column: 1 / -1;
+    }
+
+    .pj-hero__title {
+      min-height: 320px;
+    }
+
+    .pj-design__head {
+      min-height: 0;
+    }
+
+    .pj-task {
+      gap: 20px;
+    }
+
+    .pj-devices__row {
+      grid-template-columns: 2fr 1fr;
+    }
+
+    .device--desktop {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .pj-hero,
+    .pj-task,
+    .pj-design,
+    .pj-story,
+    .pj-next {
+      grid-template-columns: 1fr;
+    }
+
+    .pj-hero__cover {
+      aspect-ratio: 4 / 3;
+    }
+
+    .pj-gallery__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .pj-devices__row {
+      grid-template-columns: 1.4fr 1fr;
+    }
+  }
+</style>

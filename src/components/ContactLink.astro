@@ -1,0 +1,110 @@
+---
+/**
+ * Строка контакта. Неподтверждённый контакт не становится ссылкой:
+ * показывается как «будет указан перед запуском», чтобы не вести на чужой аккаунт.
+ */
+import { site, telegramUrl, emailUrl } from '@/config/site';
+
+interface Props {
+  kind: 'telegram' | 'email';
+  variant?: 'row' | 'tile';
+}
+const { kind, variant = 'row' } = Astro.props;
+
+const isTg = kind === 'telegram';
+const label = isTg ? 'Telegram' : 'Почта';
+const entry = isTg ? site.contacts.telegram : site.contacts.email;
+const shown = isTg ? `@${entry.value}` : entry.value;
+const href = isTg ? telegramUrl() : emailUrl('Заявка на разработку сайта');
+---
+
+{
+  href ? (
+    <a class={`cl cl--${variant}`} href={href} target={isTg ? '_blank' : undefined} rel={isTg ? 'noopener' : undefined}>
+      <span class="cl__label">{label}</span>
+      <span class="cl__value">{shown}</span>
+      <span class="cl__arrow" aria-hidden="true">↗</span>
+    </a>
+  ) : (
+    <div class={`cl cl--${variant} cl--pending`}>
+      <span class="cl__label">{label}</span>
+      <span class="cl__value">будет указан перед запуском</span>
+    </div>
+  )
+}
+
+<style>
+  .cl {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 16px;
+    align-items: end;
+    padding: 18px 20px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: inset 0 0 0 1px var(--glass-edge);
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  a.cl:hover {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  a.cl:hover .cl__label {
+    color: inherit;
+  }
+
+  .cl__label {
+    grid-column: 1;
+    font-size: var(--step-small);
+    color: var(--muted);
+  }
+
+  .cl__value {
+    grid-column: 1;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.125rem;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+  }
+
+  .cl__arrow {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  a.cl:hover .cl__arrow {
+    transform: translate(3px, -3px);
+  }
+
+  .cl--pending .cl__value {
+    font-family: var(--font-text);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+
+  .cl--tile {
+    min-height: 140px;
+    padding: var(--pad);
+    background: var(--surface-2);
+  }
+
+  .cl--tile .cl__label {
+    align-self: start;
+  }
+
+  .cl--tile .cl__value {
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  }
+</style>

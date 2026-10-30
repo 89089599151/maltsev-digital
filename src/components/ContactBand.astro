@@ -1,0 +1,323 @@
+---
+/**
+ * Финальный блок главной: латунное поле, лента фотографий и короткая форма
+ * из трёх ячеек — имя, контакт, отправка.
+ */
+import { Image } from 'astro:assets';
+import { site } from '@/config/site';
+import { url } from '@/lib/url';
+import FormNotice from './FormNotice.astro';
+import lattice from '@/assets/photos/facade-lattice.jpg';
+import concrete from '@/assets/photos/concrete-angle.jpg';
+import stepped from '@/assets/photos/stepped-corner.jpg';
+import bunker from '@/assets/photos/bunker.jpg';
+import wedge from '@/assets/photos/wedge.jpg';
+import panels from '@/assets/photos/panels.jpg';
+
+const photos = [
+  { src: lattice, w: 3, h: 4 },
+  { src: concrete, w: 1, h: 1 },
+  { src: stepped, w: 3, h: 2 },
+  { src: bunker, w: 3, h: 4 },
+  { src: wedge, w: 1, h: 1 },
+  { src: panels, w: 3, h: 2 },
+];
+const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.formspreeId}` : '';
+---
+
+<section class="band section" aria-labelledby="band-title">
+  <div class="band__strip" aria-hidden="true">
+    <div class="band__track">
+      {
+        [...photos, ...photos].map((p) => (
+          <Image
+            src={p.src}
+            alt=""
+            width={Math.round((150 * p.w) / p.h) * 2}
+            height={300}
+            style={`aspect-ratio:${p.w}/${p.h}`}
+            loading="lazy"
+            decoding="async"
+          />
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="band__body">
+    <div class="band__intro">
+    <h2 id="band-title" class="head" data-reveal>Расскажите о задаче</h2>
+    <p class="band__sub" data-reveal style="--i:1">
+      Оставьте имя и удобный контакт — отвечу {site.contacts.responseTime.value}, задам пару уточняющих вопросов и
+      предложу план. Подробный бриф можно заполнить <a href={url('/contacts/')}>на странице контактов</a>.
+    </p>
+
+    </div>
+    {!endpoint && <div class="band__notice"><FormNotice tone="accent" /></div>}
+
+    <form class="band__form" data-lead-form data-endpoint={endpoint} method="post" action={endpoint || undefined} data-reveal style="--i:2">
+      <fieldset disabled={!endpoint}>
+        <legend class="sr-only">Короткая заявка</legend>
+        <input type="hidden" name="_subject" value="Короткая заявка с главной" />
+        <input type="hidden" name="source" value="Главная, короткая форма" />
+        <div class="hp" aria-hidden="true"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></div>
+        <div class="band__cells">
+          <div class="cell">
+            <label for="q-name" class="sr-only">Ваше имя</label>
+            <input id="q-name" name="name" type="text" placeholder="Ваше имя" autocomplete="name" required minlength="2" data-error-id="q-name-err" />
+            <span class="cell__err" id="q-name-err" aria-live="polite"></span>
+          </div>
+          <div class="cell">
+            <label for="q-contact" class="sr-only">Telegram, телефон или почта</label>
+            <input id="q-contact" name="contact" type="text" placeholder="Telegram, телефон или почта" required minlength="4" data-error-id="q-contact-err" />
+            <span class="cell__err" id="q-contact-err" aria-live="polite"></span>
+          </div>
+          <button class="cell cell--submit" type="submit">
+            <span data-label>{endpoint ? 'Отправить заявку' : 'Форма не подключена'}</span>
+          </button>
+        </div>
+        <div class="band__fine small">
+          <label class="consent">
+            <input type="checkbox" name="consent" value="Согласие получено" required data-error-id="q-consent-err" />
+            <span>Согласен на обработку персональных данных по <a href={url('/privacy/')}>политике конфиденциальности</a></span>
+          </label>
+          <span class="cell__err" id="q-consent-err" aria-live="polite"></span>
+          <p class="band__status" data-status role="status" aria-live="polite"></p>
+        </div>
+      </fieldset>
+    </form>
+    <div class="band__success" data-success hidden tabindex="-1">
+      <p class="head-sm">Заявка получена.</p>
+      <p>Спасибо! Я свяжусь с вами {site.contacts.responseTime.value} по указанному контакту.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initLeadForms } from '@/scripts/forms';
+  initLeadForms();
+</script>
+
+<style>
+  .band {
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: var(--accent-ink);
+    padding-block: 48px clamp(48px, 6vw, 88px);
+    overflow: hidden;
+    min-height: 80svh;
+  }
+
+  .band__strip {
+    overflow: hidden;
+  }
+
+  .band__track {
+    display: flex;
+    gap: 8px;
+    width: max-content;
+    animation: marquee 60s linear infinite;
+  }
+
+  .band__track img {
+    height: 150px;
+    width: auto;
+    object-fit: cover;
+    border-radius: 14px;
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translateX(calc(-50% - 4px));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .band__track {
+      animation: none;
+    }
+  }
+
+  .band__body {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 0 var(--gap);
+    align-items: end;
+    padding-inline: var(--pad);
+    margin-top: 72px;
+  }
+
+  .band__intro {
+    grid-column: 1 / 7;
+  }
+
+  .band__sub {
+    margin-top: 20px;
+    max-width: 60ch;
+    font-size: var(--step-body);
+  }
+
+  .band__notice {
+    grid-column: 7 / 13;
+  }
+
+  .band__form,
+  .band__success {
+    grid-column: 1 / -1;
+  }
+
+  .band__form {
+    margin-top: 40px;
+  }
+
+  @media (max-width: 1023px) {
+    .band__intro,
+    .band__notice {
+      grid-column: 1 / -1;
+    }
+
+    .band__notice {
+      margin-top: 32px;
+    }
+  }
+
+  fieldset {
+    border: 0;
+    padding: 0;
+    min-width: 0;
+  }
+
+  .band__cells {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .cell {
+    position: relative;
+    display: block;
+  }
+
+  .cell input,
+  .cell--submit {
+    width: 100%;
+    height: 96px;
+    border: 0;
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    text-align: center;
+    padding-inline: 16px;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .cell input::placeholder {
+    color: var(--muted);
+  }
+
+  .cell input:focus {
+    background: #ffffff;
+    outline: none;
+  }
+
+  .cell input:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 2px;
+  }
+
+  .cell input[aria-invalid='true'] {
+    background: #ffe3df;
+  }
+
+  .cell--submit {
+    background: var(--night);
+    color: var(--night-ink);
+    font-weight: 700;
+  }
+
+  .cell--submit:hover:not(:disabled) {
+    background: #1b2f55;
+  }
+
+  .cell--submit:focus-visible {
+    outline-color: #ffffff;
+  }
+
+  fieldset:disabled .cell--submit,
+  fieldset:disabled input {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  .cell__err {
+    display: block;
+    min-height: 1.3em;
+    margin-top: 6px;
+    font-size: var(--step-small);
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: #ffe3df;
+  }
+
+  .band__fine {
+    margin-top: 8px;
+    display: grid;
+    gap: 6px;
+  }
+
+  .consent {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    cursor: pointer;
+  }
+
+  .consent input {
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+    accent-color: var(--night);
+    flex: none;
+  }
+
+  .band__status {
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  .band__success {
+    margin-top: 40px;
+    padding: var(--pad);
+    border-radius: var(--radius);
+    background: var(--night);
+    color: var(--night-ink);
+    display: grid;
+    gap: 10px;
+    max-width: 720px;
+  }
+
+  @media (max-width: 767px) {
+    .band {
+      padding-top: 24px;
+    }
+
+    .band__track img {
+      height: 110px;
+    }
+
+    .band__body {
+      margin-top: 40px;
+    }
+
+    .band__cells {
+      grid-template-columns: 1fr;
+    }
+
+    .cell input,
+    .cell--submit {
+      height: 60px;
+    }
+  }
+</style>

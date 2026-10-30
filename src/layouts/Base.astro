@@ -1,0 +1,102 @@
+---
+import '@fontsource-variable/onest/index.css';
+import '@fontsource-variable/source-serif-4/index.css';
+import '@/styles/global.css';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import PreviewBanner from '@/components/PreviewBanner.astro';
+import { site } from '@/config/site';
+import { url } from '@/lib/url';
+import wavesWide from '@/assets/bg/waves-wide.webp';
+import wavesTall from '@/assets/bg/waves-tall.webp';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Путь к OG-картинке внутри public/. */
+  ogImage?: string;
+  noindex?: boolean;
+  /** Дополнительная разметка Schema.org для страницы. */
+  schema?: Record<string, unknown>;
+}
+
+const {
+  title,
+  description = site.seo.defaultDescription,
+  ogImage = '/og.png',
+  noindex = false,
+  schema,
+} = Astro.props;
+
+const fullTitle = title ? `${title} — ${site.brand.name.value}` : site.seo.defaultTitle;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogUrl = new URL(url(ogImage), Astro.site).href;
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: site.brand.name.value,
+  description: site.seo.defaultDescription,
+  url: new URL(url('/'), Astro.site).href,
+  areaServed: 'RU',
+  serviceType: 'Разработка сайтов',
+  founder: { '@type': 'Person', name: site.brand.owner.value },
+};
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#e8eef8" />
+    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+    <link rel="icon" href={url("/icon-32.png")} sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href={url('/apple-touch-icon.png')} />
+    <link rel="sitemap" href={url('/sitemap-index.xml')} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={site.seo.locale} />
+    <meta property="og:site_name" content={site.brand.name.value} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+    {schema && <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />}
+
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body id="top">
+    <div class="bg-art" aria-hidden="true">
+      <picture>
+        <source media="(max-aspect-ratio: 1/1)" srcset={wavesTall.src} />
+        <img src={wavesWide.src} alt="" decoding="async" fetchpriority="low" />
+      </picture>
+    </div>
+    <a class="skip-link" href="#main">К содержимому</a>
+    <div class="page">
+      <PreviewBanner />
+      <Header />
+      <main id="main" tabindex="-1">
+        <slot />
+      </main>
+      <Footer />
+    </div>
+
+    <script>
+      import { initReveal } from '@/scripts/reveal';
+      initReveal();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,255 @@
+---
+/** Тарифы, растущие как столбцы графика: больший пакет буквально больше. */
+import { plans, formatPrice, pricingConfirmed } from '@/config/pricing';
+import { url } from '@/lib/url';
+
+interface Props {
+  headingId?: string;
+  heading?: string;
+}
+const { headingId = 'pricing-title', heading = 'Цена известна до старта' } = Astro.props;
+const looks = ['raised', 'paper', 'accent'];
+---
+
+<section class="plans section" aria-labelledby={headingId}>
+  <div class="plans__board">
+    <div class="plans__head" data-stagger>
+      <h2 id={headingId} class="head">{heading}</h2>
+      <p>
+        Три пакета с фиксированной стоимостью. Состав, сроки и количество правок прописаны заранее — вы
+        выбираете, а не торгуетесь.
+        {!pricingConfirmed && <span class="muted"> Цены предварительные.</span>}
+      </p>
+      <a class="plans__more" href={url('/services/')}>
+        Что входит, что нет и как считать <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+    {
+      plans.map((p, i) => (
+        <article class={`plan plan--${looks[i]} plan--${p.id}`} aria-labelledby={`plan-${p.id}`} data-reveal style={`--i:${i}`}>
+          <div class="plan__top">
+            <h3 id={`plan-${p.id}`} class="plan__name">{p.name}</h3>
+            <p class="plan__price">{formatPrice(p.price)}</p>
+            <p class="plan__time">{p.timeline}</p>
+            <p class="plan__for">{p.forWhom}</p>
+            <ul class="plan__list">
+              {p.highlights.map((h) => (
+                <li>{h}</li>
+              ))}
+            </ul>
+          </div>
+          <a class="plan__cta" href={url(`/contacts/?plan=${p.id}`)}>
+            Выбрать {p.name} <span class="arrow" aria-hidden="true">→</span>
+          </a>
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .plans__board {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto auto;
+    gap: var(--gap);
+    align-items: end;
+  }
+
+  .plans__head {
+    grid-column: 1 / 9;
+    grid-row: 1;
+    align-self: start;
+    display: grid;
+    gap: 20px;
+    max-width: 760px;
+    padding-bottom: 32px;
+  }
+
+  .plans__head p {
+    max-width: 52ch;
+  }
+
+  .plans__more {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--accent);
+    justify-self: start;
+    padding-block: 10px;
+  }
+
+  .plans__more .arrow {
+    display: inline-block;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .plans__more:hover .arrow {
+    transform: translateX(4px);
+  }
+
+  .plan {
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius);
+    overflow: hidden;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: inset 0 0 0 1px var(--glass-edge), var(--glass-shadow);
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .plan--start {
+    grid-column: 1 / 5;
+    min-height: 460px;
+  }
+
+  .plan--business {
+    grid-column: 5 / 9;
+    min-height: 580px;
+  }
+
+  .plan--premium {
+    grid-column: 9 / 13;
+    grid-row: 1 / 3;
+    min-height: 700px;
+  }
+
+  .plan--raised {
+    background: var(--surface-2);
+    --strip: var(--surface-3);
+    --strip-hover: #ffffff;
+  }
+
+  .plan--paper {
+    background: var(--paper);
+    color: var(--paper-ink);
+    --strip: var(--paper-2);
+    --strip-hover: #dfe8f8;
+  }
+
+  .plan--accent {
+    background: var(--accent);
+    color: var(--accent-ink);
+    --strip: var(--accent-deep);
+    --strip-hover: #163aa3;
+  }
+
+  .plan__top {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 28px;
+  }
+
+  .plan__name {
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  .plan__price {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.5rem, 1.8rem + 2vw, 3.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .plan__for {
+    font-size: 1.0625rem;
+    max-width: 34ch;
+  }
+
+  .plan__list {
+    list-style: none;
+    padding: 0;
+    margin-top: auto;
+    display: grid;
+    gap: 8px;
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+  }
+
+  .plan__list li {
+    display: grid;
+    grid-template-columns: 14px 1fr;
+    gap: 10px;
+    align-items: baseline;
+  }
+
+  .plan__list li::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: currentColor;
+    transform: translateY(-2px);
+  }
+
+  .plan__time {
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  .plan__cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 64px;
+    padding-inline: 28px;
+    background: var(--strip);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .plan__cta:hover {
+    background: var(--strip-hover);
+  }
+
+  .plan__cta .arrow {
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .plan__cta:hover .arrow {
+    transform: translateX(5px);
+  }
+
+  @media (max-width: 1023px) {
+    .plans__head {
+      grid-column: 1 / -1;
+      padding-bottom: 16px;
+    }
+
+    .plan--start,
+    .plan--business,
+    .plan--premium {
+      grid-column: 1 / -1;
+      grid-row: auto;
+      min-height: 0;
+    }
+
+    .plan__list {
+      margin-top: 8px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .plans__board {
+      grid-template-columns: 1fr;
+      row-gap: 28px;
+    }
+
+    .plan__top {
+      padding: 22px;
+    }
+
+    .plan__cta {
+      padding-inline: 22px;
+    }
+  }
+</style>

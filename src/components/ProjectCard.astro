@@ -1,0 +1,146 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { categoryLabel } from '@/config/portfolio';
+import { url } from '@/lib/url';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  size?: 'wide' | 'tall' | 'normal';
+}
+const { project, size = 'normal' } = Astro.props;
+const d = project.data;
+---
+
+<article class={`pc pc--${size}`} data-category={d.category} data-reveal>
+  <a class="pc__link" href={url(`/portfolio/${project.id}/`)}>
+    <div class="pc__media">
+      <Image src={d.cover} alt={d.coverAlt} widths={[480, 800, 1200]} sizes="(max-width: 767px) 100vw, 50vw" loading="lazy" />
+    </div>
+    <div class="pc__body">
+      <p class="pc__meta">
+        <span>{categoryLabel(d.category)}</span>
+        {d.isConcept && <span class="pc__concept">Концепт</span>}
+        <span>{d.year}</span>
+      </p>
+      <h3 class="pc__title">{d.title}</h3>
+      <p class="pc__summary">{d.summary}</p>
+    </div>
+  </a>
+</article>
+
+<style>
+  .pc {
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface-2);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: inset 0 0 0 1px var(--glass-edge), var(--glass-shadow);
+  }
+
+  .pc--wide {
+    grid-column: span 8;
+  }
+
+  .pc--normal {
+    grid-column: span 4;
+  }
+
+  .pc--tall {
+    grid-column: span 4;
+    grid-row: span 2;
+  }
+
+  .pc__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
+  }
+
+  .pc__media {
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    background: var(--surface-2);
+  }
+
+  .pc--tall .pc__media {
+    aspect-ratio: auto;
+    flex: 1;
+  }
+
+  .pc__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 900ms var(--ease-out);
+  }
+
+  .pc__link:hover .pc__media img,
+  .pc__link:focus-visible .pc__media img {
+    transform: scale(1.04);
+  }
+
+  .pc__body {
+    display: grid;
+    gap: 8px;
+    padding: 20px 22px 24px;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .pc__link:hover .pc__body {
+    background: var(--surface-2);
+  }
+
+  .pc__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    font-family: var(--font-display);
+    font-size: var(--step-small);
+    color: var(--muted);
+  }
+
+  .pc__concept {
+    padding: 0 8px;
+    border-radius: 4px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 600;
+  }
+
+  .pc__title {
+    font-size: clamp(1.375rem, 1rem + 1vw, 2rem);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+
+  .pc__summary {
+    font-size: 1rem;
+  }
+
+  @media (max-width: 1023px) {
+    .pc--wide {
+      grid-column: span 12;
+    }
+
+    .pc--normal,
+    .pc--tall {
+      grid-column: span 6;
+      grid-row: auto;
+    }
+
+    .pc--tall .pc__media {
+      aspect-ratio: 16 / 10;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .pc--wide,
+    .pc--normal,
+    .pc--tall {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

@@ -1,0 +1,356 @@
+---
+/**
+ * Калькулятор: тип сайта, число страниц и дополнительные работы → подходящий тариф,
+ * ориентировочная сумма и срок. Кнопка переносит расчёт в форму заявки.
+ */
+import { plans, addons, extraPagePrice, formatPrice, pricingConfirmed } from '@/config/pricing';
+import { url } from '@/lib/url';
+
+const types = [
+  { id: 'start', label: 'Лендинг', note: 'Одна страница', pages: 1 },
+  { id: 'business', label: 'Сайт компании', note: 'Несколько разделов', pages: 6 },
+  { id: 'premium', label: 'Индивидуальный проект', note: 'Сложный дизайн и логика', pages: 10 },
+];
+// В PREMIUM уже входят анимации, 3D и интеграции.
+const includedIn: Record<string, string[]> = { premium: ['motion', 'crm'] };
+
+const data = {
+  plans: plans.map((p) => ({ id: p.id, name: p.name, price: p.price, maxPages: p.maxPages, timeline: p.timeline })),
+  addons: addons.map((a) => ({ id: a.id, name: a.name, price: a.price })),
+  extraPagePrice,
+  includedIn,
+  contactUrl: url('/contacts/'),
+};
+const start = plans[1];
+---
+
+<section class="est section" id="calculator" aria-labelledby="est-title">
+  <div class="est__head">
+    <h2 id="est-title" class="head">Посчитайте свой сайт</h2>
+    <p>
+      Выберите тип сайта, количество страниц и нужные работы — калькулятор подберёт тариф и покажет
+      ориентир. Точную сумму я подтвержу после короткого обсуждения.
+    </p>
+  </div>
+
+  <form class="est__board" data-estimator data-config={JSON.stringify(data)}>
+    <fieldset class="est__types tile">
+      <legend class="est__legend">Тип сайта</legend>
+      <div class="est__options">
+        {
+          types.map((t, i) => (
+            <label class="opt">
+              <input type="radio" name="type" value={t.id} data-pages={t.pages} checked={i === 1} />
+              <span class="opt__box">
+                <span class="opt__name">{t.label}</span>
+                <span class="opt__note">{t.note}</span>
+              </span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <div class="est__pages tile">
+      <label class="est__legend" for="est-pages">Страниц</label>
+      <output class="est__pages-val" for="est-pages" data-pages-out>6</output>
+      <input id="est-pages" type="range" name="pages" min="1" max="25" value="6" step="1" aria-describedby="est-pages-note" />
+      <p class="est__pages-note small" id="est-pages-note">Уникальных страниц: главная, услуги, о компании, контакты и так далее.</p>
+    </div>
+
+    <fieldset class="est__addons tile">
+      <legend class="est__legend">Дополнительно</legend>
+      <div class="est__checks">
+        {
+          addons.map((a) => (
+            <label class="chk" data-addon-label={a.id}>
+              <input type="checkbox" name="addons" value={a.id} />
+              <span class="chk__box">
+                <span class="chk__name">{a.name}</span>
+                <span class="chk__price" data-addon-price={a.id}>+{formatPrice(a.price)}</span>
+              </span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <div class="est__result tile tile--accent" aria-live="polite">
+      <p class="est__res-label">Подходит тариф</p>
+      <p class="est__res-plan" data-out-plan>{start.name}</p>
+      <p class="est__res-sum" data-out-sum>{formatPrice(start.price)}</p>
+      <p class="est__res-time">Срок: <span data-out-time>{start.timeline}</span></p>
+      <p class="est__res-extra small" data-out-extra></p>
+      {!pricingConfirmed && <p class="est__res-note small">Цены предварительные и требуют подтверждения.</p>}
+      <a class="btn btn--dark est__go" href={url(`/contacts/?plan=${start.id}`)} data-out-link>
+        Отправить заявку с расчётом <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </form>
+</section>
+
+<script>
+  import { initEstimator } from '@/scripts/estimator';
+  initEstimator();
+</script>
+
+<style>
+  .est__head {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+    align-items: end;
+    margin-bottom: 40px;
+  }
+
+  .est__head h2 {
+    grid-column: 1 / 7;
+  }
+
+  .est__head p {
+    grid-column: 7 / 12;
+  }
+
+  .est__board {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto auto;
+    gap: var(--gap);
+  }
+
+  fieldset {
+    border: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .est__legend {
+    display: block;
+    padding: 0;
+    margin-bottom: 18px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+  }
+
+  .est__types {
+    grid-column: 1 / 6;
+  }
+
+  .est__pages {
+    grid-column: 6 / 9;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .est__addons {
+    grid-column: 1 / 9;
+  }
+
+  .est__result {
+    grid-column: 9 / 13;
+    grid-row: 1 / 3;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .est__options {
+    display: grid;
+    gap: var(--gap);
+  }
+
+  .opt,
+  .chk {
+    position: relative;
+    display: block;
+    cursor: pointer;
+  }
+
+  .opt input,
+  .chk input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .opt__box,
+  .chk__box {
+    display: grid;
+    gap: 2px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--glass-edge);
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+
+  .opt:hover .opt__box,
+  .chk:hover .chk__box {
+    background: var(--surface-3);
+  }
+
+  .opt input:checked + .opt__box,
+  .chk input:checked + .chk__box {
+    background: var(--night);
+    color: var(--night-ink);
+  }
+
+  .opt input:focus-visible + .opt__box,
+  .chk input:focus-visible + .chk__box {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .opt__name,
+  .chk__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.0625rem;
+  }
+
+  .opt__note {
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+
+  .opt input:checked + .opt__box .opt__note {
+    color: var(--night-muted);
+  }
+
+  .est__pages-val {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(4rem, 2rem + 4vw, 6.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+  }
+
+  input[type='range'] {
+    width: 100%;
+    margin-top: auto;
+    accent-color: var(--accent);
+    height: 32px;
+    cursor: pointer;
+  }
+
+  .est__pages-note {
+    margin-top: 10px;
+    color: var(--muted);
+  }
+
+  .est__checks {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--gap);
+  }
+
+  .chk__box {
+    grid-template-columns: 1fr;
+    min-height: 76px;
+    align-content: space-between;
+  }
+
+  .chk__price {
+    font-family: var(--font-display);
+    font-size: 0.9375rem;
+  }
+
+  .chk.is-included {
+    cursor: default;
+  }
+
+  .chk.is-included .chk__box {
+    background: rgba(255, 255, 255, 0.35);
+    color: var(--muted);
+  }
+
+  .est__res-label {
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
+
+  .est__res-plan {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 1.6rem + 2vw, 3.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+
+  .est__res-sum {
+    margin-top: auto;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.25rem, 1.5rem + 2vw, 3.25rem);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .est__res-time {
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  .est__res-note {
+    color: #dbe5ff;
+  }
+
+  .est__go {
+    margin-top: 12px;
+  }
+
+  @media (max-width: 1023px) {
+    .est__head h2,
+    .est__head p {
+      grid-column: 1 / -1;
+    }
+
+    .est__head {
+      gap: 20px;
+    }
+
+    .est__types {
+      grid-column: 1 / 8;
+    }
+
+    .est__pages {
+      grid-column: 8 / 13;
+    }
+
+    .est__addons,
+    .est__result {
+      grid-column: 1 / -1;
+      grid-row: auto;
+    }
+
+    .est__result {
+      min-height: 320px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .est__board,
+    .est__head {
+      grid-template-columns: 1fr;
+    }
+
+    .est__types,
+    .est__pages {
+      grid-column: 1 / -1;
+    }
+
+    .est__pages-val {
+      font-size: 4rem;
+    }
+
+    .est__checks {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

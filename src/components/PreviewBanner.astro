@@ -1,0 +1,38 @@
+---
+import { pendingItems } from '@/lib/launch';
+const pending = pendingItems();
+---
+
+{
+  pending.length > 0 && (
+    <details class="pv small">
+      <summary>
+        <strong>Предварительная версия</strong> — {pending.length} пунктов ждут подтверждения
+      </summary>
+      <p>{pending.join(', ')}.</p>
+    </details>
+  )
+}
+
+<style>
+  .pv {
+    margin-top: var(--margin);
+    border-radius: var(--radius);
+    background: var(--tone-2);
+    color: var(--tone-7);
+  }
+
+  .pv summary {
+    padding: 6px 14px;
+    cursor: pointer;
+  }
+
+  .pv p {
+    padding: 0 14px 10px;
+  }
+
+  .pv strong {
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+</style>

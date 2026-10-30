@@ -1,0 +1,479 @@
+---
+import Base from '@/layouts/Base.astro';
+import ContactLink from '@/components/ContactLink.astro';
+import FormNotice from '@/components/FormNotice.astro';
+import { site } from '@/config/site';
+import { plans, formatPrice } from '@/config/pricing';
+import { url } from '@/lib/url';
+
+const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.formspreeId}` : '';
+const projectTypes = ['Лендинг', 'Сайт компании', 'Каталог или магазин', 'Сайт специалиста', 'Редизайн существующего сайта', 'Другое'];
+const deadlines = ['Как можно скорее', 'В течение месяца', '1–3 месяца', 'Срок не важен'];
+---
+
+<Base
+  title="Контакты и заявка на разработку сайта"
+  description="Оставьте заявку на разработку сайта: тип проекта, тариф и описание задачи. Или напишите напрямую в Telegram или на почту."
+>
+  <div class="ct">
+    <section class="ct__intro" aria-labelledby="ct-title" data-stagger>
+      <div class="ct__title tile tile--paper">
+        <h1 id="ct-title" class="ct__h1">Обсудим ваш сайт</h1>
+        <p class="lead">
+          Расскажите о задаче — отвечу {site.contacts.responseTime.value}, задам уточняющие вопросы и
+          пришлю предложение со сроками и стоимостью.
+        </p>
+      </div>
+      <div class="ct__direct">
+        <ContactLink kind="telegram" variant="tile" />
+        <ContactLink kind="email" variant="tile" />
+      </div>
+      <div class="ct__next tile tile--raised">
+        <h2 class="head-sm">Что будет после заявки</h2>
+        <ol class="ct__steps">
+          <li><strong>Отвечу</strong> {site.contacts.responseTime.value} и уточню детали.</li>
+          <li><strong>Пришлю предложение</strong>: состав работ, сроки, стоимость, правки.</li>
+          <li><strong>Начнём</strong>, когда вы всё одобрите. До этого ни к чему не обязывает.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="ct__form-wrap tile" aria-labelledby="brief-title">
+      <h2 id="brief-title" class="head-sm">Бриф на разработку</h2>
+      <p class="ct__form-sub muted">Поля со звёздочкой обязательны. Остальное поможет точнее оценить проект.</p>
+
+      {!endpoint && <div class="ct__notice"><FormNotice /></div>}
+
+      <form data-reveal class="brief" data-lead-form data-endpoint={endpoint} method="post" action={endpoint || undefined} novalidate>
+        <fieldset class="brief__set" disabled={!endpoint}>
+          <legend class="sr-only">Заявка на разработку сайта</legend>
+          <input type="hidden" name="_subject" value="Заявка на разработку сайта" />
+          <input type="hidden" name="source" value="Страница контактов" />
+          <input type="hidden" name="estimate" value="" data-estimate-field />
+          <div class="hp" aria-hidden="true"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></div>
+
+          <div class="row row--2">
+            <div class="field">
+              <label for="f-name">Имя *</label>
+              <input id="f-name" name="name" type="text" autocomplete="name" required minlength="2" data-error-id="f-name-err" aria-describedby="f-name-err" />
+              <span class="field__err" id="f-name-err"></span>
+            </div>
+            <div class="field">
+              <label for="f-contact">Telegram, телефон или почта *</label>
+              <input id="f-contact" name="contact" type="text" required minlength="4" placeholder="@username или +7…" data-error-id="f-contact-err" aria-describedby="f-contact-err" />
+              <span class="field__err" id="f-contact-err"></span>
+            </div>
+          </div>
+
+          <fieldset class="field group">
+            <legend>Тип проекта</legend>
+            <div class="pills">
+              {
+                projectTypes.map((t, i) => (
+                  <label class="pick">
+                    <input type="radio" name="project_type" value={t} checked={i === 0} />
+                    <span>{t}</span>
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
+
+          <fieldset class="field group">
+            <legend>Тариф</legend>
+            <div class="plans-pick">
+              {
+                plans.map((p) => (
+                  <label class="pick pick--plan">
+                    <input type="radio" name="plan" value={p.name} data-plan-id={p.id} />
+                    <span>
+                      <b>{p.name}</b>
+                      <em>{formatPrice(p.price)}</em>
+                    </span>
+                  </label>
+                ))
+              }
+              <label class="pick pick--plan">
+                <input type="radio" name="plan" value="Пока не знаю" data-plan-id="unknown" checked />
+                <span>
+                  <b>Не знаю</b>
+                  <em>Подскажу</em>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="f-task">Опишите задачу *</label>
+            <textarea id="f-task" name="message" rows="6" required minlength="20" data-error-id="f-task-err" aria-describedby="f-task-hint f-task-err" placeholder="Чем занимается бизнес, для кого сайт, что он должен делать, какие сайты нравятся"></textarea>
+            <span class="field__hint" id="f-task-hint">Хотя бы пара предложений — от 20 символов.</span>
+            <span class="field__err" id="f-task-err"></span>
+          </div>
+
+          <div class="row row--2">
+            <div class="field">
+              <label for="f-site">Текущий сайт или пример, если есть</label>
+              <input id="f-site" name="site" type="text" inputmode="url" placeholder="example.ru" />
+            </div>
+            <div class="field">
+              <label for="f-deadline">Желаемый срок</label>
+              <select id="f-deadline" name="deadline">
+                {deadlines.map((d) => <option>{d}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="consent">
+              <input type="checkbox" name="consent" value="Согласие получено" required data-error-id="f-consent-err" aria-describedby="f-consent-err" />
+              <span>Согласен на обработку персональных данных в соответствии с <a href={url('/privacy/')}>политикой конфиденциальности</a> *</span>
+            </label>
+            <span class="field__err" id="f-consent-err"></span>
+          </div>
+
+          <div class="brief__submit">
+            <button class="btn btn--accent" type="submit">
+              <span data-label>{endpoint ? 'Отправить заявку' : 'Форма не подключена'}</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </button>
+            <p class="brief__status" data-status role="status" aria-live="polite"></p>
+          </div>
+        </fieldset>
+      </form>
+
+      <div class="brief__success" data-success hidden tabindex="-1">
+        <p class="head-sm">Заявка отправлена.</p>
+        <p>Спасибо! Я прочитаю бриф и свяжусь с вами {site.contacts.responseTime.value}. Если вопрос срочный — напишите напрямую.</p>
+        <a class="btn btn--ghost" href={url('/portfolio/')}>Пока посмотреть работы <span class="arrow" aria-hidden="true">→</span></a>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<script>
+  import { initLeadForms } from '@/scripts/forms';
+  import { applyBriefParams } from '@/scripts/brief-params';
+  applyBriefParams();
+  initLeadForms();
+</script>
+
+<style>
+  .ct {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+    margin-top: var(--gap);
+    align-items: start;
+  }
+
+  .ct__intro {
+    grid-column: 1 / 6;
+    display: grid;
+    gap: var(--gap);
+    position: sticky;
+    top: calc(var(--header-h) + var(--margin) + var(--gap));
+  }
+
+  .ct__title {
+    display: grid;
+    gap: 28px;
+    min-height: 360px;
+    align-content: space-between;
+  }
+
+  .ct__h1 {
+    font-size: clamp(2.75rem, 1rem + 4.4vw, 5.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+  }
+
+  .ct__direct {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap);
+  }
+
+  .ct__next {
+    display: grid;
+    gap: 16px;
+  }
+
+  .ct__steps {
+    padding-left: 1.3em;
+    display: grid;
+    gap: 10px;
+  }
+
+  .ct__steps strong {
+    font-family: var(--font-display);
+    font-weight: 650;
+  }
+
+  .ct__form-wrap {
+    grid-column: 6 / 13;
+    padding: clamp(22px, 2.6vw, 40px);
+  }
+
+  .ct__form-sub {
+    margin-top: 8px;
+  }
+
+  .ct__notice {
+    margin-top: 24px;
+  }
+
+  .brief {
+    margin-top: 28px;
+  }
+
+  .brief__set {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+    display: grid;
+    gap: 22px;
+  }
+
+  .brief__set:disabled {
+    opacity: 0.6;
+  }
+
+  .row--2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .field {
+    display: grid;
+    gap: 8px;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .field > label,
+  .group legend {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0;
+  }
+
+  .group legend {
+    margin-bottom: 10px;
+  }
+
+  input[type='text'],
+  textarea,
+  select {
+    width: 100%;
+    min-height: 54px;
+    padding: 14px 16px;
+    border: 2px solid rgba(13, 27, 51, 0.08);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out);
+  }
+
+  textarea {
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #6b7a93;
+  }
+
+  input[type='text']:hover,
+  textarea:hover,
+  select:hover {
+    background: #ffffff;
+  }
+
+  input[type='text']:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: #ffffff;
+  }
+
+  [aria-invalid='true'] {
+    border-color: var(--danger) !important;
+  }
+
+  .field__hint {
+    font-size: var(--step-small);
+    color: var(--muted);
+  }
+
+  .field__err {
+    font-family: var(--font-display);
+    font-size: var(--step-small);
+    font-weight: 600;
+    color: var(--danger);
+  }
+
+  .field__err:empty {
+    display: none;
+  }
+
+  .pills,
+  .plans-pick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .plans-pick {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .pick {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .pick input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .pick span {
+    display: block;
+    min-height: 44px;
+    padding: 11px 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: inset 0 0 0 1px var(--glass-edge);
+    font-family: var(--font-display);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .pick:hover span {
+    background: var(--surface-3);
+  }
+
+  .pick input:checked + span {
+    background: var(--night);
+    color: var(--night-ink);
+  }
+
+  .pick input:focus-visible + span {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .pick--plan span {
+    border-radius: 16px;
+    display: grid;
+    gap: 2px;
+    height: 100%;
+  }
+
+  .pick--plan b {
+    font-weight: 700;
+    font-size: 1.0625rem;
+  }
+
+  .pick--plan em {
+    font-style: normal;
+    font-size: 0.875rem;
+    opacity: 0.8;
+  }
+
+  .consent {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-family: var(--font-text) !important;
+    font-weight: 400 !important;
+    cursor: pointer;
+  }
+
+  .consent input {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    margin-top: 2px;
+    accent-color: var(--accent);
+  }
+
+  .brief__submit {
+    display: grid;
+    gap: 12px;
+    justify-items: start;
+  }
+
+  .brief__submit .btn {
+    min-width: 260px;
+  }
+
+  .brief__status {
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  .brief__success {
+    margin-top: 28px;
+    display: grid;
+    gap: 14px;
+    justify-items: start;
+    padding: var(--pad);
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .brief__success .btn--ghost {
+    background: #ffffff;
+    color: var(--ink);
+  }
+
+  @media (max-width: 1023px) {
+    .ct__intro,
+    .ct__form-wrap {
+      grid-column: 1 / -1;
+      position: static;
+    }
+
+    .ct__title {
+      min-height: 0;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .ct {
+      grid-template-columns: 1fr;
+    }
+
+    .ct__direct,
+    .row--2 {
+      grid-template-columns: 1fr;
+    }
+
+    .plans-pick {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .brief__submit .btn {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+</style>

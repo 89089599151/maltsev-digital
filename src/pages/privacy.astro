@@ -1,0 +1,133 @@
+---
+import Base from '@/layouts/Base.astro';
+import { site } from '@/config/site';
+import { url } from '@/lib/url';
+
+const { operatorName, operatorStatus, policyDate } = site.legal;
+const email = site.contacts.email;
+const draft = !operatorName.confirmed || !operatorStatus.confirmed || !policyDate.confirmed;
+---
+
+<Base
+  title="Политика обработки персональных данных"
+  description="Какие персональные данные собирает сайт MALTSEV DIGITAL, зачем, как они хранятся и как отозвать согласие."
+  noindex={draft}
+>
+  <div class="pv-page">
+    <header class="pv-head tile tile--paper">
+      <h1 class="pv-h1">Политика обработки персональных данных</h1>
+      <p>Редакция от {policyDate.value}</p>
+    </header>
+
+    {
+      draft && (
+        <p class="pv-draft tile tile--accent" role="note">
+          Черновик. Данные оператора и текст политики нужно проверить и подтвердить перед запуском сайта.
+        </p>
+      )
+    }
+
+    <div class="pv-body prose">
+      <h2>1. Кто обрабатывает данные</h2>
+      <p>
+        Оператор персональных данных — {operatorName.value}, {operatorStatus.value} (далее — «Оператор»).
+        Связаться по вопросам обработки данных можно по электронной почте {email.confirmed ? email.value : '[адрес будет указан]'}.
+      </p>
+
+      <h2>2. Какие данные собираются</h2>
+      <p>Только те, которые вы сами указываете в формах сайта:</p>
+      <ul>
+        <li>имя;</li>
+        <li>контакт для связи: логин Telegram, номер телефона или адрес электронной почты;</li>
+        <li>описание задачи и другие сведения, которые вы добавите в заявку.</li>
+      </ul>
+      <p>Сайт не использует файлы cookie для отслеживания и не подключает сервисы аналитики.</p>
+
+      <h2>3. Зачем</h2>
+      <ul>
+        <li>чтобы ответить на заявку и обсудить проект;</li>
+        <li>чтобы подготовить коммерческое предложение;</li>
+        <li>чтобы заключить и исполнить договор, если вы решите работать вместе.</li>
+      </ul>
+
+      <h2>4. Основание</h2>
+      <p>
+        Обработка ведётся на основании вашего согласия, которое вы даёте, отмечая соответствующее поле перед
+        отправкой формы (статья 6 Федерального закона № 152-ФЗ «О персональных данных»).
+      </p>
+
+      <h2>5. Как хранятся и передаются данные</h2>
+      <p>
+        Заявки с сайта передаются через сервис приёма форм Formspree (Formspree, Inc., США) и пересылаются
+        Оператору на электронную почту. Это означает трансграничную передачу данных. Оператор не передаёт
+        данные третьим лицам для рекламы и не продаёт их.
+      </p>
+      <p>
+        Данные хранятся до достижения целей обработки, но не дольше 3 лет с момента последнего обращения,
+        либо до отзыва согласия.
+      </p>
+
+      <h2>6. Ваши права</h2>
+      <p>
+        Вы можете узнать, какие ваши данные обрабатываются, потребовать их уточнения или удаления и отозвать
+        согласие, написав Оператору. Ответ — в срок, установленный законом.
+      </p>
+
+      <h2>7. Изменения</h2>
+      <p>Новая редакция политики действует с момента публикации на этой странице.</p>
+
+      <p><a href={url('/contacts/')}>Вернуться к форме заявки</a></p>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .pv-page {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+    margin-top: var(--gap);
+  }
+
+  .pv-head {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 20px;
+    min-height: 320px;
+    align-content: space-between;
+  }
+
+  .pv-h1 {
+    font-size: clamp(2.25rem, 1rem + 4vw, 5rem);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    max-width: 18ch;
+  }
+
+  .pv-draft {
+    grid-column: 1 / -1;
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  .pv-body {
+    grid-column: 3 / 11;
+    margin-top: 48px;
+  }
+
+  @media (max-width: 1023px) {
+    .pv-body {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .pv-page {
+      grid-template-columns: 1fr;
+    }
+
+    .pv-head {
+      min-height: 0;
+    }
+  }
+</style>
