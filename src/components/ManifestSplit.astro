@@ -3,7 +3,6 @@
  * Манифест: кто что делает в проекте. Слева — рутина, которую берёт ИИ,
  * справа — решения, которые остаются за человеком. Без цифр и обещаний.
  */
-import PixelWord from './PixelWord.astro';
 
 const ai = [
   'Черновики структуры и текстов',
@@ -29,19 +28,13 @@ const me = [
 
   <div class="mf__grid">
     <article class="mf__card mf__card--ai" aria-labelledby="mf-ai" data-reveal="rise">
-      <div class="mf__card-top">
-        <h3 id="mf-ai" class="mf__card-title">Делает ИИ</h3>
-        <PixelWord text="AI" class="mf__px" appear="scroll" />
-      </div>
+      <h3 id="mf-ai" class="mf__card-title">Делает ИИ</h3>
       <ul class="mf__list">{ai.map((t) => <li>{t}</li>)}</ul>
       <p class="mf__foot">Быстрее и дешевле для вас</p>
     </article>
 
     <article class="mf__card mf__card--me" aria-labelledby="mf-me" data-reveal="rise">
-      <div class="mf__card-top">
-        <h3 id="mf-me" class="mf__card-title">Решаю я</h3>
-        <PixelWord text="M" class="mf__px" appear="scroll" />
-      </div>
+      <h3 id="mf-me" class="mf__card-title">Решаю я</h3>
       <ul class="mf__list">{me.map((t) => <li>{t}</li>)}</ul>
       <p class="mf__foot">Вы говорите напрямую с тем, кто делает сайт</p>
     </article>
@@ -94,28 +87,11 @@ const me = [
     color: var(--night-ink);
   }
 
-  .mf__card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
   .mf__card-title {
     font-size: clamp(1.75rem, 1.1rem + 1.8vw, 2.75rem);
     line-height: 0.95;
     letter-spacing: -0.04em;
     text-transform: uppercase;
-  }
-
-  .mf__card :global(.mf__px) {
-    width: clamp(44px, 4vw, 64px);
-    height: auto;
-    color: var(--surface-3);
-  }
-
-  .mf__card--me :global(.mf__px) {
-    color: var(--accent);
   }
 
   .mf__list {

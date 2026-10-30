@@ -10,7 +10,7 @@ import { genImage } from '@/lib/gen';
 import { url } from '@/lib/url';
 import Icon from './Icon.astro';
 
-/** Временные замены из ретро-набора, пока нет svc-landing и svc-catalog. */
+/** Запасные объекты из ретро-набора, если своего svc-* нет. */
 const stand: Record<string, string> = { landing: 'float-window', catalog: 'float-cubes', business: 'svc-business', personal: 'svc-personal' };
 
 const items = [

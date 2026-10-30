@@ -1,7 +1,11 @@
 ---
 import Base from '@/layouts/Base.astro';
 import PageHero from '@/components/PageHero.astro';
+import { Image } from 'astro:assets';
 import { url } from '@/lib/url';
+import { genImage } from '@/lib/gen';
+
+const gear = genImage('float-gear');
 import Icon from '@/components/Icon.astro';
 
 const links = [
@@ -27,10 +31,31 @@ const links = [
         }
       </ul>
     </Fragment>
+    {gear && <Image class="nf__gear" src={gear.src} alt="" widths={[220, 400]} sizes="240px" loading="eager" />}
   </PageHero>
 </Base>
 
 <style>
+  .nf__gear {
+    justify-self: end;
+    width: clamp(140px, 16vw, 240px);
+    height: auto;
+    filter: drop-shadow(0 24px 24px rgba(21, 21, 21, 0.2));
+    animation: nf-spin 24s linear infinite;
+  }
+
+  @keyframes nf-spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nf__gear {
+      animation: none;
+    }
+  }
+
   .nf__links {
     list-style: none;
     padding: 0;
