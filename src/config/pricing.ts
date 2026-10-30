@@ -1,12 +1,12 @@
 /**
  * Тарифы и калькулятор.
  *
- * ВСЕ ЦЕНЫ И СРОКИ ПРЕДВАРИТЕЛЬНЫЕ. Пока `confirmed` равно false, рядом с ценами
- * на сайте выводится пометка «предварительно», а проверка перед запуском не проходит.
+ * Цены и сроки подтверждены владельцем. Если снять подтверждение (pricingConfirmed), рядом с ценами
+ * снова появится пометка «предварительно», а проверка перед запуском перестанет проходить.
  * Чтобы поменять стоимость, правьте только этот файл.
  */
 
-export const pricingConfirmed = false;
+export const pricingConfirmed = true;
 
 export type PlanId = 'start' | 'business' | 'premium';
 
@@ -31,7 +31,7 @@ export const plans: Plan[] = [
   {
     id: 'start',
     name: 'START',
-    price: 39000,
+    price: 29000,
     forWhom: 'Лендинг для услуги, мероприятия или запуска продукта.',
     highlights: ['Одностраничный сайт до 8 блоков', 'Форма заявки', 'Адаптив и базовое SEO'],
     includes: [
@@ -56,7 +56,7 @@ export const plans: Plan[] = [
   {
     id: 'business',
     name: 'BUSINESS',
-    price: 89000,
+    price: 69000,
     forWhom: 'Полноценный сайт компании или специалиста с разделами и каталогом услуг.',
     highlights: [
       'До 8 уникальных страниц',
@@ -87,7 +87,7 @@ export const plans: Plan[] = [
   {
     id: 'premium',
     name: 'PREMIUM',
-    price: 169000,
+    price: 129000,
     forWhom: 'Индивидуальный проект со сложным дизайном, 3D, анимацией и нестандартной логикой.',
     highlights: [
       'До 15 страниц',
@@ -126,17 +126,17 @@ export interface Addon {
 }
 
 export const addons: Addon[] = [
-  { id: 'copy', name: 'Тексты для сайта', price: 15000, note: 'Пишу или редактирую тексты по брифу' },
-  { id: 'motion', name: 'Анимации и 3D', price: 25000, note: 'Сценарии прокрутки, WebGL-объект' },
-  { id: 'lang', name: 'Вторая языковая версия', price: 20000, note: 'Перевод интерфейса и вёрстка' },
-  { id: 'crm', name: 'Интеграция с CRM или оплатой', price: 18000, note: 'amoCRM, Bitrix24, ЮKassa и другие' },
-  { id: 'support', name: 'Поддержка 3 месяца', price: 12000, note: 'Правки, обновления, резервные копии' },
+  { id: 'copy', name: 'Тексты для сайта', price: 12000, note: 'Пишу или редактирую тексты по брифу' },
+  { id: 'motion', name: 'Анимации и 3D', price: 19000, note: 'Сценарии прокрутки, WebGL-объект' },
+  { id: 'lang', name: 'Вторая языковая версия', price: 15000, note: 'Перевод интерфейса и вёрстка' },
+  { id: 'crm', name: 'Интеграция с CRM или оплатой', price: 14000, note: 'amoCRM, Bitrix24, ЮKassa и другие' },
+  { id: 'support', name: 'Поддержка 3 месяца', price: 9000, note: 'Правки, обновления, резервные копии' },
 ];
 
 /** Цена одной дополнительной страницы сверх лимита тарифа. */
-export const extraPagePrice = 7000;
+export const extraPagePrice = 5000;
 
-/** Порядок оплаты. Требует подтверждения. */
+/** Порядок оплаты. */
 export const paymentTerms = '50% предоплата перед стартом, 50% — после приёмки готового сайта.';
 
 export function formatPrice(value: number): string {

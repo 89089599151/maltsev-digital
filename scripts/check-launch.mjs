@@ -14,10 +14,15 @@ const siteTs = read('src/config/site.ts');
 const pricingTs = read('src/config/pricing.ts');
 const problems = [];
 
+// Отложены владельцем: данные оператора (legal) — заполняются вместе с приёмом заявок.
+const deferred = new Set(['operatorName', 'operatorStatus', 'policyDate']);
+
 for (const m of siteTs.matchAll(/(\w+):\s*\{\s*value:\s*'([^']*)',\s*confirmed:\s*false\s*\}/g)) {
+  if (deferred.has(m[1])) continue;
   problems.push(`src/config/site.ts → ${m[1]} («${m[2]}») не подтверждено`);
 }
-if (/formspreeId:\s*''/.test(siteTs)) problems.push('src/config/site.ts → forms.formspreeId пуст: заявки не будут приниматься');
+// forms.formspreeId: приём заявок отложен владельцем, пустой ID не блокирует запуск —
+// форма на сайте честно показывает, что не подключена, и предлагает написать напрямую.
 if (/portfolioConfirmed:\s*false/.test(siteTs)) problems.push('src/config/site.ts → portfolioConfirmed: false');
 if (/pricingConfirmed\s*=\s*false/.test(pricingTs)) problems.push('src/config/pricing.ts → pricingConfirmed = false: цены предварительные');
 

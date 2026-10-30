@@ -1,5 +1,5 @@
 ---
-title: MALTSEV DIGITAL
+title: Maltsev Digital
 summary: Сайт-портфолио студии, спроектированный и собранный вместе с ИИ-инструментами — от исследования до публикации.
 category: personal
 isConcept: false
@@ -7,7 +7,7 @@ year: 2026
 order: 1
 featured: true
 cover: ../../assets/case/home-desktop.png
-coverAlt: Первый экран сайта MALTSEV DIGITAL на десктопе
+coverAlt: Первый экран сайта Maltsev Digital на десктопе
 task: >-
   Сделать сайт, который сам доказывает качество работы: понятное предложение с первого экрана, открытые
   цены, калькулятор стоимости, удобная заявка и быстрая загрузка на любом устройстве. Весь путь — от

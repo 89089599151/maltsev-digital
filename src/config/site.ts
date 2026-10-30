@@ -13,18 +13,18 @@ export interface Confirmable<T> {
 
 export const site = {
   brand: {
-    /** Название бренда. Рабочее, требует подтверждения. */
-    name: { value: 'MALTSEV DIGITAL', confirmed: false } as Confirmable<string>,
+    /** Название бренда в текстах. В логотипе — капсом (short + second). */
+    name: { value: 'Maltsev Digital', confirmed: true } as Confirmable<string>,
     /** Короткая форма для логотипа и футера. */
     short: 'MALTSEV',
     second: 'DIGITAL',
     /** Имя автора — используется на странице «Обо мне» и в разметке Schema.org. */
-    owner: { value: 'Сергей Мальцев', confirmed: false } as Confirmable<string>,
+    owner: { value: 'Сергей Мальцев', confirmed: true } as Confirmable<string>,
     tagline: 'Разработка сайтов под задачу бизнеса',
   },
 
   seo: {
-    defaultTitle: 'MALTSEV DIGITAL — разработка сайтов под ключ',
+    defaultTitle: 'Maltsev Digital — разработка сайтов под ключ',
     defaultDescription:
       'Независимый веб-разработчик: лендинги, сайты для бизнеса и индивидуальные проекты. Продуманный дизайн, быстрый код, фиксированная цена до старта.',
     locale: 'ru_RU',
@@ -34,8 +34,8 @@ export const site = {
     /** Логин Telegram без @. */
     telegram: { value: 'mltsv_srg', confirmed: true } as Confirmable<string>,
     email: { value: 'sergey_maltsev_00@vk.com', confirmed: true } as Confirmable<string>,
-    /** Через какое время вы обычно отвечаете. Обещание клиенту — подтвердите. */
-    responseTime: { value: 'в течение рабочего дня', confirmed: false } as Confirmable<string>,
+    /** Через какое время вы обычно отвечаете. Обещание клиенту. */
+    responseTime: { value: 'в течение 15 минут', confirmed: true } as Confirmable<string>,
     workFormat: 'Удалённо, по всей России',
   },
 
@@ -43,11 +43,16 @@ export const site = {
     /**
      * ID формы Formspree (часть адреса https://formspree.io/f/<ID>).
      * Пустая строка — форма показывает, что приём заявок ещё не подключён,
-     * и предлагает написать напрямую. Ничего не имитирует.
+     * и предлагает написать напрямую. Ничего не имитирует. Подключение отложено и не блокирует запуск.
      */
     formspreeId: '',
   },
 
+  /**
+   * Данные оператора персональных данных. Заполняются позже, вместе с подключением приёма заявок;
+   * пока не блокируют запуск (онлайн-форма выключена, данные через сайт не собираются).
+   * Страница политики остаётся черновиком и закрыта от индексации, пока они не подтверждены.
+   */
   legal: {
     /** Кто обрабатывает персональные данные — ФИО самозанятого/ИП. */
     operatorName: { value: '[ФИО оператора]', confirmed: false } as Confirmable<string>,
@@ -56,7 +61,7 @@ export const site = {
   },
 
   /** Подтверждение содержания портфолио перед запуском. */
-  portfolioConfirmed: false,
+  portfolioConfirmed: true,
 } as const;
 
 export function telegramUrl(): string | null {
