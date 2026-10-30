@@ -1,0 +1,507 @@
+---
+/**
+ * Первый экран: одна большая стеклянная панель над «жидким» пейзажем.
+ * Внутри — заголовок и рабочий выбор типа сайта с живой ценой и сроком.
+ * Скульптура стоит за стеклом: по краям видна чётко, сквозь панель — размыто.
+ */
+import { Image } from 'astro:assets';
+import { plans, formatPrice, pricingConfirmed } from '@/config/pricing';
+import { genImage } from '@/lib/gen';
+import { url } from '@/lib/url';
+
+const sculpture = genImage('hero-sculpture');
+const landscape = genImage('bg-liquid-wide');
+const kinds = [
+  { plan: plans[0], label: 'Лендинг' },
+  { plan: plans[1], label: 'Сайт компании' },
+  { plan: plans[2], label: 'Индивидуальный' },
+];
+const first = kinds[1];
+---
+
+<section class="hx" aria-labelledby="hx-title" data-tilt-area>
+  <div class="hx__land" aria-hidden="true">
+    {landscape && <Image src={landscape.src} alt="" widths={[640, 1024, 1536]} sizes="100vw" quality={55} loading="eager" fetchpriority="high" />}
+  </div>
+  <div class="hx__scene" data-intro="scene" aria-hidden="true">
+    <div class="hx__float" data-float="36">
+      {
+        sculpture && (
+          <Image
+            class="hx__sculpt"
+            src={sculpture.src}
+            alt=""
+            widths={[640, 1024, 1536]}
+            sizes="(max-width: 767px) 120vw, 70vw"
+            quality={70}
+            loading="eager"
+            fetchpriority="low"
+          />
+        )
+      }
+    </div>
+  </div>
+
+  <div class="hx__tilt" data-tilt="3">
+  <div class="hx__pane" data-intro="pane">
+    <h1 id="hx-title" class="hx__title" data-intro="title">Сайты, которые работают на&nbsp;бизнес</h1>
+    <p class="hx__lead" data-intro="item">
+      Дизайн, код и запуск под ключ. Один исполнитель от первого разговора до релиза, ИИ ускоряет
+      рутину — цена фиксируется до старта.
+    </p>
+
+    <form class="hx__tool" data-intro="item" data-hero-tool aria-label="Быстрая оценка проекта">
+      <fieldset class="seg">
+        <legend class="sr-only">Какой сайт нужен</legend>
+        {
+          kinds.map((k) => (
+            <label class="seg__opt">
+              <input
+                type="radio"
+                name="kind"
+                value={k.plan.id}
+                checked={k === first}
+                data-price={formatPrice(k.plan.price)}
+                data-time={k.plan.timeline}
+                data-name={k.plan.name}
+              />
+              <span>{k.label}</span>
+            </label>
+          ))
+        }
+      </fieldset>
+      <output class="hx__result" aria-live="polite">
+        <span class="hx__price" data-out-price>от {formatPrice(first.plan.price)}</span>
+        <span class="hx__time">
+          <span data-out-name>{first.plan.name}</span> · <span data-out-time>{first.plan.timeline}</span>
+          {!pricingConfirmed && <span class="hx__pre"> · предварительно</span>}
+        </span>
+      </output>
+      <a class="btn btn--accent hx__cta" href={url(`/contacts/?plan=${first.plan.id}`)} data-out-link data-magnetic>
+        Обсудить проект <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </form>
+
+    <a class="hx__chip hx__chip--a" href={url('/services/')} data-intro="chip">
+      <span class="hx__chip-v">3 пакета</span>
+      <span class="hx__chip-l">цена и состав известны заранее</span>
+    </a>
+    <p class="hx__chip hx__chip--b" data-intro="chip">
+      <span class="hx__chip-v">100</span>
+      <span class="hx__chip-l">доступность и SEO этого сайта по Lighthouse</span>
+    </p>
+  </div>
+  </div>
+</section>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-hero-tool]');
+  if (form) {
+    const price = form.querySelector<HTMLElement>('[data-out-price]')!;
+    const time = form.querySelector<HTMLElement>('[data-out-time]')!;
+    const name = form.querySelector<HTMLElement>('[data-out-name]')!;
+    const link = form.querySelector<HTMLAnchorElement>('[data-out-link]')!;
+    const base = link.href.split('?')[0];
+    form.addEventListener('submit', (e) => e.preventDefault());
+    form.addEventListener('change', () => {
+      const r = form.querySelector<HTMLInputElement>('input[name="kind"]:checked');
+      if (!r) return;
+      price.textContent = `от ${r.dataset.price}`;
+      time.textContent = r.dataset.time ?? '';
+      name.textContent = r.dataset.name ?? '';
+      link.href = `${base}?plan=${r.value}`;
+    });
+  }
+</script>
+
+<style>
+  .hx {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: calc(100svh - var(--header-h) - var(--margin) * 2 - var(--banner-h, 0px));
+    padding-block: clamp(40px, 7vh, 96px) clamp(56px, 9vh, 120px);
+    isolation: isolate;
+  }
+
+  :global(.page:has(.pv)) {
+    --banner-h: 43px;
+  }
+
+  /* Яркий пейзаж только на первом экране */
+  .hx__land {
+    position: absolute;
+    z-index: -2;
+    inset: calc((var(--header-h) + var(--margin) * 2 + var(--banner-h, 0px)) * -1) calc(50% - 50vw) 0;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .hx__land img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 30% 60%;
+  }
+
+  /* Сцена за стеклом */
+  .hx__scene {
+    position: absolute;
+    inset: 0 calc(var(--margin) * -1);
+    z-index: -1;
+    overflow: clip;
+    pointer-events: none;
+  }
+
+  .hx__float {
+    position: absolute;
+    top: -2%;
+    right: -6%;
+    width: min(72vw, 1180px);
+  }
+
+  .hx__sculpt {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 40px 60px rgba(20, 50, 130, 0.25));
+  }
+
+  .hx__tilt {
+    width: min(1060px, 100%);
+    will-change: transform;
+  }
+
+  /* Стеклянная панель */
+  .hx__pane {
+    position: relative;
+    width: 100%;
+    padding: clamp(28px, 4vw, 60px);
+    border-radius: 36px;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.28) 55%, rgba(255, 255, 255, 0.4));
+    -webkit-backdrop-filter: blur(26px) saturate(170%);
+    backdrop-filter: blur(26px) saturate(170%);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+      0 40px 80px -40px rgba(20, 50, 130, 0.45);
+    will-change: transform;
+  }
+
+  .hx__title {
+    font-size: clamp(2.375rem, 0.9rem + 4.4vw, 5.25rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    max-width: 13ch;
+  }
+
+  .hx__lead {
+    margin-top: clamp(18px, 2.4vw, 28px);
+    max-width: 50ch;
+    font-size: clamp(1.0625rem, 0.95rem + 0.4vw, 1.3125rem);
+    line-height: 1.5;
+    color: #23324d;
+  }
+
+  /* Инструмент оценки */
+  .hx__tool {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px 24px;
+    align-items: center;
+    margin-top: clamp(28px, 4vw, 48px);
+    padding: 10px 10px 10px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.58);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.8),
+      0 12px 30px -18px rgba(20, 50, 130, 0.35);
+  }
+
+  .seg {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    margin: 0;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(13, 27, 51, 0.06);
+  }
+
+  .seg__opt {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .seg__opt input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .seg__opt span {
+    display: block;
+    padding: 11px 18px;
+    border-radius: 999px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+    color: #34445f;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
+  }
+
+  .seg__opt:hover span {
+    color: var(--ink);
+  }
+
+  .seg__opt input:checked + span {
+    background: #ffffff;
+    color: var(--ink);
+    box-shadow: 0 6px 16px -8px rgba(20, 50, 130, 0.45);
+  }
+
+  .seg__opt input:focus-visible + span {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .hx__result {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .hx__price {
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: clamp(1.25rem, 1rem + 0.8vw, 1.75rem);
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+  }
+
+  .hx__time {
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+
+  .hx__cta {
+    min-height: 58px;
+    padding-inline: 26px;
+  }
+
+  /* Плашки поверх края стекла */
+  .hx__chip {
+    position: absolute;
+    display: grid;
+    gap: 2px;
+    max-width: 230px;
+    padding: 14px 18px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.7);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+      0 20px 40px -20px rgba(20, 50, 130, 0.45);
+    text-decoration: none;
+  }
+
+  .hx__chip--a {
+    top: clamp(-30px, -2vw, -18px);
+    right: clamp(24px, 6%, 80px);
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .hx__chip--a:hover {
+    background: #ffffff;
+  }
+
+  .hx__chip--b {
+    bottom: clamp(-34px, -2.4vw, -20px);
+    left: clamp(24px, 7%, 90px);
+  }
+
+  .hx__chip-v {
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+  }
+
+  .hx__chip-l {
+    font-size: 0.875rem;
+    line-height: 1.35;
+    color: #34445f;
+  }
+
+  @media (max-width: 1023px) {
+    .hx__tool {
+      grid-template-columns: 1fr auto;
+      border-radius: 28px;
+      padding: 12px;
+    }
+
+    .seg {
+      grid-column: 1 / -1;
+    }
+
+    .seg__opt {
+      flex: 1;
+    }
+
+    .seg__opt span {
+      text-align: center;
+      padding-inline: 10px;
+    }
+
+    .hx__result {
+      padding-left: 8px;
+    }
+
+    .hx__float {
+      width: 92vw;
+      right: -18%;
+      top: -6%;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .hx {
+      place-items: end stretch;
+      padding-top: 46vw;
+      min-height: 0;
+    }
+
+    .hx__float {
+      width: 128vw;
+      right: -28%;
+      top: -2%;
+    }
+
+    .hx__pane {
+      border-radius: 28px;
+      padding: 26px 20px 22px;
+    }
+
+    .hx__title {
+      font-size: clamp(2rem, 9.4vw, 2.75rem);
+    }
+
+    .hx__tool {
+      grid-template-columns: 1fr;
+      gap: 14px;
+      padding: 10px;
+    }
+
+    .seg__opt span {
+      font-size: 0.8125rem;
+      padding: 10px 6px;
+    }
+
+    .hx__result {
+      padding: 0 8px;
+    }
+
+    .hx__cta {
+      width: 100%;
+    }
+
+    .hx__chip--a {
+      display: none;
+    }
+
+    .hx__chip--b {
+      position: static;
+      margin-top: 18px;
+      max-width: none;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+  }
+
+  /* Сборка первого экрана на CSS: стартует с первой отрисовки, не ждёт скриптов.
+     fill-mode backwards — после завершения transform отдаётся GSAP (прокрутка, наклон). */
+  @media (prefers-reduced-motion: no-preference) {
+    .hx__scene {
+      animation: hx-scene 1.6s var(--ease-out) 0s backwards;
+    }
+
+    .hx__pane {
+      animation: hx-rise 1.2s var(--ease-out) 0.1s backwards;
+      transform-origin: 50% 100%;
+    }
+
+    .hx__title {
+      animation: hx-reveal 1.1s var(--ease-out) 0.3s backwards;
+    }
+
+    .hx__lead {
+      animation: hx-up 0.9s var(--ease-out) 0.55s backwards;
+    }
+
+    .hx__tool {
+      animation: hx-up 0.9s var(--ease-out) 0.65s backwards;
+    }
+
+    .hx__chip--a {
+      animation: hx-pop 0.9s var(--ease-out) 0.85s backwards;
+    }
+
+    .hx__chip--b {
+      animation: hx-pop 0.9s var(--ease-out) 0.95s backwards;
+    }
+  }
+
+  @keyframes hx-scene {
+    from {
+      opacity: 0;
+      transform: translateY(60px) scale(0.9);
+    }
+  }
+
+  @keyframes hx-rise {
+    from {
+      opacity: 0;
+      transform: perspective(1400px) translateY(70px) rotateX(12deg);
+    }
+  }
+
+  @keyframes hx-reveal {
+    from {
+      clip-path: inset(0 0 100% 0);
+      transform: translateY(28px);
+    }
+  }
+
+  @keyframes hx-up {
+    from {
+      opacity: 0;
+      transform: translateY(22px);
+    }
+  }
+
+  @keyframes hx-pop {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.86);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hx__pane {
+      will-change: auto;
+    }
+  }
+</style>

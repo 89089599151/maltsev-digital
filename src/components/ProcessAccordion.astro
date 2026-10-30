@@ -18,7 +18,7 @@ const darkText = (i: number) => i >= 5;
   {
     intro && (
       <div class="proc__intro" data-stagger>
-        <h2 id={headingId} class="head">Как идёт работа</h2>
+        <h2 id={headingId} class="head" data-split>Как идёт работа</h2>
         <p class="lead">
           Семь шагов от заявки до запуска. На каждом вы знаете, что происходит, сколько это займёт и что
           нужно от вас.
@@ -28,7 +28,7 @@ const darkText = (i: number) => i >= 5;
   }
   {!intro && <h2 id={headingId} class="sr-only">Этапы работы</h2>}
 
-  <ol class="proc__row" data-accordion>
+  <ol class="proc__row" data-accordion data-reveal="wipe">
     {
       stages.map((s, i) => (
         <li
@@ -154,7 +154,7 @@ const darkText = (i: number) => i >= 5;
   .stage__name {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    font-family: var(--font-display);
+    font-family: var(--font-head);
     font-weight: 700;
     font-size: 1.25rem;
     letter-spacing: -0.02em;
@@ -193,7 +193,7 @@ const darkText = (i: number) => i >= 5;
   }
 
   .stage__title {
-    font-family: var(--font-display);
+    font-family: var(--font-head);
     font-weight: 700;
     font-size: clamp(2rem, 1.4rem + 1.6vw, 2.75rem);
     line-height: 1;
@@ -202,7 +202,7 @@ const darkText = (i: number) => i >= 5;
 
   .stage__text {
     margin-top: auto;
-    max-width: 38ch;
+    max-width: min(38ch, 52%);
     font-size: 1.125rem;
   }
 
@@ -216,7 +216,7 @@ const darkText = (i: number) => i >= 5;
     position: absolute;
     right: 28px;
     bottom: 28px;
-    width: min(34ch, 38%);
+    width: min(32ch, 36%);
     padding: 20px;
     border-radius: 6px;
     background: rgba(0, 0, 0, 0.22);

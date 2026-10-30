@@ -64,7 +64,7 @@ const schema = {
           )
         }
       </dl>
-      <figure class="pj-hero__cover tile tile--photo" data-shutter>
+      <figure class="pj-hero__cover tile tile--photo">
         <Image src={d.cover} alt={d.coverAlt} widths={[640, 1000, 1600, 2000]} sizes="100vw" loading="eager" fetchpriority="high" />
       </figure>
     </header>
@@ -194,9 +194,9 @@ const schema = {
   }
 
   .pj-hero__h1 {
-    font-size: clamp(2.75rem, 1rem + 5vw, 6.5rem);
-    line-height: 0.92;
-    letter-spacing: -0.05em;
+    font-size: clamp(2.25rem, 1rem + 3.6vw, 5rem);
+    line-height: 1;
+    letter-spacing: -0.045em;
   }
 
   .pj-hero__sum {
@@ -285,7 +285,7 @@ const schema = {
   }
 
   .pj-results__v {
-    font-family: var(--font-display);
+    font-family: var(--font-head);
     font-weight: 800;
     font-size: clamp(3rem, 1.6rem + 3vw, 5rem);
     line-height: 0.9;
@@ -431,7 +431,7 @@ const schema = {
   }
 
   .pj-next__t {
-    font-family: var(--font-display);
+    font-family: var(--font-head);
     font-weight: 750;
     font-size: clamp(2rem, 1rem + 3vw, 4rem);
     line-height: 0.95;

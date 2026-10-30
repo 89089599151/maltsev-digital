@@ -1,14 +1,15 @@
 ---
-import '@fontsource-variable/onest/index.css';
-import '@fontsource-variable/source-serif-4/index.css';
+import '@/styles/fonts.css';
 import '@/styles/global.css';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import PreviewBanner from '@/components/PreviewBanner.astro';
 import { site } from '@/config/site';
 import { url } from '@/lib/url';
-import wavesWide from '@/assets/bg/waves-wide.webp';
-import wavesTall from '@/assets/bg/waves-tall.webp';
+import { getImage } from 'astro:assets';
+import { genImage } from '@/lib/gen';
+import wavesWideFallback from '@/assets/bg/waves-wide.webp';
+import wavesTallFallback from '@/assets/bg/waves-tall.webp';
 
 interface Props {
   title?: string;
@@ -27,6 +28,10 @@ const {
   noindex = false,
   schema,
 } = Astro.props;
+
+// Фон: сгенерированный жидкий пейзаж (IMG-02/03), иначе нарисованная волна.
+const bgWide = await getImage({ src: genImage('bg-liquid-wide')?.src ?? wavesWideFallback, format: 'webp', quality: 78 });
+const bgTall = await getImage({ src: genImage('bg-liquid-tall')?.src ?? wavesTallFallback, format: 'webp', quality: 78 });
 
 const fullTitle = title ? `${title} — ${site.brand.name.value}` : site.seo.defaultTitle;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
@@ -74,20 +79,30 @@ const orgSchema = {
     {schema && <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />}
 
     <script is:inline>
-      document.documentElement.classList.add('js');
+      (function () {
+        var root = document.documentElement;
+        root.classList.add('js');
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          root.classList.add('motion');
+          // Если анимации не запустились за 2,5 с, показываем всё как есть.
+          window.setTimeout(function () {
+            if (!root.classList.contains('motion-ready')) root.classList.add('motion-failsafe');
+          }, 2500);
+        }
+      })();
     </script>
   </head>
   <body id="top">
     <div class="bg-art" aria-hidden="true">
       <picture>
-        <source media="(max-aspect-ratio: 1/1)" srcset={wavesTall.src} />
-        <img src={wavesWide.src} alt="" decoding="async" fetchpriority="low" />
+        <source media="(max-aspect-ratio: 1/1)" srcset={bgTall.src} />
+        <img src={bgWide.src} alt="" decoding="async" fetchpriority="low" />
       </picture>
     </div>
     <a class="skip-link" href="#main">К содержимому</a>
     <div class="page">
-      <PreviewBanner />
       <Header />
+      <PreviewBanner />
       <main id="main" tabindex="-1">
         <slot />
       </main>
@@ -95,8 +110,10 @@ const orgSchema = {
     </div>
 
     <script>
-      import { initReveal } from '@/scripts/reveal';
-      initReveal();
+      // Motion-система загружается после страницы: первый экран анимирован на CSS и не ждёт её.
+      const start = () => import('@/scripts/motion').then((m) => m.initMotion());
+      if (document.readyState === 'complete') start();
+      else window.addEventListener('load', start, { once: true });
     </script>
   </body>
 </html>

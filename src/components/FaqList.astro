@@ -15,7 +15,7 @@ const H = headingLevel;
 
 <section class="faq" aria-labelledby={headingId}>
   <div class="faq__side">
-    <H id={headingId} class="head">{heading}</H>
+    <H id={headingId} class="head" data-split>{heading}</H>
     <slot name="side" />
   </div>
   <div class="faq__list" data-stagger>

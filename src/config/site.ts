@@ -32,8 +32,8 @@ export const site = {
 
   contacts: {
     /** Логин Telegram без @. */
-    telegram: { value: 'maltsev_digital', confirmed: false } as Confirmable<string>,
-    email: { value: 'hello@maltsev.digital', confirmed: false } as Confirmable<string>,
+    telegram: { value: 'mltsv_srg', confirmed: true } as Confirmable<string>,
+    email: { value: 'sergey_maltsev_00@vk.com', confirmed: true } as Confirmable<string>,
     /** Через какое время вы обычно отвечаете. Обещание клиенту — подтвердите. */
     responseTime: { value: 'в течение рабочего дня', confirmed: false } as Confirmable<string>,
     workFormat: 'Удалённо, по всей России',

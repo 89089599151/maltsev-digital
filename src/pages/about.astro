@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import Base from '@/layouts/Base.astro';
 import { site } from '@/config/site';
 import { url } from '@/lib/url';
-import bunker from '@/assets/photos/bunker.jpg';
+import owner from '@/assets/photos/owner.webp';
 
 const split: [string, string][] = [
   ['Черновики текстов и заголовков', 'Смысл, тон и финальные тексты под ваш бизнес'],
@@ -32,11 +32,11 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
     <div class="ab-hero__title tile tile--paper">
       <h1 id="ab-title" class="ab-hero__h1">Обо мне</h1>
       <p class="ab-hero__lead">
-        Меня зовут {site.brand.owner.value}. Делаю сайты один, без отделов и посредников.
+        Меня зовут {site.brand.owner.value}. Я дизайнер по образованию и делаю сайты один — без отделов и посредников.
       </p>
     </div>
-    <div class="ab-hero__photo tile tile--photo" data-shutter>
-      <Image src={bunker} alt="Бетонное здание на фоне светлого неба" widths={[400, 700, 1000]} sizes="(max-width: 1023px) 100vw, 40vw" loading="eager" />
+    <div class="ab-hero__photo tile tile--photo">
+      <Image src={owner} alt={`${site.brand.owner.value} ночью под снегом смотрит вверх, на свет фонаря`} widths={[480, 800, 1200, 1600]} sizes="(max-width: 1023px) 100vw, 42vw" loading="eager" />
     </div>
   </section>
 
@@ -147,10 +147,9 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
   }
 
   .ab-hero__h1 {
-    font-size: clamp(3.5rem, 1rem + 8vw, 9rem);
-    line-height: 0.88;
-    letter-spacing: -0.05em;
-    text-transform: uppercase;
+    font-size: clamp(3rem, 1rem + 6vw, 6rem);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
   }
 
   .ab-hero__lead {
@@ -164,6 +163,10 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
 
   .ab-hero__photo {
     grid-column: 8 / 13;
+  }
+
+  .ab-hero__photo :global(img) {
+    object-position: 46% 38%;
   }
 
   .ab-text {
@@ -359,7 +362,7 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
     }
 
     .ab-hero__h1 {
-      font-size: 17vw;
+      font-size: 13vw;
     }
 
     .pr__head,

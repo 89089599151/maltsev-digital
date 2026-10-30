@@ -1,0 +1,354 @@
+---
+/**
+ * Финал главной: стеклянная карточка заявки на кобальтовом поле — с лицом исполнителя,
+ * короткой формой и прямыми контактами.
+ */
+import { Image } from 'astro:assets';
+import { site } from '@/config/site';
+import { url } from '@/lib/url';
+import { genImage } from '@/lib/gen';
+import ContactLink from './ContactLink.astro';
+import avatar from '@/assets/photos/owner-avatar.webp';
+
+const plane = genImage('obj-plane');
+const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.formspreeId}` : '';
+---
+
+<section class="cc section" aria-labelledby="cc-title" data-tilt-area>
+  <div class="cc__field">
+    <span class="cc__word" aria-hidden="true">напишите</span>
+    {
+      plane && (
+        <div class="cc__plane" data-float="40" aria-hidden="true">
+          <Image src={plane.src} alt="" widths={[240, 400]} sizes="220px" loading="lazy" />
+        </div>
+      )
+    }
+
+    <div class="cc__card" data-reveal>
+      <Image class="cc__avatar" src={avatar} alt={site.brand.owner.value} width={96} height={96} loading="lazy" />
+      <h2 id="cc-title" class="cc__title">Расскажите о задаче</h2>
+      <p class="cc__sub">
+        Отвечу {site.contacts.responseTime.value}: задам пару вопросов и пришлю план со сроками и ценой.
+      </p>
+
+      {
+        !endpoint && (
+          <p class="cc__notice" role="note">
+            Онлайн-форма заработает после подключения сервиса заявок. Пока удобнее написать напрямую.
+          </p>
+        )
+      }
+
+      <form class="cc__form" data-lead-form data-endpoint={endpoint} method="post" action={endpoint || undefined}>
+        <fieldset disabled={!endpoint}>
+          <legend class="sr-only">Короткая заявка</legend>
+          <input type="hidden" name="_subject" value="Короткая заявка с главной" />
+          <input type="hidden" name="source" value="Главная, карточка заявки" />
+          <div class="hp" aria-hidden="true"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></div>
+
+          <label class="cc__field-l">
+            <span class="sr-only">Ваше имя</span>
+            <input name="name" type="text" placeholder="Ваше имя" autocomplete="name" required minlength="2" data-error-id="c-name-err" aria-describedby="c-name-err" />
+          </label>
+          <span class="cc__err" id="c-name-err"></span>
+          <label class="cc__field-l">
+            <span class="sr-only">Telegram, телефон или почта</span>
+            <input name="contact" type="text" placeholder="Telegram, телефон или почта" required minlength="4" data-error-id="c-contact-err" aria-describedby="c-contact-err" />
+          </label>
+          <span class="cc__err" id="c-contact-err"></span>
+
+          <label class="cc__consent">
+            <input type="checkbox" name="consent" value="Согласие получено" required data-error-id="c-consent-err" aria-describedby="c-consent-err" />
+            <span>Согласен на обработку персональных данных по <a href={url('/privacy/')}>политике</a></span>
+          </label>
+          <span class="cc__err" id="c-consent-err"></span>
+
+          <button class="cc__submit" type="submit" data-magnetic>
+            <span data-label>{endpoint ? 'Отправить заявку' : 'Форма не подключена'}</span>
+          </button>
+          <p class="cc__status" data-status role="status" aria-live="polite"></p>
+        </fieldset>
+      </form>
+      <div class="cc__success" data-success hidden tabindex="-1">
+        <p class="head-sm">Заявка получена</p>
+        <p>Спасибо! Свяжусь с вами {site.contacts.responseTime.value} по указанному контакту.</p>
+      </div>
+
+      <div class="cc__links">
+        <ContactLink kind="telegram" />
+        <ContactLink kind="email" />
+      </div>
+      <a class="cc__brief" href={url('/contacts/')}>Заполнить подробный бриф <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initLeadForms } from '@/scripts/forms';
+  initLeadForms();
+</script>
+
+<style>
+  .cc__field {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 92svh;
+    padding: clamp(48px, 7vw, 110px) 16px;
+    border-radius: 36px;
+    overflow: hidden;
+    background:
+      radial-gradient(60% 50% at 20% 15%, rgba(255, 217, 160, 0.55), transparent 70%),
+      radial-gradient(70% 60% at 85% 90%, #0f2f97, transparent 70%),
+      linear-gradient(160deg, #6f9bff 0%, #2457e6 45%, #1a3fb4 100%);
+  }
+
+  .cc__word {
+    position: absolute;
+    left: 50%;
+    bottom: -0.22em;
+    transform: translateX(-50%);
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: clamp(5rem, 1rem + 16vw, 20rem);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    color: rgba(255, 255, 255, 0.16);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .cc__plane {
+    position: absolute;
+    top: 8%;
+    right: 12%;
+    width: clamp(120px, 16vw, 230px);
+    pointer-events: none;
+  }
+
+  .cc__plane img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 24px 30px rgba(5, 20, 70, 0.35));
+  }
+
+  .cc__card {
+    position: relative;
+    width: min(560px, 100%);
+    display: grid;
+    gap: 12px;
+    justify-items: center;
+    padding: clamp(26px, 3vw, 40px);
+    border-radius: 34px;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.2), rgba(10, 26, 80, 0.38) 60%);
+    -webkit-backdrop-filter: blur(26px) saturate(160%);
+    backdrop-filter: blur(26px) saturate(160%);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.7),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.32),
+      0 50px 90px -40px rgba(5, 20, 70, 0.6);
+    color: #ffffff;
+    text-align: center;
+  }
+
+  .cc__avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow:
+      0 0 0 4px rgba(255, 255, 255, 0.45),
+      0 16px 30px -12px rgba(5, 20, 70, 0.6);
+  }
+
+  .cc__title {
+    margin-top: 6px;
+    font-size: clamp(1.625rem, 1.1rem + 1.6vw, 2.5rem);
+    color: #ffffff;
+  }
+
+  .cc__sub {
+    max-width: 40ch;
+    color: #e6edff;
+  }
+
+  .cc__notice {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    background: rgba(13, 27, 51, 0.32);
+    font-size: 0.9375rem;
+    color: #ffffff;
+  }
+
+  .cc__form {
+    width: 100%;
+  }
+
+  fieldset {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  fieldset:disabled {
+    opacity: 0.6;
+  }
+
+  .cc__field-l input {
+    width: 100%;
+    min-height: 56px;
+    padding: 14px 22px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.88);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    transition: background-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+  }
+
+  .cc__field-l input::placeholder {
+    color: #5b6a85;
+  }
+
+  .cc__field-l input:focus {
+    outline: none;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
+  }
+
+  .cc__field-l input[aria-invalid='true'] {
+    box-shadow: 0 0 0 3px #ffb3a8;
+  }
+
+  .cc__err {
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #ffe3df;
+    text-align: left;
+    padding-left: 22px;
+  }
+
+  .cc__err:empty {
+    display: none;
+  }
+
+  .cc__consent {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 4px;
+    font-size: 0.875rem;
+    text-align: left;
+    color: #e6edff;
+    cursor: pointer;
+  }
+
+  .cc__consent input {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    accent-color: var(--night);
+  }
+
+  .cc__consent a {
+    color: #ffffff;
+  }
+
+  .cc__submit {
+    min-height: 58px;
+    margin-top: 6px;
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    box-shadow: 0 18px 40px -20px rgba(5, 20, 70, 0.7);
+    transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+
+  .cc__submit:hover:not(:disabled) {
+    background: #eef3ff;
+  }
+
+  .cc__submit:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .cc__submit:disabled {
+    cursor: not-allowed;
+  }
+
+  .cc__status {
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  .cc__success {
+    width: 100%;
+    display: grid;
+    gap: 8px;
+    padding: 20px;
+    border-radius: 24px;
+    background: rgba(13, 27, 51, 0.4);
+  }
+
+  .cc__links {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 6px;
+    text-align: left;
+  }
+
+  .cc__links :global(.cl) {
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+    border-radius: 20px;
+  }
+
+  .cc__links :global(.cl__label),
+  .cc__links :global(.cl--pending .cl__value) {
+    color: #d6e2ff;
+  }
+
+  .cc__links :global(a.cl:hover) {
+    background: #ffffff;
+    color: var(--ink);
+  }
+
+  .cc__brief {
+    margin-top: 4px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: #ffffff;
+    text-underline-offset: 0.3em;
+  }
+
+  @media (max-width: 767px) {
+    .cc__field {
+      min-height: 0;
+      padding: 72px 10px 40px;
+      border-radius: 28px;
+    }
+
+    .cc__plane {
+      top: 14px;
+      right: 14px;
+      width: 96px;
+    }
+
+    .cc__links {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

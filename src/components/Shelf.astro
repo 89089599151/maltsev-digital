@@ -25,7 +25,7 @@ const empty = projects.length === 0;
 
 <section class="shelf section" aria-labelledby={headingId}>
   <div class="shelf__head" data-stagger>
-    <h2 id={headingId} class="head">Работы</h2>
+    <h2 id={headingId} class="head" data-split>Работы</h2>
     <p class="shelf__note">
       {
         empty
@@ -154,7 +154,7 @@ const empty = projects.length === 0;
   }
 
   .spine__name {
-    font-family: var(--font-display);
+    font-family: var(--font-head);
     font-weight: 700;
     font-size: clamp(1.125rem, 0.9rem + 0.7vw, 1.5rem);
     letter-spacing: -0.02em;

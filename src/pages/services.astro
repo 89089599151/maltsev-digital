@@ -5,7 +5,9 @@ import Estimator from '@/components/Estimator.astro';
 import ProcessAccordion from '@/components/ProcessAccordion.astro';
 import { plans, addons, extraPagePrice, paymentTerms, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
-import panels from '@/assets/photos/panels.jpg';
+import { genImage } from '@/lib/gen';
+
+const sculpture = genImage('hero-sculpture');
 
 const looks = ['raised', 'paper', 'accent'];
 
@@ -43,7 +45,7 @@ const schema = {
   description="Три пакета с фиксированной ценой: START, BUSINESS и PREMIUM. Что входит и не входит, сроки, правки, калькулятор стоимости и этапы работы."
   schema={pricingConfirmed ? schema : undefined}
 >
-  <section class="sv-hero" aria-labelledby="sv-title" data-stagger>
+  <section class="sv-hero" aria-labelledby="sv-title" data-stagger data-tilt-area>
     <div class="sv-hero__title tile tile--paper">
       <h1 id="sv-title" class="sv-hero__h1">Услуги и цены</h1>
       <p class="sv-hero__lead">
@@ -51,8 +53,8 @@ const schema = {
         составом и фиксированной стоимостью.
       </p>
     </div>
-    <div class="sv-hero__photo tile tile--photo" data-shutter>
-      <Image src={panels} alt="Фасад из прямоугольных панелей, чёрно-белая фотография" widths={[400, 700, 1000]} sizes="(max-width: 767px) 100vw, 33vw" loading="eager" />
+    <div class="sv-hero__photo tile tile--accent" aria-hidden="true">
+      {sculpture && <Image class="sv-hero__sculpt" src={sculpture.src} alt="" widths={[480, 800, 1200]} sizes="(max-width: 767px) 100vw, 40vw" loading="eager" data-float="24" />}
     </div>
     <div class="sv-hero__pay tile tile--raised">
       <p class="sv-hero__k">Оплата</p>
@@ -189,10 +191,9 @@ const schema = {
   }
 
   .sv-hero__h1 {
-    font-size: clamp(3.25rem, 1rem + 7vw, 8rem);
-    line-height: 0.9;
-    letter-spacing: -0.05em;
-    text-transform: uppercase;
+    font-size: clamp(2.5rem, 1rem + 4.6vw, 5.75rem);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
   }
 
   .sv-hero__lead {
@@ -204,6 +205,17 @@ const schema = {
   .sv-hero__photo {
     grid-column: 9 / 13;
     grid-row: 1;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .sv-hero__sculpt {
+    width: 150%;
+    max-width: none;
+    height: auto;
+    filter: drop-shadow(0 30px 40px rgba(5, 20, 70, 0.35));
   }
 
   .sv-hero__pay {
@@ -256,7 +268,7 @@ const schema = {
 
   .col__price {
     margin-top: 10px;
-    font-family: var(--font-display);
+    font-family: var(--font-head);
     font-weight: 700;
     font-size: clamp(2.25rem, 1.6rem + 1.6vw, 3.25rem);
     line-height: 1;
@@ -370,7 +382,7 @@ const schema = {
   }
 
   .cmp__table thead th {
-    font-family: var(--font-display);
+    font-family: var(--font-head);
     font-weight: 700;
     font-size: 1.25rem;
     letter-spacing: -0.02em;
@@ -445,7 +457,7 @@ const schema = {
   }
 
   .extras__price {
-    font-family: var(--font-display);
+    font-family: var(--font-head);
     font-weight: 700;
     font-size: 1.125rem;
     white-space: nowrap;
@@ -514,7 +526,7 @@ const schema = {
     }
 
     .sv-hero__h1 {
-      font-size: 14vw;
+      font-size: 10.5vw;
     }
 
     .col {

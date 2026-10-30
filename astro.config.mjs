@@ -18,7 +18,8 @@ export default defineConfig({
   site,
   base,
   trailingSlash: 'always',
-  build: { format: 'directory' },
+  // CSS встраивается в страницу: без блокирующих запросов на медленных сетях.
+  build: { format: 'directory', inlineStylesheets: 'always' },
   integrations: [
     sitemap({
       filter: (page) => !page.includes('/404'),

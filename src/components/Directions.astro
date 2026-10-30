@@ -1,0 +1,283 @@
+---
+/**
+ * «Что я делаю»: направления крупной строкой вместо одинаковых карточек.
+ * При наведении рядом с курсором всплывает стеклянный объект направления (на телефоне — в строке).
+ */
+import { Image } from 'astro:assets';
+import { plans, formatPrice } from '@/config/pricing';
+import { genImage } from '@/lib/gen';
+import { url } from '@/lib/url';
+
+const rows = [
+  { key: 'landing', name: 'Лендинги', text: 'Одна страница под услугу, акцию или запуск — с понятным путём к заявке.', plan: plans[0] },
+  { key: 'business', name: 'Сайты компаний', text: 'Разделы, услуги, портфолио и блог — сайт, которому доверяют.', plan: plans[1] },
+  { key: 'catalog', name: 'Каталоги', text: 'Товары и услуги с фильтрами, карточками и формой заказа.', plan: plans[1] },
+  { key: 'personal', name: 'Сайты специалистов', text: 'Личный бренд врача, юриста, тренера или дизайнера.', plan: plans[0] },
+].map((r) => ({ ...r, img: genImage(`obj-${r.key}`) }));
+---
+
+<section class="dir section" aria-labelledby="dir-title">
+  <div class="dir__head">
+    <h2 id="dir-title" class="head" data-split>Что я делаю</h2>
+    <p class="dir__note" data-reveal>
+      Каждый сайт проектируется под задачу: структура, тексты и дизайн ведут посетителя к заявке.
+      Версия для телефона — отдельная композиция, а код, домен и доступы остаются у вас.
+    </p>
+  </div>
+
+  <ul class="dir__list" data-dir-list>
+    {
+      rows.map((r) => (
+        <li data-reveal>
+          <a class="dir__row" href={url(`/services/#plan-${r.plan.id}`)} data-dir-key={r.key}>
+            <span class="dir__name">{r.name}</span>
+            <span class="dir__text">{r.text}</span>
+            <span class="dir__price">от {formatPrice(r.plan.price)}</span>
+            {r.img && (
+              <Image class="dir__thumb" src={r.img.src} alt="" widths={[160, 240]} sizes="96px" loading="lazy" />
+            )}
+            <span class="dir__arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="dir__float" aria-hidden="true" data-dir-float>
+    {
+      rows.map(
+        (r) =>
+          r.img && (
+            <Image src={r.img.src} alt="" widths={[360, 540]} sizes="300px" loading="lazy" data-dir-img={r.key} />
+          ),
+      )
+    }
+  </div>
+</section>
+
+<script>
+  // Объект направления следует за курсором: только устройства с мышью.
+  const list = document.querySelector<HTMLElement>('[data-dir-list]');
+  const float = document.querySelector<HTMLElement>('[data-dir-float]');
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (list && float && fine) {
+    const section = list.closest('section')!;
+    let x = 0;
+    let y = 0;
+    let tx = 0;
+    let ty = 0;
+    let raf = 0;
+    const loop = () => {
+      x += (tx - x) * 0.16;
+      y += (ty - y) * 0.16;
+      float.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${(tx - x) * 0.04}deg)`;
+      raf = Math.abs(tx - x) + Math.abs(ty - y) > 0.5 ? requestAnimationFrame(loop) : 0;
+    };
+    list.addEventListener('pointermove', (e) => {
+      const r = section.getBoundingClientRect();
+      tx = e.clientX - r.left;
+      ty = e.clientY - r.top;
+      if (!raf) raf = requestAnimationFrame(loop);
+    });
+    list.querySelectorAll<HTMLElement>('[data-dir-key]').forEach((row) => {
+      const show = () => {
+        float.dataset.active = row.dataset.dirKey;
+        float.classList.add('is-on');
+      };
+      row.addEventListener('pointerenter', show);
+      row.addEventListener('focus', show);
+    });
+    list.addEventListener('pointerleave', () => float.classList.remove('is-on'));
+    list.addEventListener('focusout', () => float.classList.remove('is-on'));
+  }
+</script>
+
+<style>
+  .dir {
+    position: relative;
+  }
+
+  .dir__head {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap);
+    align-items: end;
+    margin-bottom: clamp(32px, 4vw, 56px);
+  }
+
+  .dir__head h2 {
+    grid-column: 1 / 6;
+  }
+
+  .dir__note {
+    grid-column: 7 / 12;
+    font-size: var(--step-body);
+    color: #23324d;
+  }
+
+  .dir__list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .dir__row {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 4fr) auto 40px;
+    gap: 24px;
+    align-items: center;
+    padding: clamp(22px, 2.6vw, 34px) clamp(16px, 2vw, 28px);
+    border-top: 1px solid rgba(13, 27, 51, 0.12);
+    text-decoration: none;
+    border-radius: 0;
+    transition:
+      background-color var(--dur) var(--ease-out),
+      border-radius var(--dur) var(--ease-out);
+  }
+
+  .dir__list li:last-child .dir__row {
+    border-bottom: 1px solid rgba(13, 27, 51, 0.12);
+  }
+
+  .dir__row:hover,
+  .dir__row:focus-visible {
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 24px;
+  }
+
+  .dir__name {
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 0.9rem + 2.2vw, 3rem);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .dir__row:hover .dir__name {
+    transform: translateX(10px);
+  }
+
+  .dir__text {
+    font-size: 1rem;
+    color: #34445f;
+    max-width: 40ch;
+  }
+
+  .dir__price {
+    font-family: var(--font-display);
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--accent-deep);
+  }
+
+  .dir__thumb {
+    display: none;
+  }
+
+  .dir__arrow {
+    justify-self: end;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.7);
+    font-family: var(--font-display);
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out),
+      transform var(--dur) var(--ease-out);
+  }
+
+  .dir__row:hover .dir__arrow {
+    background: var(--accent);
+    color: #fff;
+    transform: rotate(-45deg);
+  }
+
+  /* Всплывающий объект */
+  .dir__float {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 300px;
+    margin: -150px 0 0 -150px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .dir__float img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transform: scale(0.6) rotate(-8deg);
+    transition:
+      opacity 400ms var(--ease-out),
+      transform 600ms var(--ease-out);
+    filter: drop-shadow(0 30px 40px rgba(20, 50, 130, 0.3));
+  }
+
+  .dir__float.is-on[data-active='landing'] [data-dir-img='landing'],
+  .dir__float.is-on[data-active='business'] [data-dir-img='business'],
+  .dir__float.is-on[data-active='catalog'] [data-dir-img='catalog'],
+  .dir__float.is-on[data-active='personal'] [data-dir-img='personal'] {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+
+  @media (hover: none), (pointer: coarse), (max-width: 1023px) {
+    .dir__float {
+      display: none;
+    }
+
+    .dir__thumb {
+      display: block;
+      grid-row: 1 / span 2;
+      grid-column: 3;
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .dir__head h2,
+    .dir__note {
+      grid-column: 1 / -1;
+    }
+
+    .dir__head {
+      gap: 18px;
+    }
+
+    .dir__row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        'name thumb'
+        'text thumb'
+        'price thumb';
+      gap: 6px 16px;
+    }
+
+    .dir__name { grid-area: name; }
+    .dir__text { grid-area: text; }
+    .dir__price { grid-area: price; margin-top: 6px; }
+    .dir__thumb { grid-area: thumb; }
+    .dir__arrow { display: none; }
+  }
+
+  @media (max-width: 767px) {
+    .dir__head {
+      grid-template-columns: 1fr;
+    }
+
+    .dir__thumb {
+      width: 72px;
+      height: 72px;
+    }
+  }
+</style>

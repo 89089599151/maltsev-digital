@@ -31,7 +31,7 @@ const inside = [
   <div class="cs__stage" data-case-stage>
     <div class="cs__top">
       <div class="cs__intro">
-        <h2 id="cs-title" class="head">Этот сайт — первый кейс</h2>
+        <h2 id="cs-title" class="head" data-split>Этот сайт — первый кейс</h2>
         <p class="cs__lead">
           Проверьте подход на том, что уже открыто перед вами: структура, дизайн-система, анимации,
           калькулятор и форма заявки сделаны тем же процессом, что и ваш будущий сайт.
@@ -46,13 +46,13 @@ const inside = [
     <p class="cs__giant" aria-hidden="true">САЙТ</p>
 
     <div class="cs__devices" aria-hidden="true">
-      <div class="laptop" data-depth="0.06">
+      <div class="laptop" data-speed="0.6">
         <div class="laptop__screen">
           <Image src={homeDesktop} alt="" widths={[640, 960, 1280]} sizes="(max-width: 767px) 90vw, 56vw" loading="lazy" />
         </div>
         <div class="laptop__base"></div>
       </div>
-      <div class="phone" data-depth="0.14">
+      <div class="phone" data-speed="1.6">
         <div class="phone__screen">
           <Image src={homeMobile} alt="" widths={[240, 376]} sizes="(max-width: 767px) 34vw, 14vw" loading="lazy" />
         </div>
@@ -91,11 +91,11 @@ const inside = [
       <div class="ty">
         <div class="ty__row">
           <span class="ty__aa ty__aa--d" aria-hidden="true">Аа</span>
-          <span><b>Onest</b><br />Заголовки и интерфейс</span>
+          <span><b>Unbounded</b><br />Заголовки и цифры</span>
         </div>
         <div class="ty__row">
           <span class="ty__aa ty__aa--t" aria-hidden="true">Аа</span>
-          <span><b>Source Serif 4</b><br />Текст для чтения</span>
+          <span><b>Onest</b><br />Текст и интерфейс</span>
         </div>
       </div>
     </div>
@@ -117,29 +117,6 @@ const inside = [
   </div>
 </section>
 
-<script>
-  // Лёгкий параллакс устройств при прокрутке: только transform, только на крупных экранах.
-  const stage = document.querySelector<HTMLElement>('[data-case-stage]');
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (stage && !reduce && window.matchMedia('(min-width: 768px)').matches) {
-    const layers = Array.from(stage.querySelectorAll<HTMLElement>('[data-depth]'));
-    let ticking = false;
-    const update = () => {
-      ticking = false;
-      const r = stage.getBoundingClientRect();
-      const progress = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
-      if (Math.abs(progress) > 1.5) return;
-      for (const l of layers) l.style.setProperty('--py', `${progress * Number(l.dataset.depth) * 600}px`);
-    };
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(update);
-      }
-    }, { passive: true });
-    update();
-  }
-</script>
 
 <style>
   .cs__stage {
@@ -191,9 +168,9 @@ const inside = [
   .cs__giant {
     margin: clamp(16px, 3vw, 48px) 0 0;
     text-align: center;
-    font-family: var(--font-display);
-    font-weight: 800;
-    font-size: clamp(7rem, 1rem + 25vw, 26rem);
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: clamp(6rem, 1rem + 21vw, 22rem);
     line-height: 0.78;
     letter-spacing: -0.06em;
     color: var(--tone-7);
@@ -205,13 +182,7 @@ const inside = [
   .cs__devices {
     position: relative;
     width: min(70%, 980px);
-    margin: calc(-0.38 * clamp(7rem, 1rem + 25vw, 26rem)) auto 0;
-  }
-
-  .laptop,
-  .phone {
-    transform: translateY(var(--py, 0px));
-    will-change: transform;
+    margin: calc(-0.38 * clamp(6rem, 1rem + 21vw, 22rem)) auto 0;
   }
 
   .laptop__screen {
@@ -364,14 +335,14 @@ const inside = [
   }
 
   .ty__aa--d {
-    font-family: var(--font-display);
+    font-family: var(--font-head);
     font-weight: 800;
     letter-spacing: -0.04em;
   }
 
   .ty__aa--t {
     font-family: var(--font-text);
-    font-style: italic;
+    font-weight: 500;
     color: var(--accent);
   }
 

@@ -14,7 +14,7 @@ const looks = ['raised', 'paper', 'accent'];
 <section class="plans section" aria-labelledby={headingId}>
   <div class="plans__board">
     <div class="plans__head" data-stagger>
-      <h2 id={headingId} class="head">{heading}</h2>
+      <h2 id={headingId} class="head" data-split>{heading}</h2>
       <p>
         Три пакета с фиксированной стоимостью. Состав, сроки и количество правок прописаны заранее — вы
         выбираете, а не торгуетесь.
@@ -26,7 +26,7 @@ const looks = ['raised', 'paper', 'accent'];
     </div>
     {
       plans.map((p, i) => (
-        <article class={`plan plan--${looks[i]} plan--${p.id}`} aria-labelledby={`plan-${p.id}`} data-reveal style={`--i:${i}`}>
+        <article class={`plan plan--${looks[i]} plan--${p.id}`} aria-labelledby={`plan-${p.id}`} data-reveal="rise">
           <div class="plan__top">
             <h3 id={`plan-${p.id}`} class="plan__name">{p.name}</h3>
             <p class="plan__price">{formatPrice(p.price)}</p>
@@ -150,7 +150,7 @@ const looks = ['raised', 'paper', 'accent'];
   }
 
   .plan__price {
-    font-family: var(--font-display);
+    font-family: var(--font-head);
     font-weight: 700;
     font-size: clamp(2.5rem, 1.8rem + 2vw, 3.5rem);
     line-height: 1;
