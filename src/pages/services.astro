@@ -460,9 +460,37 @@ const schema = {
     letter-spacing: -0.02em;
   }
 
-  .cmp__table thead th:last-child,
-  .cmp__table td:last-child {
-    background: rgba(255, 103, 0, 0.07);
+  /* Подсвеченный пакет: по умолчанию PREMIUM (4-я колонка), при наведении — колонка под курсором. */
+  .cmp__table :is(th, td):nth-child(n + 2) {
+    transition:
+      background-color var(--dur) var(--ease-out),
+      color var(--dur) var(--ease-out);
+  }
+
+  .cmp__table :is(th, td):nth-child(4) {
+    background: rgba(255, 103, 0, 0.08);
+  }
+
+  .cmp__table:has(:is(th, td):nth-child(2):hover) :is(th, td):nth-child(4),
+  .cmp__table:has(:is(th, td):nth-child(3):hover) :is(th, td):nth-child(4) {
+    background: transparent;
+  }
+
+  .cmp__table:has(:is(th, td):nth-child(2):hover) :is(th, td):nth-child(2),
+  .cmp__table:has(:is(th, td):nth-child(3):hover) :is(th, td):nth-child(3) {
+    background: rgba(255, 103, 0, 0.08);
+  }
+
+  /* Название подсвеченного пакета — оранжевым. */
+  .cmp__table thead th:nth-child(4),
+  .cmp__table:has(:is(th, td):nth-child(2):hover) thead th:nth-child(2),
+  .cmp__table:has(:is(th, td):nth-child(3):hover) thead th:nth-child(3) {
+    color: var(--accent-deep);
+  }
+
+  .cmp__table:has(:is(th, td):nth-child(2):hover) thead th:nth-child(4),
+  .cmp__table:has(:is(th, td):nth-child(3):hover) thead th:nth-child(4) {
+    color: inherit;
   }
 
   .cmp__table th:first-child,
