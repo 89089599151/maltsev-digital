@@ -1,0 +1,68 @@
+---
+/**
+ * Пиксельное слово — графическая подпись бренда (SVG, без шрифтов и скриптов).
+ * Цвет — currentColor. Пиксели «собираются» в случайном порядке:
+ *  intro — сразу при загрузке (CSS), scroll — при появлении на экране (GSAP, data-pixels).
+ */
+import { layoutPixels } from '@/lib/pixel-font';
+
+interface Props {
+  text: string;
+  class?: string;
+  /** Как появляется: intro (CSS при загрузке), scroll (GSAP при прокрутке), none. */
+  appear?: 'intro' | 'scroll' | 'none';
+  /** Задержка появления для intro, секунды. */
+  delay?: number;
+}
+
+const { text, class: cls, appear = 'scroll', delay = 0 } = Astro.props;
+const { cells, width, height } = layoutPixels(text);
+---
+
+<svg
+  class:list={['px', `px--${appear}`, cls]}
+  viewBox={`0 0 ${width} ${height}`}
+  preserveAspectRatio="xMinYMid meet"
+  shape-rendering="crispEdges"
+  aria-hidden="true"
+  focusable="false"
+  data-pixels={appear === 'scroll' ? '' : undefined}
+>
+  {
+    cells.map((c) => (
+      <rect
+        x={c.x}
+        y={c.y}
+        width="1.02"
+        height="1.02"
+        style={appear === 'intro' ? `animation-delay:${(delay + c.order * 0.7).toFixed(3)}s` : undefined}
+      />
+    ))
+  }
+</svg>
+
+<style>
+  .px {
+    display: block;
+    fill: currentColor;
+    overflow: visible;
+  }
+
+  .px rect {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .px--intro rect {
+      animation: px-in 0.5s var(--ease-out) backwards;
+    }
+  }
+
+  @keyframes px-in {
+    from {
+      opacity: 0;
+      transform: scale(0.2);
+    }
+  }
+</style>

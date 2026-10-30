@@ -1,5 +1,5 @@
 ---
-import LogoMark from './LogoMark.astro';
+import PixelWord from './PixelWord.astro';
 import { url, isActive } from '@/lib/url';
 import { site } from '@/config/site';
 
@@ -14,11 +14,11 @@ const current = Astro.url.pathname;
 
 <header class="hdr" data-header>
   <div class="hdr__row">
-    <a class="hdr__logo" href={url('/')} aria-label={`${site.brand.name.value} — на главную`}>
-      <LogoMark size={26} />
+    <a class="hdr__brand" href={url('/')} aria-label={`${site.brand.name.value} — на главную`}>
+      <PixelWord text="M" appear="none" class="hdr__mark" />
+      <span class="hdr__name">{site.brand.short}<span> {site.brand.second}</span></span>
     </a>
     <nav class="hdr__nav" aria-label="Основная навигация">
-      <a class="hdr__home" href={url('/')}>{site.brand.short}<span> {site.brand.second}</span></a>
       <ul>
         {
           nav.map((item) => (
@@ -31,7 +31,7 @@ const current = Astro.url.pathname;
         }
       </ul>
     </nav>
-    <a class="hdr__cta" href={url('/contacts/')}>
+    <a class="hdr__cta btn btn--ink" href={url('/contacts/')} data-magnetic>
       Обсудить проект <span class="arrow" aria-hidden="true">→</span>
     </a>
     <button class="hdr__menu" type="button" aria-haspopup="dialog" aria-controls="site-menu" data-menu-open>
@@ -42,7 +42,10 @@ const current = Astro.url.pathname;
   <dialog class="menu" id="site-menu" aria-label="Меню сайта" data-menu>
     <div class="menu__board">
       <div class="menu__top">
-        <a class="menu__logo" href={url('/')} aria-label="На главную"><LogoMark size={24} /></a>
+        <a class="hdr__brand" href={url('/')} aria-label="На главную">
+          <PixelWord text="M" appear="none" class="hdr__mark" />
+          <span class="hdr__name">{site.brand.short}<span> {site.brand.second}</span></span>
+        </a>
         <button class="menu__close" type="button" data-menu-close>Закрыть</button>
       </div>
       <ul class="menu__list">
@@ -109,8 +112,8 @@ const current = Astro.url.pathname;
     position: sticky;
     top: 0;
     z-index: 50;
-    padding-block: var(--margin) 0;
-    background: transparent;
+    padding-block: var(--margin) 12px;
+    background: linear-gradient(var(--bg) 70%, rgba(246, 245, 241, 0));
     transition: transform var(--dur) var(--ease-out);
   }
 
@@ -120,121 +123,94 @@ const current = Astro.url.pathname;
 
   .hdr__row {
     display: grid;
-    grid-template-columns: var(--header-h) 1fr auto;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
     gap: var(--gap);
-    height: var(--header-h);
+    min-height: 56px;
   }
 
-  .hdr__logo,
-  .hdr__nav,
-  .hdr__cta,
-  .hdr__menu {
-    border-radius: 999px;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
-    box-shadow: inset 0 0 0 1px var(--glass-edge), var(--glass-shadow);
-    display: flex;
-    align-items: center;
-  }
-
-  .hdr__logo {
-    justify-content: center;
-    background: var(--paper);
-    color: var(--paper-ink);
-    transition: background-color var(--dur-fast) var(--ease-out);
-  }
-
-  .hdr__logo:hover {
-    background: var(--accent);
-    color: var(--accent-ink);
-  }
-
-  .hdr__nav {
-    background: var(--surface);
-    padding-inline: 20px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-  }
-
-  .hdr__home {
+  .hdr__brand {
     display: inline-flex;
     align-items: center;
-    gap: 0.28em;
-    min-height: 44px;
+    gap: 12px;
     justify-self: start;
-    font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    min-height: 44px;
     text-decoration: none;
-    font-size: 1rem;
   }
 
-  .hdr__home span {
+  .hdr__brand :global(.hdr__mark) {
+    width: 30px;
+    height: auto;
+    color: var(--accent);
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .hdr__brand:hover :global(.hdr__mark) {
+    transform: rotate(-8deg) scale(1.08);
+  }
+
+  .hdr__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    letter-spacing: -0.02em;
+  }
+
+  .hdr__name span {
     color: var(--muted);
+    font-weight: 500;
   }
 
   .hdr__nav ul {
     list-style: none;
-    padding: 0;
     display: flex;
-    gap: clamp(16px, 2vw, 32px);
+    gap: 2px;
+    padding: 5px;
+    border-radius: 14px;
+    background: var(--surface-2);
   }
 
-  .hdr__nav ul a {
-    position: relative;
+  .hdr__nav a {
+    display: block;
+    padding: 10px 16px;
+    border-radius: 10px;
     font-family: var(--font-display);
     font-weight: 500;
-    font-size: 0.975rem;
+    font-size: 0.9688rem;
     text-decoration: none;
-    padding-block: 8px;
     white-space: nowrap;
+    color: #3b3a36;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
   }
 
-  .hdr__nav ul a::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 2px;
-    height: 2px;
-    background: var(--accent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform var(--dur) var(--ease-out);
+  .hdr__nav a:hover {
+    background: var(--surface-3);
+    color: var(--ink);
   }
 
-  .hdr__nav ul a:hover::after,
-  .hdr__nav ul a[aria-current='page']::after {
-    transform: scaleX(1);
+  .hdr__nav a[aria-current='page'] {
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(21, 21, 21, 0.1);
   }
 
   .hdr__cta {
-    gap: 12px;
-    padding-inline: 22px;
-    background: var(--accent);
-    color: var(--accent-ink);
-    font-family: var(--font-display);
-    font-weight: 600;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: background-color var(--dur-fast) var(--ease-out);
-  }
-
-  .hdr__cta:hover {
-    background: var(--accent-hover);
-  }
-
-  .hdr__cta .arrow {
-    transition: transform var(--dur-fast) var(--ease-out);
-  }
-
-  .hdr__cta:hover .arrow {
-    transform: translateX(4px);
+    justify-self: end;
+    min-height: 50px;
   }
 
   .hdr__menu {
     display: none;
+    justify-self: end;
+    min-height: 46px;
+    padding-inline: 18px;
+    border-radius: var(--radius-sm);
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--font-display);
+    font-weight: 600;
   }
 
   /* Меню для телефона и планшета */
@@ -246,46 +222,33 @@ const current = Astro.url.pathname;
     margin: 0;
     padding: var(--margin);
     border: 0;
-    background: rgba(232, 238, 248, 0.82);
-    -webkit-backdrop-filter: blur(28px) saturate(160%);
-    backdrop-filter: blur(28px) saturate(160%);
+    background: var(--bg);
     color: var(--ink);
   }
 
   .menu::backdrop {
-    background: rgba(232, 238, 248, 0.4);
+    background: rgba(21, 21, 21, 0.4);
   }
 
   .menu__board {
     display: grid;
     gap: var(--gap);
-    grid-template-rows: var(--header-h) 1fr auto;
+    grid-template-rows: auto 1fr auto;
     height: 100%;
   }
 
   .menu__top {
-    display: grid;
-    grid-template-columns: var(--header-h) 1fr;
-    gap: var(--gap);
-  }
-
-  .menu__logo,
-  .menu__close {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    border-radius: 999px;
-  }
-
-  .menu__logo {
-    justify-content: center;
-    background: var(--paper);
-    color: var(--paper-ink);
+    min-height: 56px;
   }
 
   .menu__close {
-    justify-content: flex-end;
-    padding-inline: 20px;
-    background: var(--surface);
+    min-height: 46px;
+    padding-inline: 18px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
     font-family: var(--font-display);
     font-weight: 600;
   }
@@ -294,75 +257,56 @@ const current = Astro.url.pathname;
     list-style: none;
     padding: 0;
     display: grid;
-    gap: var(--gap);
+    gap: 6px;
     align-content: start;
+    margin-top: 12px;
   }
 
   .menu__list a {
     display: block;
-    padding: 18px 20px;
+    padding: 16px 18px;
     border-radius: var(--radius);
     background: var(--surface);
     font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(1.75rem, 8vw, 2.5rem);
+    font-weight: 650;
+    font-size: clamp(1.625rem, 7vw, 2.25rem);
     letter-spacing: -0.035em;
+    text-transform: uppercase;
     text-decoration: none;
   }
 
   .menu__list a[aria-current='page'] {
-    background: var(--surface-3);
+    background: var(--accent);
   }
 
   .menu__cta {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    min-height: 72px;
+    min-height: 64px;
     padding-inline: 20px;
     border-radius: var(--radius);
-    background: var(--accent);
-    color: var(--accent-ink);
+    background: var(--ink);
+    color: var(--bg);
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     text-decoration: none;
   }
 
   @media (max-width: 1023px) {
     .hdr__row {
-      grid-template-columns: var(--header-h) 1fr auto;
+      grid-template-columns: 1fr auto;
     }
 
-    .hdr__nav {
-      grid-template-columns: 1fr;
-    }
-
-    .hdr__nav ul {
-      display: none;
-    }
-
+    .hdr__nav,
     .hdr__cta {
       display: none;
     }
 
     .hdr__menu {
-      display: flex;
-      padding-inline: 22px;
-      background: var(--surface-2);
-      font-family: var(--font-display);
-      font-weight: 600;
-      transition: background-color var(--dur-fast) var(--ease-out);
-    }
-
-    .hdr__menu:hover {
-      background: var(--surface-3);
-    }
-  }
-
-  @media (max-width: 380px) {
-    .hdr__home span {
-      display: none;
+      display: inline-flex;
+      align-items: center;
     }
   }
 </style>

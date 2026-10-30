@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
 import { site } from '@/config/site';
 import { url } from '@/lib/url';
 import owner from '@/assets/photos/owner.webp';
@@ -28,17 +29,15 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
   title="Обо мне — независимый веб-разработчик"
   description="Независимый разработчик сайтов: веду проект лично от идеи до запуска и использую ИИ-инструменты, чтобы делать это быстрее и аккуратнее."
 >
-  <section class="ab-hero" aria-labelledby="ab-title" data-stagger>
-    <div class="ab-hero__title tile tile--paper">
-      <h1 id="ab-title" class="ab-hero__h1">Обо мне</h1>
-      <p class="ab-hero__lead">
-        Меня зовут {site.brand.owner.value}. Я дизайнер по образованию и делаю сайты один — без отделов и посредников.
-      </p>
+  <PageHero
+    id="ab-title"
+    title="Обо мне"
+    lead={`Меня зовут ${site.brand.owner.value}. Я дизайнер по образованию и делаю сайты один — без отделов и посредников.`}
+  >
+    <div class="ab-photo">
+      <Image src={owner} alt={`${site.brand.owner.value} ночью под снегом смотрит вверх, на свет фонаря`} widths={[480, 800, 1200]} sizes="(max-width: 1023px) 92vw, 38vw" loading="eager" />
     </div>
-    <div class="ab-hero__photo tile tile--photo">
-      <Image src={owner} alt={`${site.brand.owner.value} ночью под снегом смотрит вверх, на свет фонаря`} widths={[480, 800, 1200, 1600]} sizes="(max-width: 1023px) 100vw, 42vw" loading="eager" />
-    </div>
-  </section>
+  </PageHero>
 
   <section class="section ab-text" aria-labelledby="ab-why">
     <h2 id="ab-why" class="head">Почему один</h2>
@@ -130,45 +129,26 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
 </Base>
 
 <style>
-  .ab-hero {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--gap);
-    margin-top: var(--gap);
-    min-height: min(78svh, 760px);
+  .ab-photo {
+    aspect-ratio: 4 / 5;
+    max-height: 520px;
+    border-radius: calc(var(--radius-lg) - 8px);
+    overflow: hidden;
+    background: var(--night);
   }
 
-  .ab-hero__title {
-    grid-column: 1 / 8;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 40px;
+  .ab-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
   }
 
-  .ab-hero__h1 {
-    font-size: clamp(3rem, 1rem + 6vw, 6rem);
-    line-height: 0.95;
-    letter-spacing: -0.045em;
+  @media (max-width: 1023px) {
+    .ab-photo {
+      aspect-ratio: 16 / 11;
+    }
   }
-
-  .ab-hero__lead {
-    font-family: var(--font-display);
-    font-weight: 560;
-    font-size: clamp(1.375rem, 1rem + 1.1vw, 2rem);
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    max-width: 26ch;
-  }
-
-  .ab-hero__photo {
-    grid-column: 8 / 13;
-  }
-
-  .ab-hero__photo :global(img) {
-    object-position: 46% 38%;
-  }
-
   .ab-text {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -215,7 +195,7 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
     padding: 18px 24px;
     text-align: left;
     vertical-align: top;
-    border-bottom: 1px solid rgba(13, 27, 51, 0.1);
+    border-bottom: 1px solid rgba(21, 21, 21, 0.1);
   }
 
   .ai__table tr:last-child td {
@@ -230,7 +210,7 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
 
   .ai__table th:last-child,
   .ai__table td:last-child {
-    background: rgba(36, 87, 230, 0.08);
+    background: rgba(255, 103, 0, 0.08);
     font-family: var(--font-display);
     font-weight: 560;
   }
@@ -323,8 +303,6 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
   }
 
   @media (max-width: 1023px) {
-    .ab-hero__title,
-    .ab-hero__photo,
     .ab-text h2,
     .ab-text__body,
     .ai__side,
@@ -332,10 +310,6 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
     .honest__card,
     .honest__tools {
       grid-column: 1 / -1;
-    }
-
-    .ab-hero__photo {
-      aspect-ratio: 16 / 9;
     }
 
     .ab-text,
@@ -349,20 +323,11 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
   }
 
   @media (max-width: 767px) {
-    .ab-hero,
     .ab-text,
     .ai,
     .pr,
     .honest {
       grid-template-columns: 1fr;
-    }
-
-    .ab-hero__title {
-      min-height: 52svh;
-    }
-
-    .ab-hero__h1 {
-      font-size: 13vw;
     }
 
     .pr__head,

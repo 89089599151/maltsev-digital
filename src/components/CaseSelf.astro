@@ -6,16 +6,17 @@
  */
 import { Image } from 'astro:assets';
 import { url } from '@/lib/url';
+import PixelWord from './PixelWord.astro';
 import homeDesktop from '@/assets/case/home-desktop.png';
 import homeMobile from '@/assets/case/home-mobile.png';
 import homeWire from '@/assets/case/home-wire.png';
 import servicesDesktop from '@/assets/case/services-desktop.png';
 
 const swatches = [
-  { name: 'Поле', hex: '#E8EEF8', ink: '#0D1B33' },
-  { name: 'Стекло', hex: '#FFFFFF', ink: '#0D1B33' },
-  { name: 'Ночь', hex: '#0D1B33', ink: '#F2F6FF' },
-  { name: 'Синий', hex: '#2457E6', ink: '#FFFFFF' },
+  { name: 'Поле', hex: '#F6F5F1', ink: '#151515' },
+  { name: 'Серый', hex: '#E6E5E1', ink: '#151515' },
+  { name: 'Графит', hex: '#202020', ink: '#F6F5F1' },
+  { name: 'Оранжевый', hex: '#FF6700', ink: '#151515' },
 ];
 const inside = [
   '7 страниц и шаблон кейса',
@@ -27,7 +28,7 @@ const inside = [
 ];
 ---
 
-<section class="cs section" aria-labelledby="cs-title">
+<section class="cs section" id="work" aria-labelledby="cs-title">
   <div class="cs__stage" data-case-stage>
     <div class="cs__top">
       <div class="cs__intro">
@@ -43,7 +44,7 @@ const inside = [
         <li>CSS 3D</li>
       </ul>
     </div>
-    <p class="cs__giant" aria-hidden="true">САЙТ</p>
+    <PixelWord text="САЙТ" class="cs__giant" />
 
     <div class="cs__devices" aria-hidden="true">
       <div class="laptop" data-speed="0.6">
@@ -165,24 +166,17 @@ const inside = [
   }
 
   /* Гигантское слово: верхняя половина видна, нижнюю перекрывают устройства. */
-  .cs__giant {
-    margin: clamp(16px, 3vw, 48px) 0 0;
-    text-align: center;
-    font-family: var(--font-head);
-    font-weight: 700;
-    font-size: clamp(6rem, 1rem + 21vw, 22rem);
-    line-height: 0.78;
-    letter-spacing: -0.06em;
-    color: var(--tone-7);
-    white-space: nowrap;
-    pointer-events: none;
-    user-select: none;
+  .cs__stage :global(.cs__giant) {
+    width: min(78%, 1100px);
+    height: auto;
+    margin: clamp(24px, 4vw, 56px) auto 0;
+    color: rgba(255, 255, 255, 0.5);
   }
 
   .cs__devices {
     position: relative;
     width: min(70%, 980px);
-    margin: calc(-0.38 * clamp(6rem, 1rem + 21vw, 22rem)) auto 0;
+    margin: -14% auto 0;
   }
 
   .laptop__screen {
@@ -297,7 +291,7 @@ const inside = [
   }
 
   .sw__item:nth-child(-n + 2) {
-    box-shadow: inset 0 0 0 1px rgba(13, 27, 51, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(21, 21, 21, 0.12);
   }
 
   .sw__name {
@@ -362,7 +356,7 @@ const inside = [
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #c9d4e6;
+    background: #cfcdc5;
   }
 
   .cs__card--page img {
@@ -421,13 +415,10 @@ const inside = [
   }
 
   @media (max-width: 767px) {
-    .cs__giant {
-      font-size: 34vw;
-    }
 
     .cs__devices {
       width: 84%;
-      margin-top: -11vw;
+      margin-top: -12%;
       margin-left: 0;
     }
 

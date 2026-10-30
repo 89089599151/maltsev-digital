@@ -1,0 +1,441 @@
+---
+/**
+ * Финал главной: тёмная сцена. Слева — прямые контакты крупными кнопками,
+ * справа — короткая форма заявки (Formspree; без подключённого сервиса форма честно отключена).
+ */
+import { Image } from 'astro:assets';
+import ContactIcon from './ContactIcon.astro';
+import PixelWord from './PixelWord.astro';
+import { site, telegramUrl, emailUrl } from '@/config/site';
+import { url } from '@/lib/url';
+import avatar from '@/assets/photos/owner-avatar.webp';
+
+const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.formspreeId}` : '';
+const tg = telegramUrl();
+const mail = emailUrl('Заявка на разработку сайта');
+---
+
+<section class="ct section" id="contact" aria-labelledby="ct-title">
+  <div class="ct__stage">
+    <div class="ct__info">
+      <PixelWord text="ПРИВЕТ" class="ct__px" appear="scroll" />
+      <h2 id="ct-title" class="ct__title" data-split>Расскажите о задаче</h2>
+      <p class="ct__sub">
+        Отвечу {site.contacts.responseTime.value}: задам пару вопросов и пришлю план со сроками и ценой.
+      </p>
+
+      <div class="ct__direct">
+        {
+          tg && (
+            <a class="ct__link" href={tg} target="_blank" rel="noopener">
+              <span class="ct__ico"><ContactIcon kind="telegram" /></span>
+              <span class="ct__lt">
+                <span class="ct__ll">Telegram</span>
+                <span class="ct__lv">@{site.contacts.telegram.value}</span>
+              </span>
+              <span class="ct__arr" aria-hidden="true">↗</span>
+            </a>
+          )
+        }
+        {
+          mail && (
+            <a class="ct__link" href={mail}>
+              <span class="ct__ico"><ContactIcon kind="email" /></span>
+              <span class="ct__lt">
+                <span class="ct__ll">Почта</span>
+                <span class="ct__lv">{site.contacts.email.value}</span>
+              </span>
+              <span class="ct__arr" aria-hidden="true">↗</span>
+            </a>
+          )
+        }
+      </div>
+
+      <div class="ct__person">
+        <Image class="ct__avatar" src={avatar} alt="" width={56} height={56} loading="lazy" />
+        <p>
+          <strong>{site.brand.owner.value}</strong>
+          <span>Пишете напрямую исполнителю</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="ct__card">
+      <p class="ct__card-t">Короткая заявка</p>
+      {
+        !endpoint && (
+          <p class="ct__notice" role="note">
+            Онлайн-форма заработает после подключения сервиса заявок. Пока удобнее написать в Telegram или на почту.
+          </p>
+        )
+      }
+
+      <form class="ct__form" data-lead-form data-endpoint={endpoint} method="post" action={endpoint || undefined}>
+        <fieldset disabled={!endpoint}>
+          <legend class="sr-only">Короткая заявка</legend>
+          <input type="hidden" name="_subject" value="Короткая заявка с главной" />
+          <input type="hidden" name="source" value="Главная, блок контактов" />
+          <div class="hp" aria-hidden="true"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></div>
+
+          <label class="ct__field">
+            <span class="ct__label">Ваше имя</span>
+            <input name="name" type="text" autocomplete="name" required minlength="2" data-error-id="ct-name-err" aria-describedby="ct-name-err" />
+          </label>
+          <span class="ct__err" id="ct-name-err"></span>
+
+          <label class="ct__field">
+            <span class="ct__label">Telegram, телефон или почта</span>
+            <input name="contact" type="text" required minlength="4" data-error-id="ct-contact-err" aria-describedby="ct-contact-err" />
+          </label>
+          <span class="ct__err" id="ct-contact-err"></span>
+
+          <label class="ct__field">
+            <span class="ct__label">Коротко о задаче <span class="ct__opt">— необязательно</span></span>
+            <textarea name="message" rows="3"></textarea>
+          </label>
+
+          <label class="ct__consent">
+            <input type="checkbox" name="consent" value="Согласие получено" required data-error-id="ct-consent-err" aria-describedby="ct-consent-err" />
+            <span>Согласен на обработку персональных данных по <a href={url('/privacy/')}>политике</a></span>
+          </label>
+          <span class="ct__err" id="ct-consent-err"></span>
+
+          <button class="ct__submit" type="submit">
+            <span data-label>{endpoint ? 'Отправить заявку' : 'Форма не подключена'}</span>
+          </button>
+          <p class="ct__status" data-status role="status" aria-live="polite"></p>
+        </fieldset>
+      </form>
+      <div class="ct__success" data-success hidden tabindex="-1">
+        <p class="head-sm">Заявка получена</p>
+        <p>Спасибо! Свяжусь с вами {site.contacts.responseTime.value} по указанному контакту.</p>
+      </div>
+
+      <a class="ct__brief" href={url('/contacts/')}>Заполнить подробный бриф <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initLeadForms } from '@/scripts/forms';
+  initLeadForms();
+</script>
+
+<style>
+  .ct__stage {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: clamp(28px, 4vw, 72px);
+    align-items: stretch;
+    padding: clamp(24px, 4vw, 64px);
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(60% 55% at 0% 0%, rgba(255, 103, 0, 0.32), transparent 70%),
+      var(--night);
+    color: var(--night-ink);
+  }
+
+  .ct__info {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(18px, 2vw, 26px);
+  }
+
+  .ct__info :global(.ct__px) {
+    width: clamp(120px, 12vw, 180px);
+    height: auto;
+    color: var(--accent);
+  }
+
+  .ct__title {
+    font-size: clamp(2.5rem, 1rem + 4.4vw, 5.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+    max-width: 10ch;
+  }
+
+  .ct__sub {
+    max-width: 44ch;
+    font-size: var(--step-body);
+    color: var(--night-muted);
+  }
+
+  .ct__direct {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 520px;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .ct__link {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    min-height: 76px;
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    background: rgba(246, 245, 241, 0.08);
+    color: var(--night-ink);
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  }
+
+  .ct__link:hover {
+    background: var(--accent);
+    color: var(--ink);
+  }
+
+  .ct__ico {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--accent);
+    color: var(--ink);
+  }
+
+  .ct__link:hover .ct__ico {
+    background: var(--ink);
+    color: var(--accent);
+  }
+
+  .ct__lt {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .ct__ll {
+    font-size: 0.8125rem;
+    opacity: 0.8;
+  }
+
+  .ct__lv {
+    font-family: var(--font-display);
+    font-weight: 650;
+    overflow-wrap: anywhere;
+  }
+
+  .ct__arr {
+    font-size: 1.125rem;
+  }
+
+  .ct__person {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+
+  .ct__avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px var(--accent);
+  }
+
+  .ct__person p {
+    display: grid;
+    font-size: 0.9375rem;
+    color: var(--night-muted);
+  }
+
+  .ct__person strong {
+    font-family: var(--font-display);
+    color: var(--night-ink);
+  }
+
+  /* Карточка формы */
+  .ct__card {
+    display: grid;
+    gap: 14px;
+    align-content: start;
+    padding: clamp(22px, 2.6vw, 36px);
+    border-radius: calc(var(--radius-lg) - 6px);
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .ct__card-t {
+    font-family: var(--font-head);
+    font-weight: 650;
+    font-size: 1.5rem;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  .ct__notice {
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    background: var(--accent-soft);
+    font-size: 0.9375rem;
+  }
+
+  .ct__form {
+    width: 100%;
+  }
+
+  fieldset {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  fieldset:disabled {
+    opacity: 0.62;
+  }
+
+  .ct__field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .ct__label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .ct__opt {
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .ct__field input,
+  .ct__field textarea {
+    width: 100%;
+    min-height: 52px;
+    padding: 13px 16px;
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    color: var(--ink);
+    font: inherit;
+    font-family: var(--font-display);
+    transition: border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .ct__field textarea {
+    resize: vertical;
+    min-height: 92px;
+  }
+
+  .ct__field input:hover,
+  .ct__field textarea:hover {
+    background: var(--surface-3);
+  }
+
+  .ct__field input:focus,
+  .ct__field textarea:focus {
+    outline: none;
+    background: #fff;
+    border-color: var(--ink);
+  }
+
+  .ct__field input[aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+
+  .ct__err {
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--danger);
+  }
+
+  .ct__err:empty {
+    display: none;
+  }
+
+  .ct__consent {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 6px;
+    font-size: 0.875rem;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .ct__consent input {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    accent-color: var(--accent);
+  }
+
+  .ct__submit {
+    min-height: 58px;
+    margin-top: 8px;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+
+  .ct__submit:hover:not(:disabled) {
+    background: var(--accent-hover);
+  }
+
+  .ct__submit:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .ct__submit:disabled {
+    cursor: not-allowed;
+  }
+
+  .ct__status {
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  .ct__success {
+    display: grid;
+    gap: 8px;
+    padding: 20px;
+    border-radius: var(--radius);
+    background: var(--accent-soft);
+  }
+
+  .ct__brief {
+    justify-self: start;
+    font-family: var(--font-display);
+    font-weight: 650;
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-block: 10px 2px;
+  }
+
+  @media (max-width: 1023px) {
+    .ct__stage {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .ct__stage {
+      padding: 22px 14px 14px;
+      border-radius: 24px;
+    }
+
+    .ct__info {
+      padding-inline: 6px;
+    }
+
+    .ct__card {
+      border-radius: 18px;
+    }
+  }
+</style>

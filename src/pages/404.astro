@@ -1,5 +1,6 @@
 ---
 import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
 import { url } from '@/lib/url';
 
 const links = [
@@ -11,96 +12,47 @@ const links = [
 ---
 
 <Base title="Страница не найдена" description="Такой страницы нет. Перейдите на главную или в другой раздел." noindex>
-  <section class="nf" aria-labelledby="nf-title">
-    <div class="nf__num tile tile--accent" aria-hidden="true">404</div>
-    <div class="nf__text tile tile--paper">
-      <h1 id="nf-title" class="head">Такой страницы нет</h1>
-      <p class="lead">Возможно, адрес изменился или в нём опечатка. Вот куда можно перейти:</p>
-    </div>
-    <ul class="nf__links">
-      {
-        links.map((l) => (
-          <li>
-            <a class="nf__link tile" href={url(l.href)}>
-              {l.label} <span aria-hidden="true">→</span>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </section>
+  <PageHero id="nf-title" title="Такой страницы нет" pixel="404" lead="Возможно, адрес изменился или в нём опечатка. Вот куда можно перейти:">
+    <Fragment slot="actions">
+      <ul class="nf__links">
+        {
+          links.map((l) => (
+            <li>
+              <a class="nf__link" href={url(l.href)}>
+                {l.label} <span aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </Fragment>
+  </PageHero>
 </Base>
 
 <style>
-  .nf {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--gap);
-    margin-top: var(--gap);
-  }
-
-  .nf__num {
-    grid-column: 1 / 8;
-    display: flex;
-    align-items: flex-end;
-    min-height: 60svh;
-    font-family: var(--font-head);
-    font-weight: 800;
-    font-size: clamp(7rem, 2rem + 18vw, 20rem);
-    line-height: 0.78;
-    letter-spacing: -0.06em;
-  }
-
-  .nf__text {
-    grid-column: 8 / 13;
-    display: grid;
-    gap: 24px;
-    align-content: space-between;
-  }
-
   .nf__links {
-    grid-column: 1 / -1;
     list-style: none;
     padding: 0;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--gap);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .nf__link {
-    display: flex;
-    justify-content: space-between;
-    min-height: 96px;
-    align-items: flex-end;
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    min-height: 52px;
+    padding: 12px 18px;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.75);
     font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 1.25rem;
+    font-weight: 650;
     text-decoration: none;
     transition: background-color var(--dur-fast) var(--ease-out);
   }
 
   .nf__link:hover {
-    background: var(--surface-2);
-  }
-
-  @media (max-width: 1023px) {
-    .nf__num,
-    .nf__text {
-      grid-column: 1 / -1;
-    }
-
-    .nf__num {
-      min-height: 40svh;
-    }
-
-    .nf__links {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  @media (max-width: 767px) {
-    .nf {
-      grid-template-columns: 1fr;
-    }
+    background: var(--accent);
   }
 </style>

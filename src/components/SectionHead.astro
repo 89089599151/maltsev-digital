@@ -1,0 +1,99 @@
+---
+/**
+ * Заголовок секции: крупный капс слева, пояснение и действие справа.
+ * Один компонент для всех секций — одинаковый ритм и иерархия.
+ */
+interface Props {
+  id: string;
+  title: string;
+  text?: string;
+  link?: { href: string; label: string };
+  /** Тёмная секция — светлый текст. */
+  invert?: boolean;
+}
+const { id, title, text, link, invert = false } = Astro.props;
+---
+
+<div class:list={['sh', { 'sh--invert': invert }]}>
+  <h2 id={id} class="sh__title" data-split>{title}</h2>
+  {
+    (text || link) && (
+      <div class="sh__side" data-reveal>
+        {text && <p class="sh__text">{text}</p>}
+        {link && (
+          <a class="sh__link" href={link.href}>
+            {link.label} <span class="arrow" aria-hidden="true">→</span>
+          </a>
+        )}
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .sh {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 24px clamp(24px, 4vw, 64px);
+    align-items: end;
+    margin-bottom: clamp(32px, 4vw, 56px);
+  }
+
+  .sh__title {
+    font-size: var(--step-head);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+    max-width: 16ch;
+  }
+
+  .sh__side {
+    display: grid;
+    gap: 14px;
+    justify-items: start;
+    padding-bottom: 0.3em;
+  }
+
+  .sh__text {
+    max-width: 46ch;
+    font-size: var(--step-body);
+    color: #3b3a36;
+  }
+
+  .sh__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-weight: 650;
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+  }
+
+  .sh__link .arrow {
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .sh__link:hover .arrow {
+    transform: translateX(4px);
+  }
+
+  .sh--invert .sh__title {
+    color: var(--night-ink);
+  }
+
+  .sh--invert .sh__text {
+    color: var(--night-muted);
+  }
+
+  .sh--invert .sh__link {
+    color: var(--night-ink);
+  }
+
+  @media (max-width: 1023px) {
+    .sh {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -69,13 +69,19 @@ const H = headingLevel;
   }
 
   .faq__item[open] {
-    background: var(--accent);
-    color: var(--accent-ink);
+    background: var(--paper);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .faq__side :global(.head) {
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
   }
 
   summary {
     display: grid;
-    grid-template-columns: 1fr 24px;
+    grid-template-columns: 1fr 36px;
     gap: 20px;
     align-items: center;
     min-height: 72px;
@@ -103,18 +109,27 @@ const H = headingLevel;
 
   .faq__icon {
     position: relative;
-    width: 16px;
-    height: 16px;
+    width: 36px;
+    height: 36px;
     justify-self: end;
+    border-radius: 10px;
+    background: var(--ink);
+    color: var(--bg);
+    transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+  }
+
+  .faq__item[open] .faq__icon {
+    background: var(--accent);
+    color: var(--ink);
   }
 
   .faq__icon i {
     position: absolute;
-    left: 0;
-    top: 6.5px;
-    width: 16px;
+    left: 11px;
+    top: 16.5px;
+    width: 14px;
     height: 3px;
-    border-radius: 2px;
+    border-radius: 1px;
     background: currentColor;
     transition: transform var(--dur) var(--ease-out);
   }

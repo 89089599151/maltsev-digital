@@ -1,0 +1,187 @@
+---
+/**
+ * Манифест: кто что делает в проекте. Слева — рутина, которую берёт ИИ,
+ * справа — решения, которые остаются за человеком. Без цифр и обещаний.
+ */
+import PixelWord from './PixelWord.astro';
+
+const ai = [
+  'Черновики структуры и текстов',
+  'Варианты композиции и цвета',
+  'Рутинный код и проверку ошибок',
+  'Тесты на разных экранах',
+];
+const me = [
+  'Разбираюсь в вашем бизнесе и клиентах',
+  'Выбираю структуру и путь к заявке',
+  'Утверждаю дизайн и каждую деталь',
+  'Отвечаю за скорость, доступность и запуск',
+];
+---
+
+<section class="mf section" id="manifest" aria-labelledby="mf-title">
+  <div class="mf__head">
+    <h2 id="mf-title" class="mf__title" data-split>ИИ ускоряет.<br />Решаю&nbsp;я.</h2>
+    <p class="mf__lead" data-reveal>
+      Нейросети забирают у разработки рутину. Освободившееся время уходит на то, что определяет результат.
+    </p>
+  </div>
+
+  <div class="mf__grid">
+    <article class="mf__card mf__card--ai" aria-labelledby="mf-ai" data-reveal="rise">
+      <div class="mf__card-top">
+        <h3 id="mf-ai" class="mf__card-title">Делает ИИ</h3>
+        <PixelWord text="AI" class="mf__px" appear="scroll" />
+      </div>
+      <ul class="mf__list">{ai.map((t) => <li>{t}</li>)}</ul>
+      <p class="mf__foot">Быстрее и дешевле для вас</p>
+    </article>
+
+    <article class="mf__card mf__card--me" aria-labelledby="mf-me" data-reveal="rise">
+      <div class="mf__card-top">
+        <h3 id="mf-me" class="mf__card-title">Решаю я</h3>
+        <PixelWord text="M" class="mf__px" appear="scroll" />
+      </div>
+      <ul class="mf__list">{me.map((t) => <li>{t}</li>)}</ul>
+      <p class="mf__foot">Вы говорите напрямую с тем, кто делает сайт</p>
+    </article>
+  </div>
+</section>
+
+<style>
+  .mf__head {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 24px clamp(24px, 4vw, 64px);
+    align-items: end;
+    margin-bottom: clamp(32px, 4vw, 56px);
+  }
+
+  .mf__title {
+    font-size: var(--step-display);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+  }
+
+  .mf__lead {
+    max-width: 40ch;
+    padding-bottom: 0.4em;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.125rem, 0.95rem + 0.6vw, 1.5rem);
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+  }
+
+  .mf__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+
+  .mf__card {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(20px, 2vw, 28px);
+    padding: clamp(24px, 3vw, 44px);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+
+  .mf__card--me {
+    background: var(--night);
+    color: var(--night-ink);
+  }
+
+  .mf__card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .mf__card-title {
+    font-size: clamp(1.75rem, 1.1rem + 1.8vw, 2.75rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+  }
+
+  .mf__card :global(.mf__px) {
+    width: clamp(44px, 4vw, 64px);
+    height: auto;
+    color: var(--surface-3);
+  }
+
+  .mf__card--me :global(.mf__px) {
+    color: var(--accent);
+  }
+
+  .mf__list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+  }
+
+  .mf__list li {
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    gap: 12px;
+    align-items: baseline;
+    padding-block: 14px;
+    border-top: 1px solid rgba(21, 21, 21, 0.1);
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.0625rem, 0.95rem + 0.35vw, 1.25rem);
+    line-height: 1.3;
+  }
+
+  .mf__list li::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: var(--ink);
+  }
+
+  .mf__card--me .mf__list li {
+    border-color: rgba(246, 245, 241, 0.14);
+  }
+
+  .mf__card--me .mf__list li::before {
+    background: var(--accent);
+  }
+
+  .mf__foot {
+    margin-top: auto;
+    justify-self: start;
+    align-self: flex-start;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.65);
+    font-family: var(--font-display);
+    font-weight: 650;
+    font-size: 0.9375rem;
+    color: var(--ink);
+  }
+
+  .mf__card--me .mf__foot {
+    background: var(--accent);
+  }
+
+  @media (max-width: 1023px) {
+    .mf__head {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .mf__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .mf__card {
+      border-radius: 22px;
+    }
+  }
+</style>

@@ -10,7 +10,7 @@
  *  [data-speed="1.5"]           — параллакс (только крупные экраны);
  *  [data-tilt-area] / [data-tilt] / [data-float] — реакция на курсор;
  *  [data-magnetic]              — «магнитная» кнопка;
- *  [data-blocks]                — блоки логотипа в подвале вырастают.
+ *  [data-pixels]                — пиксельное слово собирается из пикселей при появлении.
  *
  * Без скрипта и при prefers-reduced-motion весь контент виден сразу.
  */
@@ -35,7 +35,11 @@ export function initMotion(): void {
   reveals();
   scrubWords();
   footerBlocks();
-  if (wide) parallax();
+  pixels();
+  if (wide) {
+    parallax();
+    horizontalScroll();
+  }
   if (finePointer) {
     tilt();
     magnetic();
@@ -146,9 +150,9 @@ function scrubWords(): void {
     const split = SplitText.create(el, { type: 'words', aria: 'none' });
     gsap.fromTo(
       split.words,
-      { color: '#5b6a84' },
+      { color: '#6b6a64' },
       {
-        color: '#0d1b33',
+        color: '#151515',
         ease: 'none',
         stagger: 0.1,
         scrollTrigger: { trigger: el, start: 'top 80%', end: 'bottom 45%', scrub: true },
@@ -170,6 +174,22 @@ function footerBlocks(): void {
   });
 }
 
+/** Пиксельные слова собираются в случайном порядке, когда попадают на экран. */
+function pixels(): void {
+  gsap.utils.toArray<SVGSVGElement>('[data-pixels]').forEach((svg) => {
+    const rects = svg.querySelectorAll('rect');
+    gsap.from(rects, {
+      opacity: 0,
+      scale: 0.2,
+      transformOrigin: '50% 50%',
+      duration: 0.5,
+      ease: EASE,
+      stagger: { each: 0.004, from: 'random' },
+      scrollTrigger: { trigger: svg, start: 'top 90%', once: true },
+    });
+  });
+}
+
 function parallax(): void {
   gsap.utils.toArray<HTMLElement>('[data-speed]').forEach((el) => {
     const speed = Number(el.dataset.speed) || 1;
@@ -182,6 +202,35 @@ function parallax(): void {
         scrollTrigger: { trigger: el.closest('section') ?? el, start: 'top bottom', end: 'bottom top', scrub: true },
       },
     );
+  });
+}
+
+/**
+ * Лента карточек едет горизонтально, пока секция закреплена.
+ * Если секция выше окна, закрепление не включается — остаётся обычная горизонтальная прокрутка.
+ */
+function horizontalScroll(): void {
+  gsap.utils.toArray<HTMLElement>('[data-hscroll]').forEach((section) => {
+    const viewport = section.querySelector<HTMLElement>('[data-hscroll-viewport]');
+    const track = section.querySelector<HTMLElement>('[data-hscroll-track]');
+    if (!viewport || !track) return;
+    if (section.offsetHeight > window.innerHeight - 40) return;
+
+    const distance = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
+    viewport.classList.add('is-pinned');
+    viewport.scrollLeft = 0;
+    gsap.to(track, {
+      x: () => -distance(),
+      ease: 'none',
+      scrollTrigger: {
+        trigger: section,
+        start: () => `top ${Math.max(0, (window.innerHeight - section.offsetHeight) / 2)}px`,
+        end: () => `+=${distance()}`,
+        pin: true,
+        scrub: 0.6,
+        invalidateOnRefresh: true,
+      },
+    });
   });
 }
 

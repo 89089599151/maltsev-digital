@@ -20,7 +20,7 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     {
       plane && (
         <div class="cc__plane" data-float="40" aria-hidden="true">
-          <Image src={plane.src} alt="" widths={[240, 400]} sizes="220px" loading="lazy" />
+          <Image class:list={{ 'is-tinted': !plane.generated || !genImage('float-plane') }} src={(genImage('float-plane') ?? plane).src} alt="" widths={[240, 400]} sizes="220px" loading="lazy" />
         </div>
       )
     }
@@ -96,12 +96,12 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     place-items: center;
     min-height: 92svh;
     padding: clamp(48px, 7vw, 110px) 16px;
-    border-radius: 36px;
+    border-radius: var(--radius-lg);
     overflow: hidden;
     background:
-      radial-gradient(60% 50% at 20% 15%, rgba(255, 217, 160, 0.55), transparent 70%),
-      radial-gradient(70% 60% at 85% 90%, #0f2f97, transparent 70%),
-      linear-gradient(160deg, #6f9bff 0%, #2457e6 45%, #1a3fb4 100%);
+      radial-gradient(55% 45% at 18% 12%, rgba(255, 103, 0, 0.55), transparent 70%),
+      radial-gradient(50% 40% at 90% 95%, rgba(255, 103, 0, 0.28), transparent 70%),
+      var(--night);
   }
 
   .cc__word {
@@ -114,7 +114,8 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     font-size: clamp(5rem, 1rem + 16vw, 20rem);
     line-height: 1;
     letter-spacing: -0.05em;
-    color: rgba(255, 255, 255, 0.16);
+    text-transform: uppercase;
+    color: rgba(246, 245, 241, 0.06);
     white-space: nowrap;
     pointer-events: none;
   }
@@ -130,7 +131,7 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
   .cc__plane img {
     width: 100%;
     height: auto;
-    filter: drop-shadow(0 24px 30px rgba(5, 20, 70, 0.35));
+    filter: drop-shadow(0 24px 30px rgba(0, 0, 0, 0.45));
   }
 
   .cc__card {
@@ -140,15 +141,10 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     gap: 12px;
     justify-items: center;
     padding: clamp(26px, 3vw, 40px);
-    border-radius: 34px;
-    background: linear-gradient(165deg, rgba(255, 255, 255, 0.2), rgba(10, 26, 80, 0.38) 60%);
-    -webkit-backdrop-filter: blur(26px) saturate(160%);
-    backdrop-filter: blur(26px) saturate(160%);
-    box-shadow:
-      inset 0 1.5px 0 rgba(255, 255, 255, 0.7),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.32),
-      0 50px 90px -40px rgba(5, 20, 70, 0.6);
-    color: #ffffff;
+    border-radius: var(--radius-lg);
+    background: var(--bg);
+    box-shadow: 0 50px 90px -40px rgba(0, 0, 0, 0.7);
+    color: var(--ink);
     text-align: center;
   }
 
@@ -157,29 +153,28 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     height: 96px;
     border-radius: 50%;
     object-fit: cover;
-    box-shadow:
-      0 0 0 4px rgba(255, 255, 255, 0.45),
-      0 16px 30px -12px rgba(5, 20, 70, 0.6);
+    box-shadow: 0 0 0 4px var(--accent);
   }
 
   .cc__title {
     margin-top: 6px;
-    font-size: clamp(1.625rem, 1.1rem + 1.6vw, 2.5rem);
-    color: #ffffff;
+    font-size: clamp(1.75rem, 1.1rem + 1.8vw, 2.75rem);
+    text-transform: uppercase;
+    letter-spacing: -0.04em;
   }
 
   .cc__sub {
     max-width: 40ch;
-    color: #e6edff;
+    color: var(--muted);
   }
 
   .cc__notice {
     width: 100%;
     padding: 12px 16px;
-    border-radius: 18px;
-    background: rgba(13, 27, 51, 0.32);
+    border-radius: var(--radius-sm);
+    background: var(--accent-soft);
     font-size: 0.9375rem;
-    color: #ffffff;
+    color: #5a2a06;
   }
 
   .cc__form {
@@ -202,37 +197,41 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
   .cc__field-l input {
     width: 100%;
     min-height: 56px;
-    padding: 14px 22px;
-    border: 0;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.88);
+    padding: 14px 18px;
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
     color: var(--ink);
     font-family: var(--font-display);
     font-size: 1rem;
-    transition: background-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+    transition: border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
   }
 
   .cc__field-l input::placeholder {
-    color: #5b6a85;
+    color: #6b6a64;
+  }
+
+  .cc__field-l input:hover {
+    background: var(--surface-3);
   }
 
   .cc__field-l input:focus {
     outline: none;
     background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
+    border-color: var(--ink);
   }
 
   .cc__field-l input[aria-invalid='true'] {
-    box-shadow: 0 0 0 3px #ffb3a8;
+    border-color: var(--danger);
   }
 
   .cc__err {
     font-family: var(--font-display);
     font-size: 0.875rem;
     font-weight: 600;
-    color: #ffe3df;
+    color: var(--danger);
     text-align: left;
-    padding-left: 22px;
+    padding-left: 4px;
   }
 
   .cc__err:empty {
@@ -246,7 +245,7 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     margin-top: 4px;
     font-size: 0.875rem;
     text-align: left;
-    color: #e6edff;
+    color: var(--muted);
     cursor: pointer;
   }
 
@@ -254,28 +253,23 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     width: 20px;
     height: 20px;
     flex: none;
-    accent-color: var(--night);
-  }
-
-  .cc__consent a {
-    color: #ffffff;
+    accent-color: var(--accent);
   }
 
   .cc__submit {
     min-height: 58px;
     margin-top: 6px;
-    border-radius: 999px;
-    background: #ffffff;
-    color: var(--ink);
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: var(--accent-ink);
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 1.0625rem;
-    box-shadow: 0 18px 40px -20px rgba(5, 20, 70, 0.7);
     transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
   }
 
   .cc__submit:hover:not(:disabled) {
-    background: #eef3ff;
+    background: var(--accent-hover);
   }
 
   .cc__submit:active:not(:disabled) {
@@ -296,8 +290,8 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     display: grid;
     gap: 8px;
     padding: 20px;
-    border-radius: 24px;
-    background: rgba(13, 27, 51, 0.4);
+    border-radius: var(--radius);
+    background: var(--accent-soft);
   }
 
   .cc__links {
@@ -310,35 +304,25 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
   }
 
   .cc__links :global(.cl) {
-    background: rgba(255, 255, 255, 0.16);
-    color: #ffffff;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
-    border-radius: 20px;
-  }
-
-  .cc__links :global(.cl__label),
-  .cc__links :global(.cl--pending .cl__value) {
-    color: #d6e2ff;
-  }
-
-  .cc__links :global(a.cl:hover) {
-    background: #ffffff;
-    color: var(--ink);
+    border-radius: var(--radius-sm);
   }
 
   .cc__brief {
     margin-top: 4px;
     font-family: var(--font-display);
     font-weight: 600;
-    color: #ffffff;
     text-underline-offset: 0.3em;
+  }
+
+  .cc__brief:hover {
+    color: var(--accent-deep);
   }
 
   @media (max-width: 767px) {
     .cc__field {
       min-height: 0;
       padding: 72px 10px 40px;
-      border-radius: 28px;
+      border-radius: 24px;
     }
 
     .cc__plane {

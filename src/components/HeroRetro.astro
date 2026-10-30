@@ -1,0 +1,560 @@
+---
+/**
+ * Первый экран: серая сцена в две зоны. Слева — заголовок «лесенкой» и оффер,
+ * справа — ретро-машина, которая собирает сайты, с парящими курсором, окном и кубиками
+ * поверх белого пиксельного слова. Изображения — src/assets/gen (IMAGE_GENERATION_PROMPTS.md).
+ */
+import { Image } from 'astro:assets';
+import PixelWord from './PixelWord.astro';
+import ContactIcon from './ContactIcon.astro';
+import { minPrice, formatPrice, pricingConfirmed } from '@/config/pricing';
+import { site, telegramUrl, emailUrl } from '@/config/site';
+import { genImage } from '@/lib/gen';
+import { url } from '@/lib/url';
+
+const machine = genImage('hero-machine');
+const object = machine ?? genImage('hero-sculpture');
+const tinted = !machine;
+// Парящие элементы: свои, если сгенерированы; иначе — временные, перекрашенные.
+const floats = [
+  { img: genImage('float-cursor') ?? genImage('obj-plane'), cls: 'f1', amp: 46, tint: !genImage('float-cursor') },
+  { img: genImage('float-window') ?? genImage('obj-landing'), cls: 'f2', amp: 30, tint: !genImage('float-window') },
+  { img: genImage('float-cubes') ?? genImage('obj-catalog'), cls: 'f3', amp: 60, tint: !genImage('float-cubes') },
+].filter((f) => f.img);
+const tg = telegramUrl();
+const mail = emailUrl('Заявка на разработку сайта');
+---
+
+<section class="hr" aria-labelledby="hr-title" data-tilt-area>
+  <div class="hr__stage">
+    <h1 id="hr-title" class="hr__title">
+      <span class="hr__line hr__line--1"><span>Сайты,</span></span>
+      <span class="hr__line hr__line--2"><span>которые</span></span>
+      <span class="hr__line hr__line--3"><span><i class="hr__dot" aria-hidden="true"></i>работают</span></span>
+      <span class="hr__line hr__line--4"><span>на бизнес</span></span>
+    </h1>
+
+    <div class="hr__object" aria-hidden="true">
+      <PixelWord text="MALTSEV" appear="intro" delay={0.4} class="hr__px" />
+      <div class="hr__float" data-float="22">
+        {
+          object && (
+            <Image
+              class:list={['hr__machine', { 'is-tinted': tinted }]}
+              src={object.src}
+              alt=""
+              widths={[480, 720, 958]}
+              sizes="(max-width: 767px) 92vw, (max-width: 1023px) 70vw, 620px"
+              quality={80}
+              loading="eager"
+              fetchpriority="high"
+            />
+          )
+        }
+      </div>
+      {
+        floats.map((f) => (
+          <div class={`hr__bit hr__bit--${f.cls}`} data-float={f.amp}>
+            <Image class:list={{ 'is-tinted': f.tint }} src={f.img!.src} alt="" widths={[160, 300]} sizes="140px" loading="eager" />
+          </div>
+        ))
+      }
+    </div>
+
+    <ul class="hr__social" aria-label="Связаться напрямую">
+      {
+        tg && (
+          <li>
+            <a href={tg} target="_blank" rel="noopener" aria-label={`Telegram: @${site.contacts.telegram.value}`}>
+              <ContactIcon kind="telegram" />
+            </a>
+          </li>
+        )
+      }
+      {
+        mail && (
+          <li>
+            <a href={mail} aria-label={`Почта: ${site.contacts.email.value}`}>
+              <ContactIcon kind="email" />
+            </a>
+          </li>
+        )
+      }
+    </ul>
+
+    <div class="hr__offer">
+      <p class="hr__lead">
+        Проектирую и разрабатываю сайты для бизнеса и специалистов: дизайн, код и запуск под ключ. ИИ
+        ускоряет рутину, решения и качество — за мной.
+      </p>
+      <div class="hr__btns">
+        <a class="btn btn--accent hr__btn" href={url('/contacts/')} data-magnetic>
+          Обсудить проект <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="btn btn--ghost hr__btn" href={url('/#work')}>Смотреть работы</a>
+      </div>
+    </div>
+
+    <div class="hr__stat">
+      <p class="hr__stat-v">от {formatPrice(minPrice)}</p>
+      <p class="hr__stat-l">
+        Цена и сроки известны до начала работ.{!pricingConfirmed && ' Цены предварительные.'}
+      </p>
+    </div>
+
+    <a class="hr__scroll" href="#manifest">
+      <span class="hr__mouse" aria-hidden="true"><i></i></span>
+      <span>Листайте<br />дальше</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .hr {
+    padding-top: 4px;
+  }
+
+  .hr__stage {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: 1fr auto;
+    gap: 32px var(--gap);
+    min-height: calc(100svh - var(--header-h) - var(--margin) * 2 - var(--banner-h, 0px) - 16px);
+    max-height: 1000px;
+    padding: clamp(28px, 3.4vw, 56px) clamp(24px, 3.4vw, 56px) 104px;
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(45% 60% at 72% 42%, #f6f5f1 0%, rgba(246, 245, 241, 0) 70%),
+      linear-gradient(180deg, #e3e2dd, #d7d6d0);
+    overflow: hidden;
+  }
+
+  :global(.page:has(.pv)) {
+    --banner-h: 43px;
+  }
+
+  /* Пиксельное слово — белое, за нижней частью машины: читается по краям и под клавиатурой */
+  .hr__object :global(.hr__px) {
+    position: absolute;
+    z-index: -1;
+    left: -4%;
+    right: -4%;
+    bottom: 2%;
+    width: 108%;
+    height: auto;
+    color: #ffffff;
+  }
+
+  /* Заголовок «лесенкой» — левая зона */
+  .hr__title {
+    position: relative;
+    z-index: 1;
+    grid-column: 1 / 7;
+    grid-row: 1;
+    align-self: center;
+    display: grid;
+    font-family: var(--font-head);
+    font-weight: 650;
+    font-size: clamp(2.75rem, 0.4rem + 4.6vw, 5.75rem);
+    line-height: 0.92;
+    white-space: nowrap;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+  }
+
+  .hr__line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.04em;
+  }
+
+  .hr__line > span {
+    display: inline-block;
+  }
+
+  .hr__line--1 {
+    padding-left: 1.4em;
+  }
+
+  .hr__line--3 {
+    padding-left: 0.7em;
+  }
+
+  .hr__dot {
+    display: inline-block;
+    width: 0.16em;
+    height: 0.16em;
+    margin-right: 0.3em;
+    vertical-align: 0.06em;
+    background: var(--accent);
+  }
+
+  /* Машина и парящие элементы — правая зона */
+  .hr__object {
+    position: relative;
+    z-index: 0;
+    grid-column: 7 / 13;
+    grid-row: 1;
+    align-self: center;
+    justify-self: center;
+    width: min(100%, 620px);
+    aspect-ratio: 3 / 2;
+    pointer-events: none;
+  }
+
+  .hr__float {
+    position: absolute;
+    inset: 0;
+    animation: hr-bob 7s ease-in-out infinite;
+  }
+
+  .hr__machine {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 40px 36px rgba(21, 21, 21, 0.2));
+  }
+
+  /* Временная перекраска (если своего изображения нет) перебивает собственную тень. */
+  .hr__machine:global(.is-tinted),
+  .hr__bit img:global(.is-tinted) {
+    filter: hue-rotate(178deg) saturate(1.45) brightness(1.04) drop-shadow(0 40px 40px rgba(21, 21, 21, 0.22));
+  }
+
+  .hr__bit {
+    position: absolute;
+  }
+
+  .hr__bit img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 18px 20px rgba(21, 21, 21, 0.2));
+  }
+
+  .hr__bit--f1 {
+    top: 14%;
+    right: -4%;
+    width: 21%;
+    animation: hr-bob 6s ease-in-out -2s infinite;
+  }
+
+  .hr__bit--f2 {
+    top: 46%;
+    left: -5%;
+    width: 22%;
+    animation: hr-bob 8s ease-in-out -4s infinite;
+  }
+
+  .hr__bit--f3 {
+    bottom: -6%;
+    right: 2%;
+    width: 15%;
+    animation: hr-bob 7.5s ease-in-out -1s infinite;
+  }
+
+  @keyframes hr-bob {
+    0%,
+    100% {
+      translate: 0 0;
+      rotate: 0deg;
+    }
+
+    50% {
+      translate: 0 -12px;
+      rotate: 1.5deg;
+    }
+  }
+
+  /* Контакты — в правом верхнем углу */
+  .hr__social {
+    position: absolute;
+    z-index: 1;
+    top: clamp(20px, 2.4vw, 36px);
+    right: clamp(20px, 2.4vw, 36px);
+    list-style: none;
+    padding: 6px;
+    display: flex;
+    gap: 6px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .hr__social a {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    color: #3b3a36;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  .hr__social a:hover {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .hr__social a:active {
+    transform: scale(0.94);
+  }
+
+  /* Нижняя строка: оффер слева, цена справа */
+  .hr__offer {
+    position: relative;
+    z-index: 1;
+    grid-column: 1 / 7;
+    grid-row: 2;
+    display: grid;
+    gap: 22px;
+  }
+
+  .hr__lead {
+    max-width: 46ch;
+    font-size: clamp(1.0625rem, 0.95rem + 0.35vw, 1.25rem);
+    line-height: 1.5;
+    color: #24231f;
+  }
+
+  .hr__btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .hr__btn {
+    min-height: 58px;
+    padding-inline: 26px;
+  }
+
+  .hr__btns .btn--ghost {
+    background: rgba(255, 255, 255, 0.55);
+  }
+
+  .hr__btns .btn--ghost:hover {
+    background: #ffffff;
+  }
+
+  .hr__stat {
+    position: relative;
+    z-index: 1;
+    grid-column: 9 / 13;
+    grid-row: 2;
+    align-self: end;
+    justify-self: end;
+    max-width: 320px;
+    padding: 18px 22px;
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.6);
+    text-align: right;
+  }
+
+  .hr__stat-v {
+    font-family: var(--font-head);
+    font-weight: 650;
+    font-size: clamp(1.75rem, 1.1rem + 1.6vw, 2.75rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+  }
+
+  .hr__stat-l {
+    margin-top: 8px;
+    font-size: 0.9375rem;
+    color: #3b3a36;
+  }
+
+  /* Подсказка о прокрутке: «выемка» снизу по центру */
+  .hr__scroll {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    z-index: 1;
+    transform: translateX(-50%);
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 14px 34px 10px;
+    border-radius: 26px 26px 0 0;
+    background: var(--bg);
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    color: var(--muted);
+  }
+
+  .hr__scroll:hover {
+    color: var(--ink);
+  }
+
+  .hr__mouse {
+    display: grid;
+    justify-items: center;
+    width: 18px;
+    height: 26px;
+    padding-top: 5px;
+    border: 2px solid currentColor;
+    border-radius: 10px;
+  }
+
+  .hr__mouse i {
+    width: 2px;
+    height: 6px;
+    border-radius: 2px;
+    background: currentColor;
+    animation: hr-wheel 1.8s ease-in-out infinite;
+  }
+
+  @keyframes hr-wheel {
+    0% {
+      opacity: 0;
+      transform: translateY(-2px);
+    }
+
+    40% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  /* Сборка первого экрана: CSS, стартует с первой отрисовки, не ждёт скриптов. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hr__line > span {
+      animation: hr-line 1s var(--ease-out) backwards;
+    }
+
+    .hr__line--1 > span { animation-delay: 0.1s; }
+    .hr__line--2 > span { animation-delay: 0.18s; }
+    .hr__line--3 > span { animation-delay: 0.26s; }
+    .hr__line--4 > span { animation-delay: 0.34s; }
+
+    .hr__object {
+      animation: hr-object 1.4s var(--ease-out) 0.15s backwards;
+    }
+
+    .hr__stat,
+    .hr__offer,
+    .hr__social {
+      animation: hr-up 0.9s var(--ease-out) 0.55s backwards;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hr__float,
+    .hr__bit,
+    .hr__mouse i {
+      animation: none;
+    }
+  }
+
+  @keyframes hr-line {
+    from {
+      transform: translateY(105%);
+    }
+  }
+
+  /* Без затухания: машина — LCP-элемент, она должна быть видна с первой отрисовки. */
+  @keyframes hr-object {
+    from {
+      scale: 0.86;
+      rotate: -4deg;
+    }
+  }
+
+  @keyframes hr-up {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+  }
+
+  /* Планшет и телефон: одна колонка — заголовок, машина, цена, оффер. */
+  @media (max-width: 1023px) {
+    .hr__stage {
+      grid-template-rows: auto;
+      min-height: 0;
+      max-height: none;
+      padding-bottom: 96px;
+    }
+
+    .hr__title,
+    .hr__object,
+    .hr__offer,
+    .hr__stat {
+      grid-column: 1 / -1;
+      grid-row: auto;
+    }
+
+    .hr__title {
+      padding-right: 120px;
+    }
+
+    .hr__object {
+      width: min(100%, 560px);
+      margin-block: 8px;
+    }
+
+    .hr__stat {
+      justify-self: start;
+      text-align: left;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .hr__stage {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 76px 18px 96px;
+      border-radius: 24px;
+    }
+
+    .hr__social {
+      top: 16px;
+      right: 16px;
+    }
+
+    .hr__title {
+      font-size: clamp(2.375rem, 11.5vw, 3.25rem);
+      padding-right: 0;
+    }
+
+    .hr__line--1 {
+      padding-left: 1.1em;
+    }
+
+    .hr__object {
+      width: 100%;
+    }
+
+    .hr__bit--f2 {
+      left: -4%;
+    }
+
+    .hr__bit--f1 {
+      right: 0;
+    }
+
+    .hr__stat {
+      justify-self: stretch;
+      max-width: none;
+    }
+
+    .hr__stat-v {
+      font-size: 2.25rem;
+    }
+
+    .hr__btn {
+      flex: 1 1 100%;
+      justify-content: space-between;
+    }
+  }
+</style>

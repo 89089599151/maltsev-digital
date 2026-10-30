@@ -1,5 +1,6 @@
 ---
 import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
 import FaqList from '@/components/FaqList.astro';
 import { faq } from '@/data/content';
 import { url } from '@/lib/url';
@@ -20,15 +21,16 @@ const schema = {
   description="Сколько стоит и сколько длится разработка сайта, что нужно для старта, кому принадлежит сайт, как используется ИИ и что будет после запуска."
   schema={schema}
 >
-  <section class="fq-hero" aria-labelledby="fq-title" data-stagger>
-    <div class="fq-hero__title tile tile--accent">
-      <h1 id="fq-title" class="fq-hero__h1">Вопросы и ответы</h1>
-    </div>
-    <div class="fq-hero__side tile tile--raised">
-      <p class="statement">О цене, сроках, правах на сайт и о том, как в работе используется ИИ.</p>
-      <a class="btn btn--accent" href={url('/contacts/')}>Задать свой вопрос <span class="arrow" aria-hidden="true">→</span></a>
-    </div>
-  </section>
+  <PageHero
+    id="fq-title"
+    title="Вопросы и ответы"
+    pixel="???"
+    lead="О цене, сроках, правах на сайт и о том, как в работе используется ИИ."
+  >
+    <Fragment slot="actions">
+      <a class="btn btn--ink" href={url('/contacts/')}>Задать свой вопрос <span class="arrow" aria-hidden="true">→</span></a>
+    </Fragment>
+  </PageHero>
 
   <div class="section">
     <FaqList items={faq} heading="Всё, что спрашивают" headingId="fq-list-title" group="faq-page">
@@ -41,58 +43,3 @@ const schema = {
     </FaqList>
   </div>
 </Base>
-
-<style>
-  .fq-hero {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--gap);
-    margin-top: var(--gap);
-    min-height: 420px;
-  }
-
-  .fq-hero__title {
-    grid-column: 1 / 9;
-    display: flex;
-    align-items: flex-end;
-  }
-
-  .fq-hero__h1 {
-    font-size: clamp(2.5rem, 1rem + 4.4vw, 5.5rem);
-    line-height: 0.98;
-    letter-spacing: -0.045em;
-  }
-
-  .fq-hero__side {
-    grid-column: 9 / 13;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 24px;
-  }
-
-  .fq-hero__side .btn {
-    align-self: flex-start;
-  }
-
-  @media (max-width: 1023px) {
-    .fq-hero__title,
-    .fq-hero__side {
-      grid-column: 1 / -1;
-    }
-
-    .fq-hero__title {
-      min-height: 280px;
-    }
-  }
-
-  @media (max-width: 767px) {
-    .fq-hero {
-      grid-template-columns: 1fr;
-    }
-
-    .fq-hero__h1 {
-      font-size: 10vw;
-    }
-  }
-</style>

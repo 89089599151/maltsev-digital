@@ -1,6 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro';
 import ContactLink from '@/components/ContactLink.astro';
+import PageHero from '@/components/PageHero.astro';
 import FormNotice from '@/components/FormNotice.astro';
 import { site } from '@/config/site';
 import { plans, formatPrice } from '@/config/pricing';
@@ -15,15 +16,15 @@ const deadlines = ['Как можно скорее', 'В течение меся
   title="Контакты и заявка на разработку сайта"
   description="Оставьте заявку на разработку сайта: тип проекта, тариф и описание задачи. Или напишите напрямую в Telegram или на почту."
 >
-  <div class="ct">
+  <PageHero
+    id="ct-title"
+    title="Обсудим ваш сайт"
+    pixel="ПРИВЕТ"
+    lead={`Расскажите о задаче — отвечу ${site.contacts.responseTime.value}, задам уточняющие вопросы и пришлю предложение со сроками и стоимостью.`}
+  />
+
+  <div class="ct section section--tight">
     <section class="ct__intro" aria-labelledby="ct-title" data-stagger>
-      <div class="ct__title tile tile--paper">
-        <h1 id="ct-title" class="ct__h1">Обсудим ваш сайт</h1>
-        <p class="lead">
-          Расскажите о задаче — отвечу {site.contacts.responseTime.value}, задам уточняющие вопросы и
-          пришлю предложение со сроками и стоимостью.
-        </p>
-      </div>
       <div class="ct__direct">
         <ContactLink kind="telegram" variant="tile" />
         <ContactLink kind="email" variant="tile" />
@@ -174,22 +175,9 @@ const deadlines = ['Как можно скорее', 'В течение меся
     top: calc(var(--header-h) + var(--margin) + var(--gap));
   }
 
-  .ct__title {
-    display: grid;
-    gap: 28px;
-    min-height: 360px;
-    align-content: space-between;
-  }
-
-  .ct__h1 {
-    font-size: clamp(2.25rem, 1rem + 2.8vw, 4rem);
-    line-height: 1;
-    letter-spacing: -0.045em;
-  }
-
   .ct__direct {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: var(--gap);
   }
 
@@ -272,7 +260,7 @@ const deadlines = ['Как можно скорее', 'В течение меся
     width: 100%;
     min-height: 54px;
     padding: 14px 16px;
-    border: 2px solid rgba(13, 27, 51, 0.08);
+    border: 2px solid rgba(21, 21, 21, 0.08);
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.8);
     color: var(--ink);
@@ -290,7 +278,7 @@ const deadlines = ['Как можно скорее', 'В течение меся
 
   input::placeholder,
   textarea::placeholder {
-    color: #6b7a93;
+    color: #6b6a64;
   }
 
   input[type='text']:hover,
@@ -450,10 +438,6 @@ const deadlines = ['Как можно скорее', 'В течение меся
     .ct__form-wrap {
       grid-column: 1 / -1;
       position: static;
-    }
-
-    .ct__title {
-      min-height: 0;
     }
   }
 

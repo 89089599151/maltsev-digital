@@ -1,0 +1,208 @@
+---
+/**
+ * «Кто делает сайт»: фото слева, рассказ и факты справа — на серой сцене.
+ */
+import { Image } from 'astro:assets';
+import PixelWord from './PixelWord.astro';
+import { site } from '@/config/site';
+import { url } from '@/lib/url';
+import owner from '@/assets/photos/owner.webp';
+
+const facts = [
+  { k: 'Образование', v: 'в дизайне' },
+  { k: 'Связь', v: 'напрямую' },
+  { k: 'Формат', v: 'удалённо' },
+];
+---
+
+<section class="ow section" id="about" aria-labelledby="ow-title">
+  <div class="ow__stage" data-reveal="rise">
+    <div class="ow__photo">
+      <Image
+        src={owner}
+        alt={`${site.brand.owner.value} на ночной площади под снегом смотрит вверх, на свет фонаря`}
+        widths={[480, 720, 960, 1280]}
+        sizes="(max-width: 1023px) 92vw, 42vw"
+        loading="lazy"
+      />
+      <PixelWord text="M" class="ow__mark" />
+    </div>
+
+    <div class="ow__body">
+      <h2 id="ow-title" class="ow__title" data-split>Кто делает сайт</h2>
+      <div class="ow__who">
+        <p class="ow__name">{site.brand.owner.value}</p>
+        <p class="ow__role">Независимый веб-разработчик и дизайнер</p>
+      </div>
+      <p class="ow__text">
+        Веду проект сам — от первого разговора до запуска. Не передаю задачу менеджерам и подрядчикам:
+        вы всегда знаете, кто отвечает за результат.
+      </p>
+      <dl class="ow__facts">
+        {
+          facts.map((f) => (
+            <div>
+              <dt>{f.k}</dt>
+              <dd>{f.v}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <div class="ow__btns">
+        <a class="btn btn--ink" href={url('/contacts/')} data-magnetic>
+          Обсудить проект <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="ow__more" href={url('/about/')}>Подробнее обо мне</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ow__stage {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(24px, 4vw, 72px);
+    align-items: center;
+    padding: clamp(12px, 1.2vw, 18px);
+    padding-right: clamp(24px, 4vw, 72px);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+
+  .ow__photo {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: calc(var(--radius-lg) - 8px);
+    overflow: hidden;
+    background: var(--night);
+  }
+
+  .ow__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
+  }
+
+  .ow__photo :global(.ow__mark) {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    width: 44px;
+    height: auto;
+    color: var(--accent);
+  }
+
+  .ow__body {
+    display: grid;
+    gap: clamp(18px, 2vw, 26px);
+    padding-block: clamp(12px, 3vw, 48px);
+  }
+
+  .ow__title {
+    font-size: var(--step-head);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+  }
+
+  .ow__name {
+    font-family: var(--font-head);
+    font-weight: 650;
+    font-size: clamp(1.375rem, 1.1rem + 0.8vw, 1.875rem);
+    letter-spacing: -0.03em;
+  }
+
+  .ow__role {
+    color: var(--muted);
+  }
+
+  .ow__text {
+    max-width: 52ch;
+    font-size: var(--step-body);
+  }
+
+  .ow__facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .ow__facts div {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 4px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .ow__facts dt {
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  .ow__facts dd {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.0625rem;
+  }
+
+  .ow__btns {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 24px;
+    margin-top: 4px;
+  }
+
+  .ow__btns .btn {
+    min-height: 56px;
+  }
+
+  .ow__more {
+    font-family: var(--font-display);
+    font-weight: 650;
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-block: 10px 2px;
+  }
+
+  @media (max-width: 1023px) {
+    .ow__stage {
+      grid-template-columns: 1fr;
+      padding-right: clamp(12px, 1.2vw, 18px);
+    }
+
+    .ow__photo {
+      aspect-ratio: 16 / 11;
+    }
+
+    .ow__body {
+      padding: 8px clamp(8px, 2vw, 24px) 16px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .ow__stage {
+      border-radius: 22px;
+      padding: 8px;
+    }
+
+    .ow__photo {
+      aspect-ratio: 4 / 3;
+      border-radius: 16px;
+    }
+
+    .ow__facts {
+      grid-template-columns: 1fr;
+    }
+
+    .ow__facts div {
+      flex-direction: row-reverse;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+  }
+</style>

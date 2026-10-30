@@ -1,50 +1,32 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '@/layouts/Base.astro';
-import HeroGlass from '@/components/HeroGlass.astro';
-import Shelf from '@/components/Shelf.astro';
-import CaseSelf from '@/components/CaseSelf.astro';
-import Directions from '@/components/Directions.astro';
-import ProcessAccordion from '@/components/ProcessAccordion.astro';
-import PlanTiles from '@/components/PlanTiles.astro';
-import OwnerScene from '@/components/OwnerScene.astro';
+import HeroRetro from '@/components/HeroRetro.astro';
+import ManifestSplit from '@/components/ManifestSplit.astro';
+import WorkFeature from '@/components/WorkFeature.astro';
+import ServicesGrid from '@/components/ServicesGrid.astro';
+import ProcessSteps from '@/components/ProcessSteps.astro';
+import PricingCards from '@/components/PricingCards.astro';
+import OwnerSplit from '@/components/OwnerSplit.astro';
 import FaqList from '@/components/FaqList.astro';
-import ContactCard from '@/components/ContactCard.astro';
+import ContactSplit from '@/components/ContactSplit.astro';
 import { faq } from '@/data/content';
 import { url } from '@/lib/url';
 
-const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const [featured] = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const homeFaq = faq.filter((f) => f.home);
 ---
 
 <Base>
-  <HeroGlass />
+  <HeroRetro />
+  <ManifestSplit />
+  {featured && <WorkFeature project={featured} />}
+  <ServicesGrid />
+  <ProcessSteps />
+  <PricingCards />
+  <OwnerSplit />
 
-  <!-- Манифест: только типографика, без карточек. -->
-  <section class="mf section" aria-labelledby="mf-title">
-    <h2 id="mf-title" class="mf__title" data-split>ИИ ускоряет. Решаю&nbsp;я.</h2>
-    <p class="mf__text" data-scrub-words>
-      Нейросети забирают у разработки рутину: черновики, варианты композиции, проверку кода и тесты.
-      Освободившееся время уходит на то, что определяет результат, — понять ваш бизнес, продумать путь
-      клиента от первого экрана до заявки и довести каждую страницу до быстрой и аккуратной работы на любом
-      экране.
-    </p>
-    <p class="mf__aside" data-reveal>
-      Вы говорите напрямую с тем, кто делает сайт. Без менеджеров и испорченного телефона.
-    </p>
-  </section>
-
-  {projects.length > 0 ? <Shelf projects={projects} /> : <CaseSelf />}
-
-  <Directions />
-
-  <ProcessAccordion />
-
-  <PlanTiles />
-
-  <OwnerScene />
-
-  <div class="section">
+  <div class="section" id="faq">
     <FaqList items={homeFaq} headingId="home-faq-title">
       <Fragment slot="side">
         <p>Не нашли ответ? Задайте вопрос в заявке — отвечу лично.</p>
@@ -55,57 +37,5 @@ const homeFaq = faq.filter((f) => f.home);
     </FaqList>
   </div>
 
-  <ContactCard />
+  <ContactSplit />
 </Base>
-
-<style>
-  .mf {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: clamp(28px, 4vw, 56px) var(--gap);
-    align-items: end;
-  }
-
-  .mf__title {
-    grid-column: 1 / -1;
-    font-size: clamp(2.5rem, 0.6rem + 6.4vw, 6rem);
-    line-height: 0.98;
-    letter-spacing: -0.045em;
-    max-width: 14ch;
-  }
-
-  .mf__text {
-    grid-column: 5 / 12;
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: clamp(1.25rem, 0.95rem + 1vw, 1.875rem);
-    line-height: 1.35;
-    letter-spacing: -0.015em;
-    color: var(--ink);
-  }
-
-  .mf__aside {
-    grid-column: 1 / 4;
-    grid-row: 2;
-    align-self: start;
-    padding-top: 0.4em;
-    color: #34445f;
-  }
-
-  @media (max-width: 1023px) {
-    .mf__text {
-      grid-column: 1 / -1;
-    }
-
-    .mf__aside {
-      grid-column: 1 / -1;
-      grid-row: auto;
-    }
-  }
-
-  @media (max-width: 767px) {
-    .mf {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>

@@ -13,7 +13,10 @@ const rows = [
   { key: 'business', name: 'Сайты компаний', text: 'Разделы, услуги, портфолио и блог — сайт, которому доверяют.', plan: plans[1] },
   { key: 'catalog', name: 'Каталоги', text: 'Товары и услуги с фильтрами, карточками и формой заказа.', plan: plans[1] },
   { key: 'personal', name: 'Сайты специалистов', text: 'Личный бренд врача, юриста, тренера или дизайнера.', plan: plans[0] },
-].map((r) => ({ ...r, img: genImage(`obj-${r.key}`) }));
+].map((r) => {
+  const own = genImage(`svc-${r.key}`);
+  return { ...r, img: own ?? genImage(`obj-${r.key}`), tinted: !own };
+});
 ---
 
 <section class="dir section" aria-labelledby="dir-title">
@@ -34,7 +37,7 @@ const rows = [
             <span class="dir__text">{r.text}</span>
             <span class="dir__price">от {formatPrice(r.plan.price)}</span>
             {r.img && (
-              <Image class="dir__thumb" src={r.img.src} alt="" widths={[160, 240]} sizes="96px" loading="lazy" />
+              <Image class:list={['dir__thumb', { 'is-tinted': r.tinted }]} src={r.img.src} alt="" widths={[160, 240]} sizes="96px" loading="lazy" />
             )}
             <span class="dir__arrow" aria-hidden="true">→</span>
           </a>
@@ -48,7 +51,7 @@ const rows = [
       rows.map(
         (r) =>
           r.img && (
-            <Image src={r.img.src} alt="" widths={[360, 540]} sizes="300px" loading="lazy" data-dir-img={r.key} />
+            <Image class:list={{ 'is-tinted': r.tinted }} src={r.img.src} alt="" widths={[360, 540]} sizes="300px" loading="lazy" data-dir-img={r.key} />
           ),
       )
     }
@@ -112,7 +115,7 @@ const rows = [
   .dir__note {
     grid-column: 7 / 12;
     font-size: var(--step-body);
-    color: #23324d;
+    color: #24231f;
   }
 
   .dir__list {
@@ -126,7 +129,7 @@ const rows = [
     gap: 24px;
     align-items: center;
     padding: clamp(22px, 2.6vw, 34px) clamp(16px, 2vw, 28px);
-    border-top: 1px solid rgba(13, 27, 51, 0.12);
+    border-top: 1px solid rgba(21, 21, 21, 0.12);
     text-decoration: none;
     border-radius: 0;
     transition:
@@ -135,7 +138,7 @@ const rows = [
   }
 
   .dir__list li:last-child .dir__row {
-    border-bottom: 1px solid rgba(13, 27, 51, 0.12);
+    border-bottom: 1px solid rgba(21, 21, 21, 0.12);
   }
 
   .dir__row:hover,
@@ -159,7 +162,7 @@ const rows = [
 
   .dir__text {
     font-size: 1rem;
-    color: #34445f;
+    color: #3b3a36;
     max-width: 40ch;
   }
 
@@ -218,7 +221,7 @@ const rows = [
     transition:
       opacity 400ms var(--ease-out),
       transform 600ms var(--ease-out);
-    filter: drop-shadow(0 30px 40px rgba(20, 50, 130, 0.3));
+    filter: drop-shadow(0 30px 40px rgba(21, 21, 21, 0.25));
   }
 
   .dir__float.is-on[data-active='landing'] [data-dir-img='landing'],

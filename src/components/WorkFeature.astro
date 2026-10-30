@@ -1,0 +1,330 @@
+---
+/**
+ * «Работы» на главной: одна большая витрина кейса (сейчас — этот сайт, сделанный с ИИ).
+ * Данные берутся из src/content/projects; витрина показывает проект с наименьшим order.
+ */
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import SectionHead from './SectionHead.astro';
+import { url } from '@/lib/url';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  /** false — без заголовка секции (на странице портфолио заголовок уже в первом экране). */
+  head?: boolean;
+}
+const { project, head = true } = Astro.props;
+// Без заголовка секции название кейса становится заголовком второго уровня.
+const Name = head ? 'h3' : 'h2';
+const d = project.data;
+const desktop = d.responsive.desktop ?? d.cover;
+const mobile = d.responsive.mobile;
+const steps = [
+  { t: 'Исследование', d: '20 сайтов студий разобраны в браузере' },
+  { t: 'Три концепции', d: 'Тёмная, стеклянная и финальная тёплая' },
+  { t: 'Проверка', d: 'Шесть ширин экрана и Lighthouse' },
+];
+---
+
+<section class="wf section" id="work" aria-labelledby={head ? 'wf-title' : 'wf-name'}>
+  {head && <SectionHead
+    id="wf-title"
+    title="Работы"
+    text="Первый кейс — сайт, который вы сейчас смотрите. Он сделан тем же способом, каким будет сделан ваш: с ИИ-инструментами и авторскими решениями."
+    link={{ href: url('/portfolio/'), label: 'Все работы' }}
+  />}
+
+  <article class="wf__stage" aria-labelledby="wf-name" data-tilt-area data-reveal="rise">
+    <div class="wf__info">
+      <ul class="wf__tags" aria-label="О проекте">
+        <li class="wf__tag wf__tag--accent">Сделано с ИИ</li>
+        <li class="wf__tag">Реальный проект</li>
+        <li class="wf__tag">{d.year}</li>
+      </ul>
+      <Name id="wf-name" class="wf__name">{d.title}</Name>
+      <p class="wf__sum">{d.summary}</p>
+
+      <dl class="wf__results">
+        {
+          d.results.map((r) => (
+            <div>
+              <dt>{r.label}</dt>
+              <dd>{r.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <div class="wf__actions">
+        <a class="btn btn--ink" href={url(`/portfolio/${project.id}/`)} data-magnetic>
+          Смотреть кейс <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <ul class="wf__stack" aria-label="Технологии">
+          {d.stack.slice(0, 4).map((s) => <li>{s}</li>)}
+        </ul>
+      </div>
+    </div>
+
+    <a class="wf__visual" href={url(`/portfolio/${project.id}/`)} aria-label={`Открыть кейс ${d.title}`} tabindex="-1">
+      <div class="wf__laptop" data-tilt="5">
+        <div class="wf__screen">
+          <Image src={desktop} alt={d.coverAlt} widths={[640, 960, 1280]} sizes="(max-width: 1023px) 90vw, 50vw" loading="lazy" />
+        </div>
+        <div class="wf__base"></div>
+      </div>
+      {
+        mobile && (
+          <div class="wf__phone" data-speed="1.4">
+            <Image src={mobile} alt="" widths={[240, 376]} sizes="160px" loading="lazy" />
+          </div>
+        )
+      }
+    </a>
+  </article>
+
+  <ol class="wf__steps" data-stagger>
+    {
+      steps.map((s) => (
+        <li class="wf__step">
+          <span class="wf__step-t">{s.t}</span>
+          <span class="wf__step-d">{s.d}</span>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .wf__stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(24px, 4vw, 64px);
+    align-items: center;
+    padding: clamp(28px, 4vw, 64px);
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(55% 70% at 75% 45%, #f3f2ee 0%, rgba(243, 242, 238, 0) 70%),
+      linear-gradient(180deg, #e3e2dd, #d7d6d0);
+    overflow: hidden;
+  }
+
+  .wf__info {
+    display: grid;
+    gap: 18px;
+    align-content: start;
+  }
+
+  .wf__tags {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .wf__tag {
+    padding: 7px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.6);
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .wf__tag--accent {
+    background: var(--accent);
+  }
+
+  .wf__name {
+    font-size: clamp(2rem, 1.2rem + 2.6vw, 3.75rem);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+  }
+
+  .wf__sum {
+    max-width: 42ch;
+    font-size: var(--step-body);
+    color: #24231f;
+  }
+
+  .wf__results {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .wf__results div {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: 6px;
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  .wf__results dd {
+    font-family: var(--font-head);
+    font-weight: 650;
+    font-size: clamp(1.25rem, 1rem + 0.8vw, 1.75rem);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .wf__results dt {
+    font-size: 0.8125rem;
+    line-height: 1.3;
+    color: #3b3a36;
+  }
+
+  .wf__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 18px;
+    margin-top: 8px;
+  }
+
+  .wf__actions .btn {
+    min-height: 56px;
+  }
+
+  .wf__stack {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 0.875rem;
+    color: #3b3a36;
+  }
+
+  .wf__stack li + li::before {
+    content: '·';
+    margin-right: 6px;
+  }
+
+  /* Устройства */
+  .wf__visual {
+    position: relative;
+    display: block;
+    padding: 4% 8% 8% 0;
+  }
+
+  .wf__laptop {
+    transition: scale var(--dur) var(--ease-out);
+  }
+
+  .wf__visual:hover .wf__laptop {
+    scale: 1.02;
+  }
+
+  .wf__screen {
+    aspect-ratio: 1425 / 900;
+    padding: 1.6%;
+    border-radius: 14px 14px 0 0;
+    background: #151515;
+    overflow: hidden;
+    box-shadow: 0 40px 60px -30px rgba(21, 21, 21, 0.45);
+  }
+
+  .wf__screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 4px;
+  }
+
+  .wf__base {
+    height: clamp(10px, 1.2vw, 18px);
+    margin-inline: -6%;
+    border-radius: 0 0 14px 14px;
+    background: linear-gradient(#c9c8c2, #a9a8a2);
+  }
+
+  .wf__phone {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 22%;
+    aspect-ratio: 376 / 814;
+    padding: 2.4%;
+    border-radius: 22px;
+    background: #151515;
+    overflow: hidden;
+    box-shadow: 0 30px 50px -20px rgba(21, 21, 21, 0.5);
+  }
+
+  .wf__phone img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 14px;
+  }
+
+  /* Шаги кейса */
+  .wf__steps {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap);
+    margin-top: var(--gap);
+  }
+
+  .wf__step {
+    display: grid;
+    gap: 4px;
+    padding: 20px 22px;
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  .wf__step-t {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.125rem;
+  }
+
+  .wf__step-d {
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 1023px) {
+    .wf__stage {
+      grid-template-columns: 1fr;
+    }
+
+    .wf__visual {
+      order: -1;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .wf__stage {
+      padding: 20px 16px 24px;
+      border-radius: 24px;
+    }
+
+    .wf__results {
+      grid-template-columns: 1fr;
+    }
+
+    .wf__results div {
+      flex-direction: row-reverse;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .wf__steps {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

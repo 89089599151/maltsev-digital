@@ -11,7 +11,7 @@ interface Props {
 }
 const { headingId = 'process-title', intro = true } = Astro.props;
 const fills = ['--tone-1', '--tone-2', '--tone-3', '--tone-4', '--tone-5', '--tone-6', '--tone-7'];
-const darkText = (i: number) => i >= 5;
+const darkText = (i: number) => i >= 4;
 ---
 
 <section class="proc section" id="process" aria-labelledby={headingId}>

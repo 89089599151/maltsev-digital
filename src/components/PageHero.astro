@@ -1,0 +1,188 @@
+---
+/**
+ * Первый экран внутренних страниц: серая сцена, как у главной, крупный капс-заголовок,
+ * пояснение и пиксельное слово. Справа — необязательный слот (факты, фото, кнопки).
+ */
+import PixelWord from './PixelWord.astro';
+import { url } from '@/lib/url';
+
+interface Props {
+  id: string;
+  title: string;
+  lead?: string;
+  /** Пиксельное слово в углу сцены — только из глифов pixel-font. */
+  pixel?: string;
+  crumbs?: { href: string; label: string }[];
+  /** Для длинных заголовков: меньший кегль и ниже сцена. */
+  compact?: boolean;
+}
+const { id, title, lead, pixel, crumbs, compact = false } = Astro.props;
+const hasAside = Astro.slots.has('default');
+---
+
+<section class:list={['ph', { 'ph--aside': hasAside, 'ph--compact': compact }]} aria-labelledby={id}>
+  <div class="ph__stage">
+    {pixel && <PixelWord text={pixel} appear="intro" delay={0.2} class="ph__px" />}
+    <div class="ph__main">
+      {
+        crumbs && (
+          <nav class="ph__crumbs" aria-label="Навигационная цепочка">
+            <a href={url('/')}>Главная</a>
+            {crumbs.map((c) => (
+              <>
+                <span aria-hidden="true">/</span>
+                <a href={c.href}>{c.label}</a>
+              </>
+            ))}
+          </nav>
+        )
+      }
+      <h1 id={id} class="ph__title">{title}</h1>
+      {lead && <p class="ph__lead">{lead}</p>}
+      <slot name="actions" />
+    </div>
+    {
+      hasAside && (
+        <div class="ph__aside">
+          <slot />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .ph {
+    margin-top: var(--margin);
+  }
+
+  .ph__stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(24px, 3vw, 48px);
+    align-items: end;
+    min-height: clamp(360px, 42vw, 560px);
+    padding: clamp(28px, 4vw, 64px);
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(55% 70% at 80% 30%, #f3f2ee 0%, rgba(243, 242, 238, 0) 70%),
+      linear-gradient(180deg, #e3e2dd, #d7d6d0);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .ph--aside .ph__stage {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+
+  .ph__stage :global(.ph__px) {
+    position: absolute;
+    z-index: -1;
+    top: clamp(24px, 3.4vw, 56px);
+    right: clamp(24px, 3.4vw, 56px);
+    width: clamp(160px, 26vw, 420px);
+    height: auto;
+    color: #ffffff;
+  }
+
+  .ph__main {
+    display: grid;
+    gap: clamp(16px, 2vw, 24px);
+    justify-items: start;
+  }
+
+  .ph__crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+
+  .ph__crumbs a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .ph__crumbs a:hover {
+    color: var(--ink);
+  }
+
+  .ph__title {
+    font-size: var(--step-display);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+    max-width: 12ch;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+
+  .ph--compact .ph__stage {
+    min-height: clamp(280px, 28vw, 400px);
+  }
+
+  .ph--compact .ph__title {
+    font-size: clamp(2rem, 1rem + 3.6vw, 4.5rem);
+    max-width: 18ch;
+  }
+
+  .ph__lead {
+    max-width: 52ch;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.0625rem, 0.95rem + 0.5vw, 1.375rem);
+    line-height: 1.4;
+    color: #24231f;
+  }
+
+  .ph__aside {
+    display: grid;
+    gap: 8px;
+    align-self: stretch;
+    align-content: end;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ph__main {
+      animation: ph-up 0.9s var(--ease-out) 0.1s backwards;
+    }
+
+    .ph__aside {
+      animation: ph-up 0.9s var(--ease-out) 0.25s backwards;
+    }
+  }
+
+  @keyframes ph-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .ph--aside .ph__stage {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .ph__stage {
+      min-height: 0;
+      padding: 24px 18px;
+      border-radius: 24px;
+    }
+
+    .ph__stage :global(.ph__px) {
+      top: 18px;
+      right: 18px;
+      width: 120px;
+      opacity: 0.8;
+    }
+
+    .ph__main {
+      padding-top: 56px;
+    }
+  }
+</style>

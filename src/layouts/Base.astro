@@ -6,10 +6,6 @@ import Footer from '@/components/Footer.astro';
 import PreviewBanner from '@/components/PreviewBanner.astro';
 import { site } from '@/config/site';
 import { url } from '@/lib/url';
-import { getImage } from 'astro:assets';
-import { genImage } from '@/lib/gen';
-import wavesWideFallback from '@/assets/bg/waves-wide.webp';
-import wavesTallFallback from '@/assets/bg/waves-tall.webp';
 
 interface Props {
   title?: string;
@@ -28,10 +24,6 @@ const {
   noindex = false,
   schema,
 } = Astro.props;
-
-// Фон: сгенерированный жидкий пейзаж (IMG-02/03), иначе нарисованная волна.
-const bgWide = await getImage({ src: genImage('bg-liquid-wide')?.src ?? wavesWideFallback, format: 'webp', quality: 78 });
-const bgTall = await getImage({ src: genImage('bg-liquid-tall')?.src ?? wavesTallFallback, format: 'webp', quality: 78 });
 
 const fullTitle = title ? `${title} — ${site.brand.name.value}` : site.seo.defaultTitle;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
@@ -58,7 +50,7 @@ const orgSchema = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
-    <meta name="theme-color" content="#e8eef8" />
+    <meta name="theme-color" content="#f6f5f1" />
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
     <link rel="icon" href={url("/icon-32.png")} sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href={url('/apple-touch-icon.png')} />
@@ -93,12 +85,6 @@ const orgSchema = {
     </script>
   </head>
   <body id="top">
-    <div class="bg-art" aria-hidden="true">
-      <picture>
-        <source media="(max-aspect-ratio: 1/1)" srcset={bgTall.src} />
-        <img src={bgWide.src} alt="" decoding="async" fetchpriority="low" />
-      </picture>
-    </div>
     <a class="skip-link" href="#main">К содержимому</a>
     <div class="page">
       <Header />

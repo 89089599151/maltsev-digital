@@ -1,15 +1,12 @@
 ---
-import { Image } from 'astro:assets';
 import Base from '@/layouts/Base.astro';
 import Estimator from '@/components/Estimator.astro';
-import ProcessAccordion from '@/components/ProcessAccordion.astro';
+import ProcessSteps from '@/components/ProcessSteps.astro';
+import PageHero from '@/components/PageHero.astro';
 import { plans, addons, extraPagePrice, paymentTerms, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
-import { genImage } from '@/lib/gen';
 
-const sculpture = genImage('hero-sculpture');
-
-const looks = ['raised', 'paper', 'accent'];
+const looks = ['raised', 'deep', 'raised'];
 
 // Таблица сравнения: строка — возможность, значения по тарифам.
 const compare: { label: string; values: [string, string, string] }[] = [
@@ -45,29 +42,24 @@ const schema = {
   description="Три пакета с фиксированной ценой: START, BUSINESS и PREMIUM. Что входит и не входит, сроки, правки, калькулятор стоимости и этапы работы."
   schema={pricingConfirmed ? schema : undefined}
 >
-  <section class="sv-hero" aria-labelledby="sv-title" data-stagger data-tilt-area>
-    <div class="sv-hero__title tile tile--paper">
-      <h1 id="sv-title" class="sv-hero__h1">Услуги и цены</h1>
-      <p class="sv-hero__lead">
-        Делаю сайты под ключ: от структуры и текстов до запуска на вашем домене. Три пакета с понятным
-        составом и фиксированной стоимостью.
-      </p>
+  <PageHero
+    id="sv-title"
+    title="Услуги и цены"
+    pixel="ЦЕНА"
+    lead="Делаю сайты под ключ: от структуры и текстов до запуска на вашем домене. Три пакета с понятным составом и фиксированной стоимостью."
+  >
+    <div class="sv-fact">
+      <p class="sv-fact__k">Оплата</p>
+      <p class="sv-fact__v">{paymentTerms}</p>
     </div>
-    <div class="sv-hero__photo tile tile--accent" aria-hidden="true">
-      {sculpture && <Image class="sv-hero__sculpt" src={sculpture.src} alt="" widths={[480, 800, 1200]} sizes="(max-width: 767px) 100vw, 40vw" loading="eager" data-float="24" />}
-    </div>
-    <div class="sv-hero__pay tile tile--raised">
-      <p class="sv-hero__k">Оплата</p>
-      <p class="statement">{paymentTerms}</p>
-    </div>
-    <div class="sv-hero__fix tile tile--accent">
-      <p class="sv-hero__k">Цена не растёт</p>
-      <p class="statement">
+    <div class="sv-fact sv-fact--accent">
+      <p class="sv-fact__k">Цена не растёт</p>
+      <p class="sv-fact__v">
         Сумма фиксируется в предложении и меняется, только если меняется задача.
         {!pricingConfirmed && ' Цены на сайте — предварительные.'}
       </p>
     </div>
-  </section>
+  </PageHero>
 
   <!-- Подробно о каждом тарифе -->
   <section class="section" aria-labelledby="detail-title">
@@ -99,7 +91,7 @@ const schema = {
               <div><dt>Правки</dt><dd>{p.revisions}</dd></div>
               <div><dt>Результат</dt><dd>{p.result}</dd></div>
             </dl>
-            <a class={`btn ${i === 2 ? 'btn--dark' : i === 1 ? 'btn--dark' : 'btn--accent'} col__btn`} href={url(`/contacts/?plan=${p.id}`)}>
+            <a class={`btn ${i === 1 ? 'btn--accent' : 'btn--ink'} col__btn`} href={url(`/contacts/?plan=${p.id}`)}>
               Заказать {p.name} <span class="arrow" aria-hidden="true">→</span>
             </a>
           </article>
@@ -163,82 +155,41 @@ const schema = {
     </ul>
   </section>
 
-  <ProcessAccordion headingId="sv-process-title" />
+  <ProcessSteps />
 
-  <section class="section sv-cta tile tile--paper" aria-labelledby="sv-cta-title">
+  <section class="section sv-cta tile tile--accent" aria-labelledby="sv-cta-title">
     <h2 id="sv-cta-title" class="head">Не уверены, какой тариф нужен?</h2>
     <p class="lead">Опишите задачу в двух словах — предложу подходящий вариант и назову точную сумму.</p>
-    <a class="btn btn--dark" href={url('/contacts/')}>Описать задачу <span class="arrow" aria-hidden="true">→</span></a>
+    <a class="btn btn--ink" href={url('/contacts/')}>Описать задачу <span class="arrow" aria-hidden="true">→</span></a>
   </section>
 </Base>
 
 <style>
-  .sv-hero {
+  .sv-fact {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    grid-template-rows: minmax(340px, auto) auto;
-    gap: var(--gap);
-    margin-top: var(--gap);
+    gap: 10px;
+    padding: 20px 22px;
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.7);
   }
 
-  .sv-hero__title {
-    grid-column: 1 / 9;
-    grid-row: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 40px;
+  .sv-fact--accent {
+    background: var(--accent);
   }
 
-  .sv-hero__h1 {
-    font-size: clamp(2.5rem, 1rem + 4.6vw, 5.75rem);
-    line-height: 0.98;
-    letter-spacing: -0.045em;
-  }
-
-  .sv-hero__lead {
-    font-size: var(--step-lead);
-    line-height: 1.35;
-    max-width: 40ch;
-  }
-
-  .sv-hero__photo {
-    grid-column: 9 / 13;
-    grid-row: 1;
-    display: grid;
-    place-items: center;
-    padding: 0;
-    overflow: hidden;
-  }
-
-  .sv-hero__sculpt {
-    width: 150%;
-    max-width: none;
-    height: auto;
-    filter: drop-shadow(0 30px 40px rgba(5, 20, 70, 0.35));
-  }
-
-  .sv-hero__pay {
-    grid-column: 1 / 7;
-    grid-row: 2;
-  }
-
-  .sv-hero__fix {
-    grid-column: 7 / 13;
-    grid-row: 2;
-  }
-
-  .sv-hero__pay,
-  .sv-hero__fix {
-    display: grid;
-    gap: 12px;
-    min-height: 200px;
-    align-content: space-between;
-  }
-
-  .sv-hero__k {
+  .sv-fact__k {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .sv-fact__v {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.0625rem;
+    line-height: 1.35;
   }
 
   .sv-h2 {
@@ -378,7 +329,7 @@ const schema = {
     padding: 16px 20px;
     text-align: left;
     vertical-align: top;
-    border-bottom: 1px solid rgba(13, 27, 51, 0.1);
+    border-bottom: 1px solid rgba(21, 21, 21, 0.1);
   }
 
   .cmp__table thead th {
@@ -390,7 +341,7 @@ const schema = {
 
   .cmp__table thead th:last-child,
   .cmp__table td:last-child {
-    background: rgba(36, 87, 230, 0.08);
+    background: rgba(255, 103, 0, 0.08);
   }
 
   .cmp__table tbody th {
@@ -427,6 +378,11 @@ const schema = {
     justify-content: space-between;
     gap: 24px;
     min-height: 320px;
+  }
+
+  .extras__head .head {
+    font-size: clamp(1.75rem, 1rem + 1.8vw, 2.75rem);
+    overflow-wrap: anywhere;
   }
 
   .extras__list {
@@ -478,11 +434,6 @@ const schema = {
   }
 
   @media (max-width: 1023px) {
-    .sv-hero__title { grid-column: 1 / -1; }
-    .sv-hero__photo { grid-column: 1 / -1; grid-row: auto; aspect-ratio: 16 / 9; }
-    .sv-hero__pay { grid-column: 1 / 7; grid-row: auto; }
-    .sv-hero__fix { grid-column: 7 / 13; grid-row: auto; }
-
     .cols {
       grid-template-columns: 1fr;
     }
@@ -508,25 +459,9 @@ const schema = {
   }
 
   @media (max-width: 767px) {
-    .sv-hero,
     .cmp,
     .extras {
       grid-template-columns: 1fr;
-    }
-
-    .sv-hero__title,
-    .sv-hero__photo,
-    .sv-hero__pay,
-    .sv-hero__fix {
-      grid-column: 1 / -1;
-    }
-
-    .sv-hero__title {
-      min-height: 46svh;
-    }
-
-    .sv-hero__h1 {
-      font-size: 10.5vw;
     }
 
     .col {

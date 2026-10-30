@@ -1,63 +1,71 @@
 /* ==========================================================================
-   MALTSEV DIGITAL — дизайн-система
-   Светлая доска из стеклянных плиток на сине-голубом фоне: 12 колонок,
-   один радиус, панели с размытием, белые и синие кнопки-«таблетки».
+   MALTSEV DIGITAL — дизайн-система (DESIGN.md — правила и примеры)
+   Тёплое светлое поле, графитовая типографика, насыщенный оранжевый акцент,
+   пиксельная графика как подпись бренда. Поверхности плоские, тени мягкие.
    ========================================================================== */
 
 :root {
-  /* Цвет: светлое поле, тёмно-синий текст, насыщенный синий акцент. */
-  --bg: #e8eef8;
-  --surface: rgba(255, 255, 255, 0.46);
-  --surface-2: rgba(255, 255, 255, 0.62);
-  --surface-3: rgba(255, 255, 255, 0.9);
-  --surface-solid: #f4f7fc;
-  --ink: #0d1b33;
-  --muted: #45556f;
-  --accent: #2457e6;
-  --accent-ink: #ffffff;
-  --accent-deep: #1a45c2;
-  --accent-hover: #3a6cf5;
-  --paper: rgba(255, 255, 255, 0.88);
-  --paper-2: #eef3fb;
-  --paper-ink: #0d1b33;
-  --paper-muted: #45556f;
-  --night: #0d1b33;
-  --night-ink: #f2f6ff;
-  --night-muted: #b9c6dd;
+  /* Цвет: семантические токены. */
+  --bg: #f6f5f1;
+  --surface: #ecebe6;
+  --surface-2: #e6e5e1;
+  --surface-3: #dad9d3;
+  --surface-solid: #ffffff;
+  --ink: #151515;
+  --muted: #55544f;
+  --accent: #ff6700;
+  --accent-ink: #151515;
+  --accent-deep: #d95500;
+  --accent-hover: #ff7d24;
+  --accent-soft: #ffe3cf;
+  --paper: #ffffff;
+  --paper-2: #f1f0eb;
+  --paper-ink: #151515;
+  --paper-muted: #55544f;
+  --night: #202020;
+  --night-ink: #f6f5f1;
+  --night-muted: #b7b5ad;
   --danger: #c62f22;
+  --success: #1f7a3a;
 
-  /* Шкала синего для этапов (тёмное → светлое). */
-  --tone-1: #0d1b33;
-  --tone-2: #13284d;
-  --tone-3: #1b3a73;
-  --tone-4: #1f4cb8;
-  --tone-5: #2457e6;
-  --tone-6: #7fa4ff;
-  --tone-7: #c4d5ff;
+  /* Шкала этапов: графит → оранжевый. */
+  --tone-1: #202020;
+  --tone-2: #2f2c29;
+  --tone-3: #4a3a2f;
+  --tone-4: #a9481a;
+  --tone-5: #ff6700;
+  --tone-6: #ff9a57;
+  --tone-7: #ffd0ad;
 
-  /* Стекло. */
-  --glass-blur: blur(22px) saturate(160%);
-  --glass-edge: rgba(255, 255, 255, 0.7);
-  --glass-top: rgba(255, 255, 255, 0.95);
-  --glass-shadow: 0 18px 40px -22px rgba(22, 50, 110, 0.35);
+  /* Глубина: плоские поверхности, мягкие тени только у поднятых элементов. */
+  --glass-blur: none;
+  --glass-edge: rgba(21, 21, 21, 0.06);
+  --glass-top: rgba(255, 255, 255, 0.7);
+  --glass-shadow: 0 1px 2px rgba(21, 21, 21, 0.06), 0 18px 36px -24px rgba(21, 21, 21, 0.28);
+  --shadow-lift: 0 2px 4px rgba(21, 21, 21, 0.08), 0 28px 50px -26px rgba(21, 21, 21, 0.4);
 
   /* Типографика. */
-  --font-head: 'Unbounded Variable', 'Onest Variable', system-ui, sans-serif;
+  --font-head: 'Onest Variable', 'Segoe UI', system-ui, sans-serif;
   --font-display: 'Onest Variable', 'Segoe UI', system-ui, sans-serif;
   --font-text: 'Onest Variable', 'Segoe UI', system-ui, sans-serif;
 
   --step-small: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
   --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
   --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
-  --step-head: clamp(1.75rem, 1.05rem + 2.5vw, 3.375rem);
-  --step-display: clamp(2.75rem, 1rem + 5.4vw, 6rem);
+  --step-head: clamp(2rem, 1.1rem + 3.2vw, 4.25rem);
+  --step-display: clamp(3rem, 1rem + 6.6vw, 7.5rem);
 
   /* Сетка. */
   --gap: 10px;
   --margin: clamp(16px, 1.4vw, 24px);
-  --radius: 22px;
+  /* Контейнер страницы: ширина и боковые поля. */
+  --page-max: 1560px;
+  --page-pad: clamp(20px, 5vw, 88px);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-lg: 28px;
   --pad: clamp(18px, 1.6vw, 26px);
-  --section-gap: clamp(96px, 12vw, 200px);
+  --section-gap: clamp(80px, 8vw, 140px);
   --header-h: 60px;
 
   /* Движение. */
@@ -97,7 +105,9 @@ html {
 
 body {
   min-height: 100svh;
-  background: var(--bg);
+  background:
+    radial-gradient(90% 60% at 60% 0%, #ffffff 0%, transparent 60%),
+    var(--bg);
   color: var(--ink);
   font-family: var(--font-text);
   font-size: var(--step-body);
@@ -209,9 +219,9 @@ dd {
 
 .page {
   width: 100%;
-  max-width: 1440px;
+  max-width: var(--page-max);
   margin-inline: auto;
-  padding-inline: var(--margin);
+  padding-inline: var(--page-pad);
 }
 
 .board {
@@ -223,13 +233,7 @@ dd {
 .tile {
   position: relative;
   border-radius: var(--radius);
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.7), var(--surface) 55%, rgba(255, 255, 255, 0.34));
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  box-shadow:
-    inset 0 1px 0 var(--glass-top),
-    inset 0 0 0 1px var(--glass-edge),
-    var(--glass-shadow);
+  background: var(--surface);
   padding: var(--pad);
   overflow: hidden;
   min-width: 0;
@@ -245,11 +249,8 @@ dd {
 
 /* Тёмно-синее «ночное» стекло — один-два акцентных блока на экран. */
 .tile--deep {
-  background: rgba(13, 27, 51, 0.88);
+  background: var(--night);
   color: var(--night-ink);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-    var(--glass-shadow);
 }
 
 .tile--deep .muted {
@@ -268,9 +269,6 @@ dd {
 .tile--accent {
   background: var(--accent);
   color: var(--accent-ink);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
-    0 22px 44px -22px rgba(36, 87, 230, 0.7);
 }
 
 .tile--photo {
@@ -285,27 +283,6 @@ dd {
 }
 
 /* Фон страницы: глянцевые сине-голубые волны под стеклом. */
-.bg-art {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  overflow: hidden;
-  background: var(--bg);
-}
-
-.bg-art img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.bg-art::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(240, 244, 251, 0.86);
-}
 
 .section {
   margin-top: var(--section-gap);
@@ -319,16 +296,19 @@ dd {
 
 .display {
   font-family: var(--font-head);
-  font-weight: 600;
+  font-weight: 650;
   font-size: var(--step-display);
-  line-height: 0.95;
-  letter-spacing: -0.035em;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
 }
 
 .head {
   font-family: var(--font-head);
   font-size: var(--step-head);
-  line-height: 1.04;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
 }
 
 .head-sm {
@@ -366,7 +346,7 @@ dd {
 }
 
 .tile--accent .muted {
-  color: #dbe5ff;
+  color: #3d1d06;
 }
 
 .prose {
@@ -410,7 +390,7 @@ dd {
   gap: 14px;
   min-height: 52px;
   padding: 14px 20px;
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 1rem;
@@ -438,24 +418,21 @@ dd {
 }
 
 .btn--ink {
-  background: #ffffff;
-  color: var(--ink);
-  box-shadow: var(--glass-shadow);
+  background: var(--ink);
+  color: var(--bg);
 }
 
 .btn--ink:hover {
-  background: var(--accent);
-  color: var(--accent-ink);
+  background: #333230;
 }
 
 .btn--ghost {
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--surface-3);
   color: var(--ink);
-  box-shadow: inset 0 0 0 1px var(--glass-edge);
 }
 
 .btn--ghost:hover {
-  background: #ffffff;
+  background: #cfcec7;
 }
 
 .btn--dark {
@@ -464,7 +441,7 @@ dd {
 }
 
 .btn--dark:hover {
-  background: #1b2f55;
+  background: #333230;
 }
 
 .btn[disabled],
@@ -521,6 +498,7 @@ a:hover > .arrow {
   :root {
     --gap: 6px;
     --margin: 16px;
+    --page-pad: 16px;
     --pad: 18px;
   }
 
@@ -541,7 +519,7 @@ a:hover > .arrow {
 /* --- Поверхности браузера ------------------------------------------- */
 
 html {
-  scrollbar-color: rgba(36, 87, 230, 0.55) transparent;
+  scrollbar-color: rgba(21, 21, 21, 0.35) transparent;
   scrollbar-width: thin;
 }
 
@@ -552,7 +530,7 @@ html {
 ::-webkit-scrollbar-thumb {
   border: 3px solid transparent;
   border-radius: 999px;
-  background: rgba(36, 87, 230, 0.5) padding-box;
+  background: rgba(21, 21, 21, 0.3) padding-box;
 }
 
 ::-webkit-scrollbar-track {
@@ -563,4 +541,10 @@ html {
 .split-line {
   padding-bottom: 0.08em;
   margin-bottom: -0.08em;
+}
+
+/* Временная перекраска синих объектов прошлой версии в оранжевый — пока нет финальных ассетов
+   (IMAGE_GENERATION_PROMPTS.md). Как только файл с новым именем появится, класс не ставится. */
+.is-tinted {
+  filter: hue-rotate(178deg) saturate(1.45) brightness(1.04) drop-shadow(0 30px 30px rgba(21, 21, 21, 0.2));
 }

@@ -2,11 +2,14 @@
 import { getCollection } from 'astro:content';
 import Base from '@/layouts/Base.astro';
 import ProjectCard from '@/components/ProjectCard.astro';
+import PageHero from '@/components/PageHero.astro';
+import WorkFeature from '@/components/WorkFeature.astro';
 import { categories } from '@/config/portfolio';
 import { url } from '@/lib/url';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
-const used = categories.filter((c) => projects.some((p) => p.data.category === c.id));
+const [featured, ...rest] = projects;
+const used = categories.filter((c) => rest.some((p) => p.data.category === c.id));
 // Ритм карточек: широкая, обычная, высокая, обычная, обычная...
 const pattern = ['wide', 'normal', 'tall', 'normal', 'normal', 'wide', 'normal'] as const;
 
@@ -23,19 +26,27 @@ const hints: Record<string, string> = {
   title="Работы — портфолио веб-разработчика"
   description="Портфолио MALTSEV DIGITAL: лендинги, сайты для бизнеса, каталоги и концепты — с разбором задачи, решений и ссылками на работающие сайты."
 >
-  <section class="pf-hero" aria-labelledby="pf-title" data-stagger>
-    <div class="pf-hero__title tile">
-      <h1 id="pf-title" class="pf-hero__h1">Работы</h1>
-    </div>
-    <div class="pf-hero__note tile tile--paper">
-      <p class="statement">
-        Каждый проект — с задачей, решениями и ссылкой на живой сайт.
-      </p>
+  <PageHero
+    id="pf-title"
+    title="Работы"
+    pixel="01"
+    lead="Каждый проект — с задачей, решениями и ссылкой на живой сайт. Первый кейс — этот сайт: он сделан тем же способом, каким будет сделан ваш."
+  />
+
+  {featured && <WorkFeature project={featured} head={false} />}
+
+  <section class="section pf-next" aria-labelledby="pf-next-title">
+    <div class="pf-next__card">
+      <h2 id="pf-next-title" class="pf-next__title">Следующий кейс — ваш</h2>
+      <p>Портфолио пополняется реальными проектами с разбором. Без выдуманных клиентов и цифр.</p>
+      <a class="btn btn--ink" href={url('/contacts/')} data-magnetic>
+        Обсудить проект <span class="arrow" aria-hidden="true">→</span>
+      </a>
     </div>
   </section>
 
   {
-    projects.length > 0 ? (
+    rest.length > 0 ? (
       <section class="section" aria-labelledby="pf-list-title">
         <h2 id="pf-list-title" class="sr-only">Проекты</h2>
         {used.length > 1 && (
@@ -49,13 +60,13 @@ const hints: Record<string, string> = {
           </div>
         )}
         <div class="grid" data-grid>
-          {projects.map((p, i) => (
+          {rest.map((p, i) => (
             <ProjectCard project={p} size={pattern[i % pattern.length]} />
           ))}
         </div>
         <p class="filters__empty" data-filter-empty hidden>В этой категории пока нет проектов.</p>
       </section>
-    ) : (
+    ) : !featured && (
       <section class="section empty" aria-labelledby="pf-empty-title">
         <div class="empty__main tile tile--raised">
           <h2 id="pf-empty-title" class="head">Портфолио наполняется</h2>
@@ -108,30 +119,26 @@ const hints: Record<string, string> = {
 </script>
 
 <style>
-  .pf-hero {
+  .pf-next__card {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--gap);
-    margin-top: var(--gap);
-    min-height: 440px;
+    gap: 18px;
+    justify-items: start;
+    padding: clamp(28px, 4vw, 56px);
+    border-radius: var(--radius-lg);
+    background: var(--accent);
   }
 
-  .pf-hero__title {
-    grid-column: 1 / 9;
-    display: flex;
-    align-items: flex-end;
+  .pf-next__title {
+    font-size: var(--step-head);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
   }
 
-  .pf-hero__h1 {
-    font-size: clamp(3.25rem, 1rem + 7.6vw, 8.5rem);
-    line-height: 0.9;
-    letter-spacing: -0.05em;
-  }
-
-  .pf-hero__note {
-    grid-column: 9 / 13;
-    display: flex;
-    align-items: flex-end;
+  .pf-next__card p {
+    max-width: 52ch;
+    font-size: var(--step-body);
+    color: #3d1d06;
   }
 
   .filters {
@@ -238,15 +245,9 @@ const hints: Record<string, string> = {
   }
 
   @media (max-width: 1023px) {
-    .pf-hero__title,
-    .pf-hero__note,
     .empty__main,
     .empty__cats {
       grid-column: 1 / -1;
-    }
-
-    .pf-hero__title {
-      min-height: 300px;
     }
 
     .empty__main {
@@ -255,14 +256,9 @@ const hints: Record<string, string> = {
   }
 
   @media (max-width: 767px) {
-    .pf-hero,
     .grid,
     .empty {
       grid-template-columns: 1fr;
-    }
-
-    .pf-hero__h1 {
-      font-size: 15vw;
     }
 
     .empty__cat {
