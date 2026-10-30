@@ -1,8 +1,8 @@
 ---
 /**
- * Первый экран: серая сцена в две зоны. Слева — заголовок «лесенкой» и оффер,
- * справа — ретро-машина, которая собирает сайты, с парящими курсором, окном и кубиками
- * поверх белого пиксельного слова. Изображения — src/assets/gen (IMAGE_GENERATION_PROMPTS.md).
+ * Первый экран: серая сцена в две зоны. Слева — заголовок «лесенкой» и оффер,
+ * справа — ретро-машина, которая собирает сайты, с парящими курсором, окном и кубиками
+ * поверх белого пиксельного слова. Изображения — src/assets/gen (IMAGE_GENERATION_PROMPTS.md).
  */
 import { Image } from 'astro:assets';
 import PixelWord from './PixelWord.astro';
@@ -11,11 +11,12 @@ import { minPrice, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { site, telegramUrl, emailUrl } from '@/config/site';
 import { genImage } from '@/lib/gen';
 import { url } from '@/lib/url';
+import Icon from './Icon.astro';
 
 const machine = genImage('hero-machine');
 const object = machine ?? genImage('hero-sculpture');
 const tinted = !machine;
-// Парящие элементы: свои, если сгенерированы; иначе — временные, перекрашенные.
+// Парящие элементы: свои, если сгенерированы; иначе — временные, перекрашенные.
 const floats = [
   { img: genImage('float-cursor') ?? genImage('obj-plane'), cls: 'f1', amp: 46, tint: !genImage('float-cursor') },
   { img: genImage('float-window') ?? genImage('obj-landing'), cls: 'f2', amp: 30, tint: !genImage('float-window') },
@@ -85,11 +86,11 @@ const mail = emailUrl('Заявка на разработку сайта');
     <div class="hr__offer">
       <p class="hr__lead">
         Проектирую и разрабатываю сайты для бизнеса и специалистов: дизайн, код и запуск под ключ. ИИ
-        ускоряет рутину, решения и качество — за мной.
+        ускоряет рутину, решения и качество — за мной.
       </p>
       <div class="hr__btns">
         <a class="btn btn--accent hr__btn" href={url('/contacts/')} data-magnetic>
-          Обсудить проект <span class="arrow" aria-hidden="true">→</span>
+          Обсудить проект <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
         </a>
         <a class="btn btn--ghost hr__btn" href={url('/#work')}>Смотреть работы</a>
       </div>
@@ -160,7 +161,7 @@ const mail = emailUrl('Заявка на разработку сайта');
     font-size: clamp(2.75rem, 0.4rem + 4.6vw, 5.75rem);
     line-height: 0.92;
     white-space: nowrap;
-    letter-spacing: -0.045em;
+    letter-spacing: -0.04em;
     text-transform: uppercase;
   }
 

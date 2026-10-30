@@ -2,7 +2,7 @@
 /**
  * «Как идёт работа»: семь этапов лентой карточек.
  * На широком экране лента едет горизонтально, пока секция закреплена (GSAP, data-hscroll).
- * Без скрипта — горизонтальная прокрутка с прилипанием; на телефоне — вертикальный список.
+ * Без скрипта — горизонтальная прокрутка с прилипанием; на телефоне — вертикальный список.
  */
 import PixelWord from './PixelWord.astro';
 import SectionHead from './SectionHead.astro';
@@ -23,15 +23,18 @@ import { url } from '@/lib/url';
       {
         stages.map((s, i) => (
           <li class:list={['ps__step', { 'ps__step--last': i === stages.length - 1 }]}>
-            <PixelWord text={String(i + 1).padStart(2, '0')} class="ps__num" />
-            <h3 class="ps__name">{s.name}</h3>
-            <p class="ps__text">{s.text}</p>
-            <div class="ps__meta">
+            <div class="ps__top">
+              <PixelWord text={String(i + 1).padStart(2, '0')} class="ps__num" />
               <p class="ps__dur">{s.duration}</p>
-              <p class="ps__you">
-                <span>От вас:</span> {s.fromYou}
-              </p>
             </div>
+            <div class="ps__body">
+              <h3 class="ps__name">{s.name}</h3>
+              <p class="ps__text">{s.text}</p>
+            </div>
+            <p class="ps__you">
+              <span>От вас</span>
+              {s.fromYou}
+            </p>
           </li>
         ))
       }
@@ -67,10 +70,10 @@ import { url } from '@/lib/url';
   .ps__step {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    width: clamp(300px, 28vw, 420px);
-    min-height: 440px;
-    padding: clamp(24px, 2.4vw, 34px);
+    gap: clamp(24px, 2.4vw, 32px);
+    width: clamp(310px, 29vw, 440px);
+    min-height: 460px;
+    padding: clamp(26px, 2.8vw, 40px);
     border-radius: var(--radius-lg);
     background: var(--surface);
     scroll-snap-align: start;
@@ -95,8 +98,19 @@ import { url } from '@/lib/url';
     color: var(--ink);
   }
 
+  .ps__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .ps__body {
+    display: grid;
+    gap: 14px;
+  }
+
   .ps__name {
-    margin-top: 12px;
     font-size: clamp(1.5rem, 1rem + 1.1vw, 2.125rem);
     line-height: 0.95;
     letter-spacing: -0.04em;
@@ -104,23 +118,21 @@ import { url } from '@/lib/url';
   }
 
   .ps__text {
-    font-size: 1.0625rem;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--muted);
   }
 
-  .ps__meta {
-    display: grid;
-    gap: 10px;
-    margin-top: auto;
-    padding-top: 16px;
-    border-top: 1px solid rgba(21, 21, 21, 0.12);
+  .ps__step:first-child .ps__text {
+    color: var(--night-muted);
   }
 
-  .ps__step:first-child .ps__meta {
-    border-color: rgba(246, 245, 241, 0.16);
+  .ps__step--last .ps__text {
+    color: #3d1d06;
   }
 
   .ps__dur {
-    justify-self: start;
+    flex: none;
     padding: 6px 10px;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.6);
@@ -130,23 +142,35 @@ import { url } from '@/lib/url';
     color: var(--ink);
   }
 
+  /* Что нужно от клиента — внизу карточки, отдельной короткой репликой. */
   .ps__you {
+    display: grid;
+    gap: 4px;
+    margin-top: auto;
     font-size: 0.9375rem;
-    color: #3b3a36;
+    line-height: 1.45;
+    color: var(--ink);
   }
 
   .ps__you span {
     font-family: var(--font-display);
     font-weight: 700;
-    color: inherit;
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
 
-  .ps__step:first-child .ps__you {
+  .ps__step:first-child .ps__you span {
     color: var(--night-muted);
   }
 
-  .ps__step--last .ps__you {
+  .ps__step--last .ps__you span {
     color: #3d1d06;
+  }
+
+  .ps__step:first-child .ps__you {
+    color: var(--night-ink);
   }
 
   @media (max-width: 767px) {

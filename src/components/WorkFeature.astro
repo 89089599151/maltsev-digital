@@ -1,16 +1,17 @@
 ---
 /**
- * «Работы» на главной: одна большая витрина кейса (сейчас — этот сайт, сделанный с ИИ).
+ * «Работы» на главной: одна большая витрина кейса (сейчас — этот сайт, сделанный с ИИ).
  * Данные берутся из src/content/projects; витрина показывает проект с наименьшим order.
  */
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import SectionHead from './SectionHead.astro';
 import { url } from '@/lib/url';
+import Icon from './Icon.astro';
 
 interface Props {
   project: CollectionEntry<'projects'>;
-  /** false — без заголовка секции (на странице портфолио заголовок уже в первом экране). */
+  /** false — без заголовка секции (на странице портфолио заголовок уже в первом экране). */
   head?: boolean;
 }
 const { project, head = true } = Astro.props;
@@ -30,7 +31,7 @@ const steps = [
   {head && <SectionHead
     id="wf-title"
     title="Работы"
-    text="Первый кейс — сайт, который вы сейчас смотрите. Он сделан тем же способом, каким будет сделан ваш: с ИИ-инструментами и авторскими решениями."
+    text="Первый кейс — сайт, который вы сейчас смотрите. Он сделан тем же способом, каким будет сделан ваш: с ИИ-инструментами и авторскими решениями."
     link={{ href: url('/portfolio/'), label: 'Все работы' }}
   />}
 
@@ -57,7 +58,7 @@ const steps = [
 
       <div class="wf__actions">
         <a class="btn btn--ink" href={url(`/portfolio/${project.id}/`)} data-magnetic>
-          Смотреть кейс <span class="arrow" aria-hidden="true">→</span>
+          Смотреть кейс <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
         </a>
         <ul class="wf__stack" aria-label="Технологии">
           {d.stack.slice(0, 4).map((s) => <li>{s}</li>)}
@@ -120,11 +121,11 @@ const steps = [
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 8px;
   }
 
   .wf__tag {
-    padding: 7px 12px;
+    padding: 8px 14px;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.6);
     font-family: var(--font-display);
@@ -139,7 +140,7 @@ const steps = [
   .wf__name {
     font-size: clamp(2rem, 1.2rem + 2.6vw, 3.75rem);
     line-height: 0.95;
-    letter-spacing: -0.045em;
+    letter-spacing: -0.04em;
     text-transform: uppercase;
   }
 
@@ -152,7 +153,7 @@ const steps = [
   .wf__results {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
+    gap: 10px;
     margin-top: 6px;
   }
 
@@ -210,6 +211,8 @@ const steps = [
 
   /* Устройства */
   .wf__visual {
+    /* Одна толщина рамки у ноутбука и телефона, в пикселях, а не от ширины разных блоков. */
+    --bezel: clamp(4px, 0.4vw, 6px);
     position: relative;
     display: block;
     padding: 4% 8% 8% 0;
@@ -225,7 +228,7 @@ const steps = [
 
   .wf__screen {
     aspect-ratio: 1425 / 900;
-    padding: 0.8%;
+    padding: var(--bezel);
     border-radius: 12px 12px 0 0;
     background: #151515;
     overflow: hidden;
@@ -253,8 +256,8 @@ const steps = [
     bottom: 0;
     width: 22%;
     aspect-ratio: 376 / 814;
-    padding: 1.2%;
-    border-radius: 18px;
+    padding: var(--bezel);
+    border-radius: 14px;
     background: #151515;
     overflow: hidden;
     box-shadow: 0 30px 50px -20px rgba(21, 21, 21, 0.5);
@@ -265,7 +268,7 @@ const steps = [
     height: 100%;
     object-fit: cover;
     object-position: top;
-    border-radius: 14px;
+    border-radius: calc(14px - var(--bezel));
   }
 
   .wf__base {
@@ -284,8 +287,8 @@ const steps = [
 
   .wf__step {
     display: grid;
-    gap: 4px;
-    padding: 20px 22px;
+    gap: 6px;
+    padding: clamp(20px, 2vw, 28px);
     border-radius: var(--radius);
     background: var(--surface);
   }

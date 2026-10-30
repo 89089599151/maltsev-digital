@@ -12,6 +12,7 @@ import FaqList from '@/components/FaqList.astro';
 import ContactSplit from '@/components/ContactSplit.astro';
 import { faq } from '@/data/content';
 import { url } from '@/lib/url';
+import Icon from '@/components/Icon.astro';
 
 const [featured] = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const homeFaq = faq.filter((f) => f.home);
@@ -29,9 +30,9 @@ const homeFaq = faq.filter((f) => f.home);
   <div class="section" id="faq">
     <FaqList items={homeFaq} headingId="home-faq-title">
       <Fragment slot="side">
-        <p>Не нашли ответ? Задайте вопрос в заявке — отвечу лично.</p>
+        <p>Не нашли ответ? Задайте вопрос в заявке — отвечу лично.</p>
         <a class="btn btn--ghost" href={url('/faq/')} style="justify-self:start">
-          Все вопросы <span class="arrow" aria-hidden="true">→</span>
+          Все вопросы <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
         </a>
       </Fragment>
     </FaqList>

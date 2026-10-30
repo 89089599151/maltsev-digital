@@ -5,6 +5,7 @@
  */
 import { plans, addons, extraPagePrice, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
+import Icon from './Icon.astro';
 
 const types = [
   { id: 'start', label: 'Лендинг', note: 'Одна страница', pages: 1 },
@@ -28,7 +29,7 @@ const start = plans[1];
   <div class="est__head">
     <h2 id="est-title" class="head" data-split>Посчитайте свой сайт</h2>
     <p>
-      Выберите тип сайта, количество страниц и нужные работы — калькулятор подберёт тариф и покажет
+      Выберите тип сайта, количество страниц и нужные работы — калькулятор подберёт тариф и покажет
       ориентир. Точную сумму я подтвержу после короткого обсуждения.
     </p>
   </div>
@@ -83,7 +84,7 @@ const start = plans[1];
       <p class="est__res-extra small" data-out-extra></p>
       {!pricingConfirmed && <p class="est__res-note small">Цены предварительные и требуют подтверждения.</p>}
       <a class="btn btn--dark est__go" href={url(`/contacts/?plan=${start.id}`)} data-out-link>
-        Отправить заявку с расчётом <span class="arrow" aria-hidden="true">→</span>
+        Отправить заявку с расчётом <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
       </a>
     </div>
   </form>
@@ -235,14 +236,14 @@ const start = plans[1];
     font-weight: 800;
     font-size: clamp(4rem, 2rem + 4vw, 6.5rem);
     line-height: 0.9;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.04em;
   }
 
   input[type='range'] {
     width: 100%;
     margin-top: auto;
     accent-color: var(--accent);
-    height: 32px;
+    height: 44px;
     cursor: pointer;
   }
 

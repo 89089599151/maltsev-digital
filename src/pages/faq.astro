@@ -4,6 +4,7 @@ import PageHero from '@/components/PageHero.astro';
 import FaqList from '@/components/FaqList.astro';
 import { faq } from '@/data/content';
 import { url } from '@/lib/url';
+import Icon from '@/components/Icon.astro';
 
 const schema = {
   '@context': 'https://schema.org',
@@ -28,16 +29,16 @@ const schema = {
     lead="О цене, сроках, правах на сайт и о том, как в работе используется ИИ."
   >
     <Fragment slot="actions">
-      <a class="btn btn--ink" href={url('/contacts/')}>Задать свой вопрос <span class="arrow" aria-hidden="true">→</span></a>
+      <a class="btn btn--ink" href={url('/contacts/')}>Задать свой вопрос <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
     </Fragment>
   </PageHero>
 
   <div class="section">
     <FaqList items={faq} heading="Всё, что спрашивают" headingId="fq-list-title" group="faq-page">
       <Fragment slot="side">
-        <p>Если ответа нет — напишите. Отвечаю сам, без шаблонов и ботов.</p>
+        <p>Если ответа нет — напишите. Отвечаю сам, без шаблонов и ботов.</p>
         <a class="btn btn--ghost" href={url('/services/')} style="justify-self:start">
-          Тарифы и калькулятор <span class="arrow" aria-hidden="true">→</span>
+          Тарифы и калькулятор <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
         </a>
       </Fragment>
     </FaqList>

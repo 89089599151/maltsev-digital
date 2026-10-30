@@ -6,6 +6,7 @@ import PageHero from '@/components/PageHero.astro';
 import WorkFeature from '@/components/WorkFeature.astro';
 import { categories } from '@/config/portfolio';
 import { url } from '@/lib/url';
+import Icon from '@/components/Icon.astro';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const [featured, ...rest] = projects;
@@ -18,29 +19,29 @@ const hints: Record<string, string> = {
   business: 'Многостраничные сайты компаний с услугами и портфолио.',
   catalog: 'Каталоги товаров и услуг с карточками и заказом.',
   personal: 'Личные сайты врачей, юристов, тренеров, дизайнеров.',
-  concept: 'Демонстрационные проекты для разных сфер — честно помечены как концепты.',
+  concept: 'Демонстрационные проекты для разных сфер — честно помечены как концепты.',
 };
 ---
 
 <Base
-  title="Работы — портфолио веб-разработчика"
-  description="Портфолио Maltsev Digital: лендинги, сайты для бизнеса, каталоги и концепты — с разбором задачи, решений и ссылками на работающие сайты."
+  title="Работы — портфолио веб-разработчика"
+  description="Портфолио Maltsev Digital: лендинги, сайты для бизнеса, каталоги и концепты — с разбором задачи, решений и ссылками на работающие сайты."
 >
   <PageHero
     id="pf-title"
     title="Работы"
     pixel="01"
-    lead="Каждый проект — с задачей, решениями и ссылкой на живой сайт. Первый кейс — этот сайт: он сделан тем же способом, каким будет сделан ваш."
+    lead="Каждый проект — с задачей, решениями и ссылкой на живой сайт. Первый кейс — этот сайт: он сделан тем же способом, каким будет сделан ваш."
   />
 
   {featured && <WorkFeature project={featured} head={false} />}
 
   <section class="section pf-next" aria-labelledby="pf-next-title">
     <div class="pf-next__card">
-      <h2 id="pf-next-title" class="pf-next__title">Следующий кейс — ваш</h2>
+      <h2 id="pf-next-title" class="pf-next__title">Следующий кейс — ваш</h2>
       <p>Портфолио пополняется реальными проектами с разбором. Без выдуманных клиентов и цифр.</p>
       <a class="btn btn--ink" href={url('/contacts/')} data-magnetic>
-        Обсудить проект <span class="arrow" aria-hidden="true">→</span>
+        Обсудить проект <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
       </a>
     </div>
   </section>
@@ -71,15 +72,15 @@ const hints: Record<string, string> = {
         <div class="empty__main tile tile--raised">
           <h2 id="pf-empty-title" class="head">Портфолио наполняется</h2>
           <p class="lead">
-            Сейчас готовлю первые кейсы к публикации. Здесь они появятся с подробным разбором — без
+            Сейчас готовлю первые кейсы к публикации. Здесь они появятся с подробным разбором — без
             выдуманных клиентов и цифр.
           </p>
           <div class="empty__btns">
             <a class="btn btn--accent" href={url('/contacts/')}>
-              Обсудить ваш проект <span class="arrow" aria-hidden="true">→</span>
+              Обсудить ваш проект <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
             </a>
             <a class="btn btn--ghost" href={url('/services/')}>
-              Тарифы <span class="arrow" aria-hidden="true">→</span>
+              Тарифы <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
             </a>
           </div>
         </div>
@@ -131,7 +132,7 @@ const hints: Record<string, string> = {
   .pf-next__title {
     font-size: var(--step-head);
     line-height: 0.95;
-    letter-spacing: -0.045em;
+    letter-spacing: -0.04em;
     text-transform: uppercase;
   }
 

@@ -5,6 +5,7 @@ import PageHero from '@/components/PageHero.astro';
 import { site } from '@/config/site';
 import { url } from '@/lib/url';
 import owner from '@/assets/photos/owner.webp';
+import Icon from '@/components/Icon.astro';
 
 const split: [string, string][] = [
   ['Черновики текстов и заголовков', 'Смысл, тон и финальные тексты под ваш бизнес'],
@@ -18,7 +19,7 @@ const principles = [
   { t: 'Честность вместо витрины', d: 'Никаких выдуманных отзывов, логотипов и цифр. Только то, что можно проверить.' },
   { t: 'Цена до старта', d: 'Состав работ и сумма фиксируются письменно до начала.' },
   { t: 'Сайт ваш', d: 'Код, домен и доступы передаются вам. Без привязки к конструктору.' },
-  { t: 'Скорость — часть дизайна', d: 'Медленный сайт теряет клиентов, поэтому скорость проверяется на каждом этапе.' },
+  { t: 'Скорость — часть дизайна', d: 'Медленный сайт теряет клиентов, поэтому скорость проверяется на каждом этапе.' },
   { t: 'Понятный язык', d: 'Объясняю решения без жаргона, чтобы вы понимали, за что платите.' },
 ];
 
@@ -26,13 +27,13 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
 ---
 
 <Base
-  title="Обо мне — независимый веб-разработчик"
+  title="Обо мне — независимый веб-разработчик"
   description="Независимый разработчик сайтов: веду проект лично от идеи до запуска и использую ИИ-инструменты, чтобы делать это быстрее и аккуратнее."
 >
   <PageHero
     id="ab-title"
     title="Обо мне"
-    lead={`Меня зовут ${site.brand.owner.value}. Я дизайнер по образованию и делаю сайты один — без отделов и посредников.`}
+    lead={`Меня зовут ${site.brand.owner.value}. Я дизайнер по образованию и делаю сайты один — без отделов и посредников.`}
   >
     <div class="ab-photo">
       <Image src={owner} alt={`${site.brand.owner.value} ночью под снегом смотрит вверх, на свет фонаря`} widths={[480, 800, 1200]} sizes="(max-width: 1023px) 92vw, 38vw" loading="eager" />
@@ -48,7 +49,7 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
       </p>
       <p>
         Я веду проект целиком: разговариваю с вами, проектирую структуру, рисую дизайн, пишу код, проверяю и
-        запускаю. Решения принимает один человек, который помнит всю историю проекта, — поэтому меньше
+        запускаю. Решения принимает один человек, который помнит всю историю проекта, — поэтому меньше
         согласований и испорченного телефона.
       </p>
       <p>
@@ -62,7 +63,7 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
     <div class="ai__side">
       <h2 id="ai-title" class="head">Как я использую ИИ</h2>
       <p>
-        Не скрываю: ИИ — часть моей работы. Но он инструмент, а не автор. Вот как распределены роли.
+        Не скрываю: ИИ — часть моей работы. Но он инструмент, а не автор. Вот как распределены роли.
       </p>
     </div>
     <div class="ai__wrap tile">
@@ -120,10 +121,10 @@ const tools = ['Astro', 'TypeScript', 'HTML и современный CSS', 'Web
 
   <section class="section ab-cta" aria-labelledby="ab-cta-title">
     <h2 id="ab-cta-title" class="head">Давайте познакомимся</h2>
-    <p class="lead">Расскажите, что за бизнес и какой сайт нужен — начнём с разговора, он ни к чему не обязывает.</p>
+    <p class="lead">Расскажите, что за бизнес и какой сайт нужен — начнём с разговора, он ни к чему не обязывает.</p>
     <div class="ab-cta__btns">
-      <a class="btn btn--accent" href={url('/contacts/')}>Написать <span class="arrow" aria-hidden="true">→</span></a>
-      <a class="btn btn--ghost" href={url('/services/')}>Тарифы <span class="arrow" aria-hidden="true">→</span></a>
+      <a class="btn btn--accent" href={url('/contacts/')}>Написать <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
+      <a class="btn btn--ghost" href={url('/services/')}>Тарифы <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
     </div>
   </section>
 </Base>

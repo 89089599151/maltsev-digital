@@ -6,6 +6,7 @@ import FormNotice from '@/components/FormNotice.astro';
 import { site } from '@/config/site';
 import { plans, formatPrice } from '@/config/pricing';
 import { url } from '@/lib/url';
+import Icon from '@/components/Icon.astro';
 
 const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.formspreeId}` : '';
 const projectTypes = ['Лендинг', 'Сайт компании', 'Каталог или магазин', 'Сайт специалиста', 'Редизайн существующего сайта', 'Другое'];
@@ -20,7 +21,7 @@ const deadlines = ['Как можно скорее', 'В течение меся
     id="ct-title"
     title="Обсудим ваш сайт"
     pixel="ПРИВЕТ"
-    lead={`Расскажите о задаче — отвечу ${site.contacts.responseTime.value}, задам уточняющие вопросы и пришлю предложение со сроками и стоимостью.`}
+    lead={`Расскажите о задаче — отвечу ${site.contacts.responseTime.value}, задам уточняющие вопросы и пришлю предложение со сроками и стоимостью.`}
   />
 
   <div class="ct section section--tight">
@@ -107,7 +108,7 @@ const deadlines = ['Как можно скорее', 'В течение меся
           <div class="field">
             <label for="f-task">Опишите задачу *</label>
             <textarea id="f-task" name="message" rows="6" required minlength="20" data-error-id="f-task-err" aria-describedby="f-task-hint f-task-err" placeholder="Чем занимается бизнес, для кого сайт, что он должен делать, какие сайты нравятся"></textarea>
-            <span class="field__hint" id="f-task-hint">Хотя бы пара предложений — от 20 символов.</span>
+            <span class="field__hint" id="f-task-hint">Хотя бы пара предложений — от 20 символов.</span>
             <span class="field__err" id="f-task-err"></span>
           </div>
 
@@ -135,7 +136,7 @@ const deadlines = ['Как можно скорее', 'В течение меся
           <div class="brief__submit">
             <button class="btn btn--accent" type="submit">
               <span data-label>{endpoint ? 'Отправить заявку' : 'Форма не подключена'}</span>
-              <span class="arrow" aria-hidden="true">→</span>
+              <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
             </button>
             <p class="brief__status" data-status role="status" aria-live="polite"></p>
           </div>
@@ -144,8 +145,8 @@ const deadlines = ['Как можно скорее', 'В течение меся
 
       <div class="brief__success" data-success hidden tabindex="-1">
         <p class="head-sm">Заявка отправлена.</p>
-        <p>Спасибо! Я прочитаю бриф и свяжусь с вами {site.contacts.responseTime.value}. Если вопрос срочный — напишите напрямую.</p>
-        <a class="btn btn--ghost" href={url('/portfolio/')}>Пока посмотреть работы <span class="arrow" aria-hidden="true">→</span></a>
+        <p>Спасибо! Я прочитаю бриф и свяжусь с вами {site.contacts.responseTime.value}. Если вопрос срочный — напишите напрямую.</p>
+        <a class="btn btn--ghost" href={url('/portfolio/')}>Пока посмотреть работы <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
       </div>
     </section>
   </div>

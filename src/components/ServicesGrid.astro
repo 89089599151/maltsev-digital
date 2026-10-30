@@ -1,13 +1,14 @@
 ---
 /**
- * «Что я делаю»: четыре направления карточками 2×2 — задача, что входит, цена «от».
- * Объекты: svc-* из src/assets/gen; пока их нет — временные, перекрашенные.
+ * «Что я делаю»: четыре направления карточками 2×2 — задача, что входит, цена «от».
+ * Объекты: svc-* из src/assets/gen; пока их нет — временные, перекрашенные.
  */
 import { Image } from 'astro:assets';
 import SectionHead from './SectionHead.astro';
 import { plans, formatPrice } from '@/config/pricing';
 import { genImage } from '@/lib/gen';
 import { url } from '@/lib/url';
+import Icon from './Icon.astro';
 
 /** Временные замены из ретро-набора, пока нет svc-landing и svc-catalog. */
 const stand: Record<string, string> = { landing: 'float-window', catalog: 'float-cubes', business: 'svc-business', personal: 'svc-personal' };
@@ -42,7 +43,7 @@ const items = [
     plan: plans[0],
   },
 ].map((it) => {
-  // Свой объект услуги; пока его нет — подходящий объект из того же ретро-набора; в крайнем случае — старый перекрашенный.
+  // Свой объект услуги; пока его нет — подходящий объект из того же ретро-набора; в крайнем случае — старый перекрашенный.
   const own = genImage(`svc-${it.key}`) ?? genImage(stand[it.key]);
   return { ...it, img: own ?? genImage(`obj-${it.key}`), tinted: !own };
 });
@@ -82,7 +83,7 @@ const items = [
             </ul>
             <span class="sv__foot">
               <span class="sv__price">от {formatPrice(it.plan.price)}</span>
-              <span class="sv__go" aria-hidden="true">→</span>
+              <span class="sv__go" aria-hidden="true"><Icon name="arrow" /></span>
             </span>
           </a>
         </li>
@@ -108,7 +109,7 @@ const items = [
     flex: 1;
     display: grid;
     grid-template-rows: auto auto 1fr auto;
-    gap: 14px;
+    gap: 20px;
     min-height: 380px;
     padding: clamp(24px, 2.6vw, 36px);
     border-radius: var(--radius-lg);
@@ -153,19 +154,19 @@ const items = [
   }
 
   .sv__task {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.125rem;
-    max-width: 28ch;
+    max-width: 30ch;
+    font-size: 1.0625rem;
+    line-height: 1.45;
+    color: var(--muted);
   }
 
   .sv__points {
     list-style: none;
     padding: 0;
     display: grid;
-    gap: 8px;
+    gap: 12px;
     align-content: start;
-    color: #3b3a36;
+    color: var(--ink);
   }
 
   .sv__points li {

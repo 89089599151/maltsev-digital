@@ -53,10 +53,11 @@
   --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
   --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
   --step-head: clamp(2rem, 1.1rem + 3.2vw, 4.25rem);
-  --step-display: clamp(3rem, 1rem + 6.6vw, 7.5rem);
+  --step-display: clamp(3rem, 1rem + 5.4vw, 6rem);
 
   /* Сетка. */
-  --gap: 10px;
+  /* Между карточками: на телефоне 12px, на широком экране до 20px — иначе крупные плашки слипаются. */
+  --gap: clamp(12px, 1.25vw, 20px);
   --margin: clamp(16px, 1.4vw, 24px);
   /* Контейнер страницы: ширина и боковые поля. */
   --page-max: 1560px;
@@ -299,7 +300,7 @@ dd {
   font-weight: 650;
   font-size: var(--step-display);
   line-height: 0.9;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.04em;
   text-transform: uppercase;
 }
 
@@ -307,7 +308,7 @@ dd {
   font-family: var(--font-head);
   font-size: var(--step-head);
   line-height: 0.95;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.04em;
   text-transform: uppercase;
 }
 

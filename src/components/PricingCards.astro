@@ -1,11 +1,12 @@
 ---
 /**
  * Тарифы на главной: три равные карточки с ценой, сроком и составом.
- * Цены берутся из src/config/pricing.ts; пока они не подтверждены — пометка «предварительные».
+ * Цены берутся из src/config/pricing.ts; пока они не подтверждены — пометка «предварительные».
  */
 import SectionHead from './SectionHead.astro';
-import { plans, formatPrice, pricingConfirmed, extraPagePrice } from '@/config/pricing';
+import { plans, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
+import Icon from './Icon.astro';
 ---
 
 <section class="pc section" id="pricing" aria-labelledby="pc-title">
@@ -24,17 +25,19 @@ import { url } from '@/lib/url';
             <h3 id={`pc-${p.id}`} class="pc__name">{p.name}</h3>
             <p class="pc__time">{p.timeline}</p>
           </div>
-          <p class="pc__price">
-            <span class="pc__from">от</span> {formatPrice(p.price)}
-          </p>
-          <p class="pc__for">{p.forWhom}</p>
+          <div class="pc__offer">
+            <p class="pc__price">
+              <span class="pc__from">от</span> {formatPrice(p.price)}
+            </p>
+            <p class="pc__for">{p.forWhom}</p>
+          </div>
           <ul class="pc__list">
             {p.highlights.map((h) => (
               <li>{h}</li>
             ))}
           </ul>
           <a class:list={['btn', i === 1 ? 'btn--accent' : 'btn--ink', 'pc__cta']} href={url(`/contacts/?plan=${p.id}`)}>
-            Выбрать {p.name} <span class="arrow" aria-hidden="true">→</span>
+            Выбрать {p.name} <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
           </a>
         </article>
       ))
@@ -43,10 +46,8 @@ import { url } from '@/lib/url';
 
   <a class="pc__calc" href={url('/services/#calculator')} data-reveal>
     <span class="pc__calc-t">Не знаете, какой пакет нужен?</span>
-    <span class="pc__calc-d">
-      Калькулятор посчитает стоимость под ваш тип сайта и число страниц. Страница сверх тарифа — {formatPrice(extraPagePrice)}.
-    </span>
-    <span class="pc__calc-go" aria-hidden="true">→</span>
+    <span class="pc__calc-d">Калькулятор подберёт пакет под ваш тип сайта и число страниц.</span>
+    <span class="pc__calc-go" aria-hidden="true"><Icon name="arrow" /></span>
   </a>
 </section>
 
@@ -60,8 +61,8 @@ import { url } from '@/lib/url';
   .pc__card {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    padding: clamp(24px, 2.6vw, 36px);
+    gap: clamp(28px, 2.6vw, 36px);
+    padding: clamp(26px, 3vw, 44px);
     border-radius: var(--radius-lg);
     background: var(--surface);
   }
@@ -99,19 +100,22 @@ import { url } from '@/lib/url';
     color: var(--night-ink);
   }
 
+  /* Цена и одна фраза о том, кому подходит, — одна группа, без разделителей. */
+  .pc__offer {
+    display: grid;
+    gap: 14px;
+  }
+
   .pc__price {
-    padding-block: 18px;
-    border-block: 1px solid rgba(21, 21, 21, 0.1);
     font-family: var(--font-head);
     font-weight: 650;
     font-size: clamp(2.25rem, 1.6rem + 1.6vw, 3.25rem);
     line-height: 1;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.04em;
     white-space: nowrap;
   }
 
   .pc__card--dark .pc__price {
-    border-color: rgba(246, 245, 241, 0.14);
     color: var(--accent);
   }
 
@@ -122,23 +126,29 @@ import { url } from '@/lib/url';
   }
 
   .pc__for {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.0625rem;
-    line-height: 1.35;
+    max-width: 32ch;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  .pc__card--dark .pc__for {
+    color: var(--night-muted);
   }
 
   .pc__list {
     list-style: none;
     padding: 0;
     display: grid;
-    gap: 10px;
-    margin-bottom: 8px;
-    color: #3b3a36;
+    gap: 14px;
+    padding-top: clamp(24px, 2.4vw, 32px);
+    border-top: 1px solid rgba(21, 21, 21, 0.08);
+    color: var(--ink);
   }
 
   .pc__card--dark .pc__list {
-    color: var(--night-muted);
+    border-color: rgba(246, 245, 241, 0.12);
+    color: var(--night-ink);
   }
 
   .pc__list li {
@@ -169,7 +179,7 @@ import { url } from '@/lib/url';
     gap: 8px 28px;
     align-items: center;
     margin-top: var(--gap);
-    padding: 22px clamp(22px, 2.6vw, 36px);
+    padding: clamp(26px, 2.6vw, 36px) clamp(26px, 3vw, 44px);
     border-radius: var(--radius-lg);
     background: var(--accent);
     color: var(--accent-ink);

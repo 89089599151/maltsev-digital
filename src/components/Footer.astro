@@ -3,6 +3,7 @@ import { url } from '@/lib/url';
 import { site } from '@/config/site';
 import ContactLink from './ContactLink.astro';
 import PixelWord from './PixelWord.astro';
+import Icon from './Icon.astro';
 
 
 const year = new Date().getFullYear();
@@ -34,7 +35,7 @@ const year = new Date().getFullYear();
       </ul>
     </nav>
     <div class="ftr__contacts">
-      <p class="ftr__lead">Напишите о задаче — отвечу {site.contacts.responseTime.value} и предложу план.</p>
+      <p class="ftr__lead">Напишите о задаче — отвечу {site.contacts.responseTime.value} и предложу план.</p>
       <ContactLink kind="telegram" />
       <ContactLink kind="email" />
     </div>
@@ -42,7 +43,7 @@ const year = new Date().getFullYear();
 
   <div class="ftr__bottom small">
     <p>© {year} {site.brand.name.value}. {site.contacts.workFormat}.</p>
-    <a class="btn btn--ghost ftr__top" href="#top">Наверх <span class="arrow" aria-hidden="true">↑</span></a>
+    <a class="btn btn--ghost ftr__top" href="#top">Наверх <span class="arrow" aria-hidden="true"><Icon name="arrow-up" /></span></a>
   </div>
 </footer>
 

@@ -5,6 +5,7 @@ import Base from '@/layouts/Base.astro';
 import PageHero from '@/components/PageHero.astro';
 import { categoryLabel } from '@/config/portfolio';
 import { url } from '@/lib/url';
+import Icon from '@/components/Icon.astro';
 
 export async function getStaticPaths() {
   const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
@@ -23,7 +24,7 @@ const { project, next } = Astro.props;
 const d = project.data;
 const { Content } = await render(project);
 const hasNext = next.id !== project.id;
-/** Кейс этого сайта: живая версия — то, что открыто сейчас. */
+/** Кейс этого сайта: живая версия — то, что открыто сейчас. */
 const isSelf = project.id === 'maltsev-digital';
 const devices = [
   { key: 'desktop', label: 'Десктоп', img: d.responsive.desktop },
@@ -41,7 +42,7 @@ const schema = {
 };
 ---
 
-<Base title={isSelf ? 'Кейс: этот сайт, сделанный с ИИ' : `${d.title} — ${d.isConcept ? 'концепт' : 'проект'}`} description={d.summary} schema={schema}>
+<Base title={isSelf ? 'Кейс: этот сайт, сделанный с ИИ' : `${d.title} — ${d.isConcept ? 'концепт' : 'проект'}`} description={d.summary} schema={schema}>
   <article>
     <PageHero
       id="pj-title"
@@ -51,18 +52,18 @@ const schema = {
       compact
     >
       <dl class="pj-facts">
-        <div><dt>Тип</dt><dd>{d.isConcept ? 'Концепт — демонстрационный проект' : categoryLabel(d.category)}</dd></div>
+        <div><dt>Тип</dt><dd>{d.isConcept ? 'Концепт — демонстрационный проект' : categoryLabel(d.category)}</dd></div>
         <div><dt>Год</dt><dd>{d.year}</dd></div>
         <div class="pj-facts__wide"><dt>Технологии</dt><dd>{d.stack.join(', ')}</dd></div>
       </dl>
       {
         d.liveUrl ? (
           <a class="pj-live" href={d.liveUrl} target="_blank" rel="noopener">
-            Открыть сайт <span aria-hidden="true">↗</span>
+            Открыть сайт <span aria-hidden="true"><Icon name="arrow-ne" /></span>
           </a>
         ) : isSelf ? (
           <a class="pj-live" href={url('/')}>
-            Вы сейчас на этом сайте <span aria-hidden="true">→</span>
+            Вы сейчас на этом сайте <span aria-hidden="true"><Icon name="arrow" /></span>
           </a>
         ) : (
           <p class="pj-live pj-live--off">Живая версия недоступна</p>
@@ -135,7 +136,7 @@ const schema = {
             {devices.map((dv) => (
               <figure class={`device device--${dv.key}`} data-reveal>
                 <div class="device__frame">
-                  <Image src={dv.img!} alt={`${d.title}: версия — ${dv.label.toLowerCase()}`} widths={[400, 800, 1200]} sizes="(max-width: 767px) 100vw, 40vw" loading="lazy" />
+                  <Image src={dv.img!} alt={`${d.title}: версия — ${dv.label.toLowerCase()}`} widths={[400, 800, 1200]} sizes="(max-width: 767px) 100vw, 40vw" loading="lazy" />
                 </div>
                 <figcaption>{dv.label}</figcaption>
               </figure>
@@ -157,13 +158,13 @@ const schema = {
           <a class="pj-next__link tile tile--paper" href={url(`/portfolio/${next.id}/`)}>
             <span class="pj-next__k">Следующий проект</span>
             <span class="pj-next__t">{next.data.title}</span>
-            <span class="pj-next__arrow" aria-hidden="true">→</span>
+            <span class="pj-next__arrow" aria-hidden="true"><Icon name="arrow" /></span>
           </a>
         ) : (
           <a class="pj-next__link tile tile--paper" href={url('/portfolio/')}>
             <span class="pj-next__k">Все работы</span>
             <span class="pj-next__t">Вернуться в портфолио</span>
-            <span class="pj-next__arrow" aria-hidden="true">→</span>
+            <span class="pj-next__arrow" aria-hidden="true"><Icon name="arrow" /></span>
           </a>
         )
       }
@@ -267,7 +268,7 @@ const schema = {
     font-weight: 800;
     font-size: clamp(3rem, 1.6rem + 3vw, 5rem);
     line-height: 0.9;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.04em;
   }
 
   .pj-design {
@@ -413,7 +414,7 @@ const schema = {
     font-weight: 750;
     font-size: clamp(2rem, 1rem + 3vw, 4rem);
     line-height: 0.95;
-    letter-spacing: -0.045em;
+    letter-spacing: -0.04em;
   }
 
   .pj-next__arrow {

@@ -14,7 +14,7 @@ export interface Plan {
   id: PlanId;
   name: string;
   price: number;
-  /** Кому подходит — одна фраза. */
+  /** Кому подходит — одна фраза. */
   forWhom: string;
   /** Короткий список для главной. */
   highlights: string[];
@@ -137,7 +137,7 @@ export const addons: Addon[] = [
 export const extraPagePrice = 5000;
 
 /** Порядок оплаты. */
-export const paymentTerms = '50% предоплата перед стартом, 50% — после приёмки готового сайта.';
+export const paymentTerms = '50% предоплата перед стартом, 50% — после приёмки готового сайта.';
 
 export function formatPrice(value: number): string {
   return new Intl.NumberFormat('ru-RU').format(value) + ' ₽';

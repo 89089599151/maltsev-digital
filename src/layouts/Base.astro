@@ -25,7 +25,7 @@ const {
   schema,
 } = Astro.props;
 
-const fullTitle = title ? `${title} — ${site.brand.name.value}` : site.seo.defaultTitle;
+const fullTitle = title ? `${title} — ${site.brand.name.value}` : site.seo.defaultTitle;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogUrl = new URL(url(ogImage), Astro.site).href;
 

@@ -1,12 +1,13 @@
 ---
 /**
- * «Кто делает сайт»: фото слева, рассказ и факты справа — на серой сцене.
+ * «Кто делает сайт»: фото слева, рассказ и факты справа — на серой сцене.
  */
 import { Image } from 'astro:assets';
 import PixelWord from './PixelWord.astro';
 import { site } from '@/config/site';
 import { url } from '@/lib/url';
 import owner from '@/assets/photos/owner.webp';
+import Icon from './Icon.astro';
 
 const facts = [
   { k: 'Образование', v: 'в дизайне' },
@@ -35,7 +36,7 @@ const facts = [
         <p class="ow__role">Независимый веб-разработчик и дизайнер</p>
       </div>
       <p class="ow__text">
-        Веду проект сам — от первого разговора до запуска. Не передаю задачу менеджерам и подрядчикам:
+        Веду проект сам — от первого разговора до запуска. Не передаю задачу менеджерам и подрядчикам:
         вы всегда знаете, кто отвечает за результат.
       </p>
       <dl class="ow__facts">
@@ -50,7 +51,7 @@ const facts = [
       </dl>
       <div class="ow__btns">
         <a class="btn btn--ink" href={url('/contacts/')} data-magnetic>
-          Обсудить проект <span class="arrow" aria-hidden="true">→</span>
+          Обсудить проект <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
         </a>
         <a class="ow__more" href={url('/about/')}>Подробнее обо мне</a>
       </div>
@@ -103,7 +104,7 @@ const facts = [
   .ow__title {
     font-size: var(--step-head);
     line-height: 0.95;
-    letter-spacing: -0.045em;
+    letter-spacing: -0.04em;
     text-transform: uppercase;
   }
 
@@ -162,11 +163,14 @@ const facts = [
   }
 
   .ow__more {
+    display: inline-flex;
+    align-items: flex-end;
+    min-height: 44px;
     font-family: var(--font-display);
     font-weight: 650;
     text-decoration: none;
     border-bottom: 2px solid var(--accent);
-    padding-block: 10px 2px;
+    padding-bottom: 2px;
   }
 
   @media (max-width: 1023px) {

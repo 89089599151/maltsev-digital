@@ -1,7 +1,7 @@
 ---
 /**
  * Первый экран внутренних страниц: серая сцена, как у главной, крупный капс-заголовок,
- * пояснение и пиксельное слово. Справа — необязательный слот (факты, фото, кнопки).
+ * пояснение и пиксельное слово. Справа — необязательный слот (факты, фото, кнопки).
  */
 import PixelWord from './PixelWord.astro';
 import { url } from '@/lib/url';
@@ -10,7 +10,7 @@ interface Props {
   id: string;
   title: string;
   lead?: string;
-  /** Пиксельное слово в углу сцены — только из глифов pixel-font. */
+  /** Пиксельное слово в углу сцены — только из глифов pixel-font. */
   pixel?: string;
   crumbs?: { href: string; label: string }[];
   /** Для длинных заголовков: меньший кегль и ниже сцена. */
@@ -101,8 +101,15 @@ const hasAside = Astro.slots.has('default');
   }
 
   .ph__crumbs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     color: inherit;
     text-decoration: none;
+  }
+
+  .ph__crumbs {
+    align-items: center;
   }
 
   .ph__crumbs a:hover {
@@ -112,7 +119,7 @@ const hasAside = Astro.slots.has('default');
   .ph__title {
     font-size: var(--step-display);
     line-height: 0.9;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.04em;
     text-transform: uppercase;
     max-width: 12ch;
     overflow-wrap: anywhere;

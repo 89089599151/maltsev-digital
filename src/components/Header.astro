@@ -2,6 +2,7 @@
 import PixelWord from './PixelWord.astro';
 import { url, isActive } from '@/lib/url';
 import { site } from '@/config/site';
+import Icon from './Icon.astro';
 
 const nav = [
   { href: '/portfolio/', label: 'Работы' },
@@ -14,7 +15,7 @@ const current = Astro.url.pathname;
 
 <header class="hdr" data-header>
   <div class="hdr__row">
-    <a class="hdr__brand" href={url('/')} aria-label={`${site.brand.name.value} — на главную`}>
+    <a class="hdr__brand" href={url('/')} aria-label={`${site.brand.name.value} — на главную`}>
       <PixelWord text="M" appear="none" class="hdr__mark" />
       <span class="hdr__name">{site.brand.short}<span> {site.brand.second}</span></span>
     </a>
@@ -32,7 +33,7 @@ const current = Astro.url.pathname;
       </ul>
     </nav>
     <a class="hdr__cta btn btn--ink" href={url('/contacts/')} data-magnetic>
-      Обсудить проект <span class="arrow" aria-hidden="true">→</span>
+      Обсудить проект <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
     </a>
     <button class="hdr__menu" type="button" aria-haspopup="dialog" aria-controls="site-menu" data-menu-open>
       Меню
@@ -58,7 +59,7 @@ const current = Astro.url.pathname;
           </li>
         ))}
       </ul>
-      <a class="menu__cta" href={url('/contacts/')}>Обсудить проект <span aria-hidden="true">→</span></a>
+      <a class="menu__cta" href={url('/contacts/')}>Обсудить проект <span aria-hidden="true"><Icon name="arrow" /></span></a>
     </div>
   </dialog>
 </header>

@@ -5,10 +5,11 @@ import ProcessSteps from '@/components/ProcessSteps.astro';
 import PageHero from '@/components/PageHero.astro';
 import { plans, addons, extraPagePrice, paymentTerms, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
+import Icon from '@/components/Icon.astro';
 
 const looks = ['raised', 'deep', 'raised'];
 
-// Таблица сравнения: строка — возможность, значения по тарифам.
+// Таблица сравнения: строка — возможность, значения по тарифам.
 const compare: { label: string; values: [string, string, string] }[] = [
   { label: 'Страниц', values: ['1', 'до 8', 'до 15'] },
   { label: 'Дизайн', values: ['По стилю или с нуля', 'Индивидуальный', 'Авторская концепция'] },
@@ -56,7 +57,7 @@ const schema = {
       <p class="sv-fact__k">Цена не растёт</p>
       <p class="sv-fact__v">
         Сумма фиксируется в предложении и меняется, только если меняется задача.
-        {!pricingConfirmed && ' Цены на сайте — предварительные.'}
+        {!pricingConfirmed && ' Цены на сайте — предварительные.'}
       </p>
     </div>
   </PageHero>
@@ -74,25 +75,37 @@ const schema = {
               <p class="col__for">{p.forWhom}</p>
             </header>
 
-            <div class="col__block">
-              <h4 class="col__h">Входит</h4>
-              <ul class="col__list col__list--yes">
-                {p.includes.map((x) => <li>{x}</li>)}
-              </ul>
-            </div>
-            <div class="col__block">
-              <h4 class="col__h">Не входит</h4>
-              <ul class="col__list col__list--no">
-                {p.excludes.map((x) => <li>{x}</li>)}
-              </ul>
-            </div>
+            <ul class="col__list col__list--yes" aria-label={`Главное в ${p.name}`}>
+              {p.includes.slice(0, 4).map((x) => <li>{x}</li>)}
+            </ul>
+
             <dl class="col__terms">
               <div><dt>Срок</dt><dd>{p.timeline}</dd></div>
               <div><dt>Правки</dt><dd>{p.revisions}</dd></div>
-              <div><dt>Результат</dt><dd>{p.result}</dd></div>
             </dl>
+
+            {/* Полный состав — по запросу: на первом взгляде только то, что отличает пакет. */}
+            <details class="col__more">
+              <summary>
+                Весь состав и что не входит <span class="col__more-ico" aria-hidden="true"><Icon name="arrow" /></span>
+              </summary>
+              <div class="col__more-body">
+                {p.includes.length > 4 && (
+                  <ul class="col__list col__list--yes">
+                    {p.includes.slice(4).map((x) => <li>{x}</li>)}
+                  </ul>
+                )}
+                <div>
+                  <h4 class="col__h">Не входит</h4>
+                  <ul class="col__list col__list--no">
+                    {p.excludes.map((x) => <li>{x}</li>)}
+                  </ul>
+                </div>
+                <p class="col__result"><strong>Результат.</strong> {p.result}</p>
+              </div>
+            </details>
             <a class={`btn ${i === 1 ? 'btn--accent' : 'btn--ink'} col__btn`} href={url(`/contacts/?plan=${p.id}`)}>
-              Заказать {p.name} <span class="arrow" aria-hidden="true">→</span>
+              Заказать {p.name} <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
             </a>
           </article>
         ))
@@ -104,7 +117,7 @@ const schema = {
   <section class="section cmp" aria-labelledby="cmp-title">
     <div class="cmp__side">
       <h2 id="cmp-title" class="head">Сравнение</h2>
-      <p>Если сомневаетесь между двумя тарифами, опишите задачу — подскажу, какой подойдёт, и не стану продавать лишнее.</p>
+      <p>Если сомневаетесь между двумя тарифами, опишите задачу — подскажу, какой подойдёт, и не стану продавать лишнее.</p>
     </div>
     <div class="cmp__wrap" tabindex="0" role="region" aria-labelledby="cmp-title">
       <table class="cmp__table">
@@ -138,14 +151,14 @@ const schema = {
 
   <!-- Дополнительные работы -->
   <section class="section extras" aria-labelledby="extras-title">
-    <div class="extras__head tile tile--raised">
+    <div class="extras__head">
       <h2 id="extras-title" class="head">Дополнительно</h2>
-      <p>Можно добавить к любому тарифу. Каждая страница сверх лимита — {formatPrice(extraPagePrice)}.</p>
+      <p>Можно добавить к любому тарифу. Каждая страница сверх лимита — {formatPrice(extraPagePrice)}.</p>
     </div>
     <ul class="extras__list" data-stagger>
       {
         addons.map((a) => (
-          <li class="extras__item tile">
+          <li class="extras__item">
             <span class="extras__name">{a.name}</span>
             <span class="extras__note">{a.note}</span>
             <span class="extras__price">{formatPrice(a.price)}</span>
@@ -159,8 +172,8 @@ const schema = {
 
   <section class="section sv-cta tile tile--accent" aria-labelledby="sv-cta-title">
     <h2 id="sv-cta-title" class="head">Не уверены, какой тариф нужен?</h2>
-    <p class="lead">Опишите задачу в двух словах — предложу подходящий вариант и назову точную сумму.</p>
-    <a class="btn btn--ink" href={url('/contacts/')}>Описать задачу <span class="arrow" aria-hidden="true">→</span></a>
+    <p class="lead">Опишите задачу в двух словах — предложу подходящий вариант и назову точную сумму.</p>
+    <a class="btn btn--ink" href={url('/contacts/')}>Описать задачу <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
   </section>
 </Base>
 
@@ -208,8 +221,9 @@ const schema = {
   .col {
     display: flex;
     flex-direction: column;
-    gap: 28px;
-    padding: 28px;
+    gap: clamp(28px, 2.8vw, 40px);
+    padding: clamp(26px, 3vw, 44px);
+    border-radius: var(--radius-lg);
   }
 
   .col__name {
@@ -227,11 +241,18 @@ const schema = {
   }
 
   .col__for {
-    margin-top: 14px;
+    max-width: 34ch;
+    margin-top: 16px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  .tile--deep .col__for {
+    color: var(--night-muted);
   }
 
   .col__h {
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     font-size: 1.125rem;
     letter-spacing: -0.01em;
   }
@@ -240,55 +261,138 @@ const schema = {
     list-style: none;
     padding: 0;
     display: grid;
-    gap: 8px;
+    gap: 12px;
     font-size: 1rem;
+    line-height: 1.45;
   }
 
   .col__list li {
     display: grid;
-    grid-template-columns: 18px 1fr;
-    gap: 8px;
+    grid-template-columns: 14px 1fr;
+    gap: 12px;
+    align-items: baseline;
   }
 
   .col__list--yes li::before {
-    content: '+';
-    font-family: var(--font-display);
-    font-weight: 700;
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    transform: translateY(-1px);
   }
 
   .col__list--no li::before {
-    content: '–';
-    font-family: var(--font-display);
-    font-weight: 700;
+    content: '';
+    width: 8px;
+    height: 2px;
+    background: currentColor;
+    transform: translateY(-4px);
   }
 
   .col__list--no li {
-    opacity: 0.85;
+    color: var(--muted);
+  }
+
+  .tile--deep .col__list--no li {
+    color: var(--night-muted);
   }
 
   .col__terms {
     display: grid;
-    gap: 14px;
+    gap: 16px;
     margin-top: auto;
+    padding-top: clamp(24px, 2.4vw, 32px);
+    border-top: 1px solid rgba(21, 21, 21, 0.08);
+  }
+
+  .tile--deep .col__terms {
+    border-color: rgba(246, 245, 241, 0.12);
   }
 
   .col__terms dt {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 0.9375rem;
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .tile--deep .col__terms dt {
+    color: var(--night-muted);
   }
 
   .col__terms dd {
+    margin-top: 4px;
     font-size: 1rem;
+    line-height: 1.45;
   }
 
   .col__btn {
     width: 100%;
   }
 
-  .tile--raised .col__btn {
-    background: var(--accent);
-    color: var(--accent-ink);
+  .col__more {
+    margin-top: -8px;
+  }
+
+  .col__more summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-weight: 650;
+    font-size: 0.9375rem;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .col__more summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .col__more summary:hover {
+    color: var(--accent-deep);
+  }
+
+  .tile--deep .col__more summary:hover {
+    color: var(--accent);
+  }
+
+  .col__more-ico {
+    display: inline-grid;
+    transition: transform var(--dur) var(--ease-out);
+    transform: rotate(90deg);
+  }
+
+  .col__more[open] .col__more-ico {
+    transform: rotate(-90deg);
+  }
+
+  .col__more-body {
+    display: grid;
+    gap: 24px;
+    padding-block: 16px 4px;
+  }
+
+  .col__result {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  .tile--deep .col__result {
+    color: var(--night-muted);
+  }
+
+  .col__result strong {
+    color: var(--ink);
+  }
+
+  .tile--deep .col__result strong {
+    color: var(--night-ink);
   }
 
   /* Сравнение */
@@ -381,11 +485,15 @@ const schema = {
 
   .extras__head {
     grid-column: 1 / 5;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 24px;
-    min-height: 320px;
+    display: grid;
+    gap: 20px;
+    align-content: start;
+    padding-right: clamp(0px, 2vw, 32px);
+  }
+
+  .extras__head p {
+    max-width: 36ch;
+    color: #3b3a36;
   }
 
   .extras__head .head {
@@ -396,17 +504,23 @@ const schema = {
   .extras__list {
     grid-column: 5 / 13;
     list-style: none;
-    padding: 0;
     display: grid;
-    gap: var(--gap);
+    padding: 8px clamp(22px, 2.6vw, 36px);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
   }
 
+  /* Один лист со строками вместо стопки плиток. */
   .extras__item {
     display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 16px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    gap: 24px;
     align-items: center;
-    padding-block: 20px;
+    padding-block: 24px;
+  }
+
+  .extras__item + .extras__item {
+    border-top: 1px solid rgba(21, 21, 21, 0.08);
   }
 
   .extras__name {

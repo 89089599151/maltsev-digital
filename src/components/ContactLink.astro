@@ -4,6 +4,7 @@
  * показывается как «будет указан перед запуском», чтобы не вести на чужой аккаунт.
  */
 import { site, telegramUrl, emailUrl } from '@/config/site';
+import Icon from './Icon.astro';
 
 interface Props {
   kind: 'telegram' | 'email';
@@ -23,7 +24,7 @@ const href = isTg ? telegramUrl() : emailUrl('Заявка на разработ
     <a class={`cl cl--${variant}`} href={href} target={isTg ? '_blank' : undefined} rel={isTg ? 'noopener' : undefined}>
       <span class="cl__label">{label}</span>
       <span class="cl__value">{shown}</span>
-      <span class="cl__arrow" aria-hidden="true">↗</span>
+      <span class="cl__arrow" aria-hidden="true"><Icon name="arrow-ne" /></span>
     </a>
   ) : (
     <div class={`cl cl--${variant} cl--pending`}>

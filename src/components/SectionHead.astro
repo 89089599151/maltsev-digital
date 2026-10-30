@@ -1,14 +1,15 @@
 ---
+import Icon from './Icon.astro';
 /**
  * Заголовок секции: крупный капс слева, пояснение и действие справа.
- * Один компонент для всех секций — одинаковый ритм и иерархия.
+ * Один компонент для всех секций — одинаковый ритм и иерархия.
  */
 interface Props {
   id: string;
   title: string;
   text?: string;
   link?: { href: string; label: string };
-  /** Тёмная секция — светлый текст. */
+  /** Тёмная секция — светлый текст. */
   invert?: boolean;
 }
 const { id, title, text, link, invert = false } = Astro.props;
@@ -22,7 +23,7 @@ const { id, title, text, link, invert = false } = Astro.props;
         {text && <p class="sh__text">{text}</p>}
         {link && (
           <a class="sh__link" href={link.href}>
-            {link.label} <span class="arrow" aria-hidden="true">→</span>
+            {link.label} <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
           </a>
         )}
       </div>
@@ -42,7 +43,7 @@ const { id, title, text, link, invert = false } = Astro.props;
   .sh__title {
     font-size: var(--step-head);
     line-height: 0.95;
-    letter-spacing: -0.045em;
+    letter-spacing: -0.04em;
     text-transform: uppercase;
     max-width: 16ch;
   }
