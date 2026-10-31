@@ -4,13 +4,16 @@
  * Размер — 1em, поэтому иконка подстраивается под кегль кнопки или ссылки.
  */
 interface Props {
-  name: 'arrow' | 'arrow-ne' | 'arrow-up';
+  name: 'arrow' | 'arrow-ne' | 'arrow-up' | 'plus' | 'minus' | 'check';
 }
 const { name } = Astro.props;
 const paths = {
   arrow: 'M5 12h14M13 6l6 6-6 6',
   'arrow-ne': 'M7 17 17 7M8 7h9v9',
   'arrow-up': 'M12 19V5M6 11l6-6 6 6',
+  plus: 'M12 5v14M5 12h14',
+  minus: 'M5 12h14',
+  check: 'M5 12.5l4.5 4.5L19 7',
 };
 ---
 

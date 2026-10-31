@@ -1,7 +1,8 @@
 ---
 /**
- * Калькулятор: тип сайта, число страниц и дополнительные работы → подходящий тариф,
- * ориентировочная сумма и срок. Кнопка переносит расчёт в форму заявки.
+ * Калькулятор: тип сайта и число страниц → подходящий тариф, ориентировочная сумма и срок.
+ * Дополнительные работы добавляются кнопками «+» в списке «Дополнительно» ниже (data-addon).
+ * Кнопка переносит расчёт в форму заявки.
  */
 import { plans, addons, extraPagePrice, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
@@ -58,23 +59,6 @@ const start = plans[1];
       <input id="est-pages" type="range" name="pages" min="1" max="25" value="6" step="1" aria-describedby="est-pages-note" />
       <p class="est__pages-note small" id="est-pages-note">Уникальных страниц: главная, услуги, о компании, контакты и так далее.</p>
     </div>
-
-    <fieldset class="est__addons tile">
-      <legend class="est__legend">Дополнительно</legend>
-      <div class="est__checks">
-        {
-          addons.map((a) => (
-            <label class="chk" data-addon-label={a.id}>
-              <input type="checkbox" name="addons" value={a.id} />
-              <span class="chk__box">
-                <span class="chk__name">{a.name}</span>
-                <span class="chk__price" data-addon-price={a.id}>+{formatPrice(a.price)}</span>
-              </span>
-            </label>
-          ))
-        }
-      </div>
-    </fieldset>
 
     <div class="est__result tile tile--accent" aria-live="polite">
       <p class="est__res-label">Подходит тариф</p>
@@ -148,37 +132,27 @@ const start = plans[1];
     flex-direction: column;
   }
 
-  .est__addons {
-    grid-column: 1 / 9;
-  }
-
   .est__result {
     grid-column: 9 / 13;
-    grid-row: 1 / 3;
+    grid-row: 1;
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
 
-  .est__options,
-  .est__checks {
-    clear: both;
-  }
-
   .est__options {
+    clear: both;
     display: grid;
     gap: var(--gap);
   }
 
-  .opt,
-  .chk {
+  .opt {
     position: relative;
     display: block;
     cursor: pointer;
   }
 
-  .opt input,
-  .chk input {
+  .opt input {
     position: absolute;
     opacity: 0;
     inset: 0;
@@ -186,8 +160,7 @@ const start = plans[1];
     cursor: pointer;
   }
 
-  .opt__box,
-  .chk__box {
+  .opt__box {
     display: grid;
     gap: 2px;
     padding: 14px 16px;
@@ -198,25 +171,21 @@ const start = plans[1];
       color var(--dur-fast) var(--ease-out);
   }
 
-  .opt:hover .opt__box,
-  .chk:hover .chk__box {
+  .opt:hover .opt__box {
     background: var(--accent-soft);
   }
 
-  .opt input:checked + .opt__box,
-  .chk input:checked + .chk__box {
+  .opt input:checked + .opt__box {
     background: var(--night);
     color: var(--night-ink);
   }
 
-  .opt input:focus-visible + .opt__box,
-  .chk input:focus-visible + .chk__box {
+  .opt input:focus-visible + .opt__box {
     outline: 3px solid var(--accent);
     outline-offset: 2px;
   }
 
-  .opt__name,
-  .chk__name {
+  .opt__name {
     font-family: var(--font-display);
     font-weight: 600;
     font-size: 1.0625rem;
@@ -252,32 +221,6 @@ const start = plans[1];
     color: var(--muted);
   }
 
-  .est__checks {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: var(--gap);
-  }
-
-  .chk__box {
-    grid-template-columns: 1fr;
-    min-height: 76px;
-    align-content: space-between;
-  }
-
-  .chk__price {
-    font-family: var(--font-display);
-    font-size: 0.9375rem;
-  }
-
-  .chk.is-included {
-    cursor: default;
-  }
-
-  .chk.is-included .chk__box {
-    background: rgba(255, 255, 255, 0.45);
-    color: var(--muted);
-  }
-
   .est__res-label {
     font-family: var(--font-display);
     font-weight: 500;
@@ -291,7 +234,20 @@ const start = plans[1];
     letter-spacing: -0.04em;
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    .est__res-sum:global(.is-bumped) {
+      animation: est-bump 420ms var(--ease-out);
+    }
+  }
+
+  @keyframes est-bump {
+    40% {
+      scale: 1.06;
+    }
+  }
+
   .est__res-sum {
+    transform-origin: left center;
     margin-top: auto;
     font-family: var(--font-head);
     font-weight: 700;
@@ -331,13 +287,9 @@ const start = plans[1];
       grid-column: 8 / 13;
     }
 
-    .est__addons,
     .est__result {
       grid-column: 1 / -1;
       grid-row: auto;
-    }
-
-    .est__result {
       min-height: 320px;
     }
   }
@@ -355,10 +307,6 @@ const start = plans[1];
 
     .est__pages-val {
       font-size: 4rem;
-    }
-
-    .est__checks {
-      grid-template-columns: 1fr;
     }
   }
 </style>

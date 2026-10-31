@@ -14,8 +14,13 @@ interface EstConfig {
   contactUrl: string;
 }
 
-const fmt = (n: number) => new Intl.NumberFormat('ru-RU').format(n) + ' ₽';
+const fmt = (n: number) => new Intl.NumberFormat('ru-RU').format(n) + ' ₽';
 
+/**
+ * Калькулятор на странице услуг. Тип сайта и страницы — в форме [data-estimator];
+ * дополнительные работы — кнопки [data-addon] в списке «Дополнительно» под калькулятором.
+ * Без скрипта кнопки скрыты, а список остаётся обычным прайсом.
+ */
 export function initEstimator(): void {
   const form = document.querySelector<HTMLFormElement>('[data-estimator]');
   if (!form?.dataset.config) return;
@@ -28,11 +33,15 @@ export function initEstimator(): void {
   const outTime = form.querySelector<HTMLElement>('[data-out-time]')!;
   const outExtra = form.querySelector<HTMLElement>('[data-out-extra]')!;
   const outLink = form.querySelector<HTMLAnchorElement>('[data-out-link]')!;
+  const mirror = document.querySelector<HTMLElement>('[data-out-mirror]');
+  const mirrorSum = document.querySelector<HTMLElement>('[data-out-mirror-sum]');
+  const toggles = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-addon]'));
+  const chosen = new Set<string>();
 
   form.addEventListener('submit', (e) => e.preventDefault());
 
   const calc = () => {
-    const type = (form.querySelector<HTMLInputElement>('input[name="type"]:checked')?.value ?? 'business');
+    const type = form.querySelector<HTMLInputElement>('input[name="type"]:checked')?.value ?? 'business';
     const pages = Number(range.value);
     pagesOut.value = String(pages);
 
@@ -44,31 +53,45 @@ export function initEstimator(): void {
     const extraPages = Math.max(0, pages - plan.maxPages);
 
     let sum = plan.price + extraPages * cfg.extraPagePrice;
-    const chosen: string[] = [];
-    form.querySelectorAll<HTMLInputElement>('input[name="addons"]').forEach((box) => {
-      const label = box.closest<HTMLElement>('[data-addon-label]');
-      const price = label?.querySelector<HTMLElement>('[data-addon-price]');
-      const addon = cfg.addons.find((a) => a.id === box.value);
-      const isIncluded = included.includes(box.value);
-      label?.classList.toggle('is-included', isIncluded);
-      box.disabled = isIncluded;
-      if (price && addon) price.textContent = isIncluded ? `входит в ${plan.name}` : `+${fmt(addon.price)}`;
-      if (box.checked && !isIncluded && addon) {
+    const names: string[] = [];
+    const ids: string[] = [];
+    for (const btn of toggles) {
+      const id = btn.dataset.addon!;
+      const addon = cfg.addons.find((a) => a.id === id);
+      if (!addon) continue;
+      const row = btn.closest<HTMLElement>('[data-addon-row]');
+      const price = row?.querySelector<HTMLElement>('[data-addon-price]');
+      const isIncluded = included.includes(id);
+      const isOn = chosen.has(id) && !isIncluded;
+
+      btn.disabled = isIncluded;
+      btn.setAttribute('aria-pressed', String(isOn));
+      btn.setAttribute('aria-label', isIncluded ? `${addon.name}: уже входит в ${plan.name}` : `${isOn ? 'Убрать из расчёта' : 'Добавить в расчёт'}: ${addon.name}`);
+      // «+» — можно добавить, «−» — добавлено, галочка — уже входит в тариф.
+      btn.querySelector('[data-icon-plus]')?.toggleAttribute('hidden', isOn || isIncluded);
+      btn.querySelector('[data-icon-minus]')?.toggleAttribute('hidden', !isOn);
+      btn.querySelector('[data-icon-check]')?.toggleAttribute('hidden', !isIncluded);
+      row?.classList.toggle('is-on', isOn);
+      row?.classList.toggle('is-included', isIncluded);
+      if (price) price.textContent = isIncluded ? `входит в ${plan.name}` : fmt(addon.price);
+
+      if (isOn) {
         sum += addon.price;
-        chosen.push(addon.name);
+        names.push(addon.name);
+        ids.push(id);
       }
-    });
+    }
 
     outPlan.textContent = plan.name;
     outSum.textContent = fmt(sum);
     outTime.textContent = plan.timeline;
     const notes: string[] = [];
     if (extraPages) notes.push(`${extraPages} доп. стр. × ${fmt(cfg.extraPagePrice)}`);
-    if (chosen.length) notes.push(chosen.join(', '));
+    if (names.length) notes.push(names.join(', '));
     outExtra.textContent = notes.length ? `Включено: ${notes.join('; ')}` : '';
+    if (mirrorSum) mirrorSum.textContent = `${fmt(sum)} · ${plan.name}`;
 
     const params = new URLSearchParams({ plan: plan.id, pages: String(pages), sum: String(sum) });
-    const ids = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="addons"]:checked:not(:disabled)')).map((b) => b.value);
     if (ids.length) params.set('addons', ids.join(','));
     outLink.href = `${cfg.contactUrl}?${params}`;
   };
@@ -80,5 +103,20 @@ export function initEstimator(): void {
     }),
   );
   form.addEventListener('input', calc);
+
+  for (const btn of toggles) {
+    btn.hidden = false;
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.addon!;
+      if (chosen.has(id)) chosen.delete(id);
+      else chosen.add(id);
+      calc();
+      // Итог чуть «подпрыгивает», чтобы изменение заметили.
+      outSum.classList.remove('is-bumped');
+      void outSum.offsetWidth;
+      outSum.classList.add('is-bumped');
+    });
+  }
+  if (mirror) mirror.hidden = false;
   calc();
 }
