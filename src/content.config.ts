@@ -42,7 +42,7 @@ const projects = defineCollection({
         })
         .default({}),
       /** Результаты проекта — только реальные, проверяемые цифры. */
-      results: z.array(z.object({ value: z.string(), label: z.string() })).default([]),
+      results: z.array(z.object({ value: z.string(), label: z.string(), short: z.string().optional() })).default([]),
       liveUrl: z.url().optional(),
       repoUrl: z.url().optional(),
     }),
