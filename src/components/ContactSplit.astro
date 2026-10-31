@@ -63,16 +63,9 @@ const mail = emailUrl('Заявка на разработку сайта');
 
     <div class="ct__card">
       <p class="ct__card-t">Короткая заявка</p>
-      {
-        !endpoint && (
-          <p class="ct__notice" role="note">
-            Онлайн-форма заработает после подключения сервиса заявок. Пока удобнее написать в Telegram или на почту.
-          </p>
-        )
-      }
 
-      <form class="ct__form" data-lead-form data-endpoint={endpoint} method="post" action={endpoint || undefined}>
-        <fieldset disabled={!endpoint}>
+      <form class="ct__form" data-lead-form data-endpoint={endpoint} data-mailto={endpoint ? undefined : site.contacts.email.value} data-telegram={endpoint ? undefined : tg} method="post" action={endpoint || undefined}>
+        <fieldset>
           <legend class="sr-only">Короткая заявка</legend>
           <input type="hidden" name="_subject" value="Короткая заявка с главной" />
           <input type="hidden" name="source" value="Главная, блок контактов" />
@@ -102,8 +95,16 @@ const mail = emailUrl('Заявка на разработку сайта');
           <span class="ct__err" id="ct-consent-err"></span>
 
           <button class="ct__submit" type="submit">
-            <span data-label>{endpoint ? 'Отправить заявку' : 'Форма не подключена'}</span>
+            <span data-label>{endpoint ? 'Отправить заявку' : 'Отправить на почту'}</span>
           </button>
+          {
+            !endpoint && tg && (
+              <button class="ct__submit ct__submit--alt" type="button" data-send-telegram>
+                Отправить в Telegram
+              </button>
+            )
+          }
+          {!endpoint && <p class="ct__hint">Письмо с заявкой откроется в вашей почте. В Telegram текст скопируется — останется вставить его в чат.</p>}
           <p class="ct__status" data-status role="status" aria-live="polite"></p>
         </fieldset>
       </form>
@@ -209,7 +210,7 @@ const mail = emailUrl('Заявка на разработку сайта');
   }
 
   .ct__ll {
-    font-size: 0.8125rem;
+    font-size: var(--fs-xs);
     opacity: 0.8;
   }
 
@@ -220,7 +221,7 @@ const mail = emailUrl('Заявка на разработку сайта');
   }
 
   .ct__arr {
-    font-size: 1.125rem;
+    font-size: var(--step-body);
   }
 
   .ct__person {
@@ -240,7 +241,7 @@ const mail = emailUrl('Заявка на разработку сайта');
 
   .ct__person p {
     display: grid;
-    font-size: 0.9375rem;
+    font-size: var(--step-small);
     color: var(--night-muted);
   }
 
@@ -263,17 +264,11 @@ const mail = emailUrl('Заявка на разработку сайта');
   .ct__card-t {
     font-family: var(--font-head);
     font-weight: 650;
-    font-size: 1.5rem;
+    font-size: var(--fs-2);
     letter-spacing: -0.03em;
     text-transform: uppercase;
   }
 
-  .ct__notice {
-    padding: 12px 14px;
-    border-radius: var(--radius-sm);
-    background: var(--accent-soft);
-    font-size: 0.9375rem;
-  }
 
   .ct__form {
     width: 100%;
@@ -300,7 +295,7 @@ const mail = emailUrl('Заявка на разработку сайта');
   .ct__label {
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: var(--step-small);
   }
 
   .ct__opt {
@@ -335,7 +330,7 @@ const mail = emailUrl('Заявка на разработку сайта');
   .ct__field input:focus,
   .ct__field textarea:focus {
     outline: none;
-    background: #fff;
+    background: var(--surface-solid);
     border-color: var(--ink);
   }
 
@@ -345,7 +340,7 @@ const mail = emailUrl('Заявка на разработку сайта');
 
   .ct__err {
     font-family: var(--font-display);
-    font-size: 0.875rem;
+    font-size: var(--step-small);
     font-weight: 600;
     color: var(--danger);
   }
@@ -359,7 +354,7 @@ const mail = emailUrl('Заявка на разработку сайта');
     gap: 10px;
     align-items: flex-start;
     margin-top: 6px;
-    font-size: 0.875rem;
+    font-size: var(--step-small);
     color: var(--muted);
     cursor: pointer;
   }
@@ -379,7 +374,7 @@ const mail = emailUrl('Заявка на разработку сайта');
     color: var(--accent-ink);
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 1.0625rem;
+    font-size: var(--step-body);
     transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
   }
 
@@ -393,6 +388,22 @@ const mail = emailUrl('Заявка на разработку сайта');
 
   .ct__submit:disabled {
     cursor: not-allowed;
+  }
+
+  .ct__submit--alt {
+    margin-top: 0;
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .ct__submit--alt:hover:not(:disabled) {
+    background: var(--ink-hover);
+  }
+
+  .ct__hint {
+    font-size: var(--fs-xs);
+    line-height: 1.45;
+    color: var(--muted);
   }
 
   .ct__status {

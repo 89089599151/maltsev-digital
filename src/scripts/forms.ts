@@ -1,6 +1,9 @@
 /**
- * Отправка заявок в Formspree без перезагрузки страницы.
- * Успех показывается только после положительного ответа сервиса.
+ * Отправка заявок.
+ * - С Formspree (data-endpoint): без перезагрузки, успех — только после положительного ответа сервиса.
+ * - Без Formspree (data-mailto): форма проверяет поля и собирает письмо, которое открывается в почтовом
+ *   приложении посетителя; кнопка [data-send-telegram] копирует тот же текст и открывает Telegram.
+ *   Сайт ничего не отправляет сам и не делает вид, что отправил.
  */
 
 interface FormspreeError {
@@ -32,19 +35,60 @@ function showFieldError(el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectE
   if (box) box.textContent = text;
 }
 
+type Field = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+
+/** Подпись поля для письма: <label for>, обёртка-<label> или <legend> группы. */
+function fieldLabel(el: Field): string {
+  const byFor = el.id ? document.querySelector<HTMLLabelElement>(`label[for="${el.id}"]`) : null;
+  const group = el instanceof HTMLInputElement && el.type === 'radio' ? el.closest('fieldset')?.querySelector('legend') : null;
+  const wrap = el.closest('label')?.querySelector('span');
+  const raw = (byFor ?? group ?? wrap)?.textContent ?? el.name;
+  return raw.replace(/\s*\*\s*$/, '').replace(/\s*—\s*необязательно\s*$/, '').trim();
+}
+
+/** Текст заявки из заполненных полей — для письма и для Telegram. */
+function composeBrief(form: HTMLFormElement, fields: Field[]): string {
+  const lines: string[] = [];
+  for (const el of fields) {
+    if (el instanceof HTMLInputElement && el.type === 'checkbox') continue;
+    if (el instanceof HTMLInputElement && el.type === 'radio' && !el.checked) continue;
+    const value = el.value.trim();
+    if (value) lines.push(`${fieldLabel(el)}: ${value}`);
+  }
+  const estimate = form.querySelector<HTMLInputElement>('[data-estimate-field]')?.value.trim();
+  if (estimate) lines.push(`Расчёт с сайта: ${estimate}`);
+  return lines.join('\n');
+}
+
 export function initLeadForms(): void {
   document.querySelectorAll<HTMLFormElement>('form[data-lead-form]').forEach((form) => {
     const endpoint = form.dataset.endpoint;
+    const mailto = form.dataset.mailto;
     const status = form.querySelector<HTMLElement>('[data-status]');
     const submit = form.querySelector<HTMLButtonElement>('[type="submit"]');
     const success = form.parentElement?.querySelector<HTMLElement>('[data-success]');
-    if (!endpoint || !submit) return;
+    if (!submit || (!endpoint && !mailto)) return;
 
     form.noValidate = true;
 
-    const fields = Array.from(
-      form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('input, textarea, select'),
-    ).filter((el) => el.name && el.type !== 'hidden' && el.name !== '_gotcha');
+    const fields = Array.from(form.querySelectorAll<Field>('input, textarea, select')).filter(
+      (el) => el.name && el.type !== 'hidden' && el.name !== '_gotcha',
+    );
+
+    const validate = (): boolean => {
+      let firstInvalid: HTMLElement | null = null;
+      for (const el of fields) {
+        const msg = fieldMessage(el);
+        showFieldError(el, msg);
+        if (msg && !firstInvalid) firstInvalid = el;
+      }
+      if (firstInvalid) {
+        firstInvalid.focus();
+        if (status) status.textContent = 'Проверьте отмеченные поля.';
+        return false;
+      }
+      return true;
+    };
 
     fields.forEach((el) => {
       const evt = el instanceof HTMLInputElement && el.type === 'checkbox' ? 'change' : 'blur';
@@ -56,19 +100,44 @@ export function initLeadForms(): void {
       });
     });
 
+    if (!endpoint && mailto) {
+      const subject = form.querySelector<HTMLInputElement>('input[name="_subject"]')?.value ?? 'Заявка с сайта';
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!validate()) return;
+        const body = composeBrief(form, fields);
+        window.location.href = `mailto:${mailto}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        if (status)
+          status.textContent = `Открываю почту с готовым письмом — останется нажать «Отправить». Если ничего не открылось, напишите на ${mailto}.`;
+      });
+
+      const tgButton = form.querySelector<HTMLButtonElement>('[data-send-telegram]');
+      const tgUrl = form.dataset.telegram;
+      if (tgButton && tgUrl) {
+        tgButton.addEventListener('click', async () => {
+          if (!validate()) return;
+          const body = `${subject}\n${composeBrief(form, fields)}`;
+          let copied = false;
+          try {
+            await navigator.clipboard.writeText(body);
+            copied = true;
+          } catch {
+            /* буфер обмена недоступен — откроем чат без текста */
+          }
+          window.open(tgUrl, '_blank', 'noopener');
+          if (status)
+            status.textContent = copied
+              ? 'Текст заявки скопирован. Вставьте его в открывшийся чат и отправьте.'
+              : 'Открываю Telegram. Скопировать текст не получилось — опишите задачу в чате.';
+        });
+      }
+      return;
+    }
+    if (!endpoint) return;
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      let firstInvalid: HTMLElement | null = null;
-      for (const el of fields) {
-        const msg = fieldMessage(el);
-        showFieldError(el, msg);
-        if (msg && !firstInvalid) firstInvalid = el;
-      }
-      if (firstInvalid) {
-        firstInvalid.focus();
-        if (status) status.textContent = 'Проверьте отмеченные поля.';
-        return;
-      }
+      if (!validate()) return;
 
       const label = submit.querySelector<HTMLElement>('[data-label]');
       const original = label?.textContent ?? '';

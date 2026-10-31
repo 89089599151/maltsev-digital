@@ -5,7 +5,6 @@
  * поверх белого пиксельного слова. Изображения — src/assets/gen (IMAGE_GENERATION_PROMPTS.md).
  */
 import { Image } from 'astro:assets';
-import PixelWord from './PixelWord.astro';
 import ContactIcon from './ContactIcon.astro';
 import { minPrice, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { site, telegramUrl, emailUrl } from '@/config/site';
@@ -29,14 +28,13 @@ const mail = emailUrl('Заявка на разработку сайта');
 <section class="hr" aria-labelledby="hr-title" data-tilt-area>
   <div class="hr__stage">
     <h1 id="hr-title" class="hr__title">
-      <span class="hr__line hr__line--1"><span>Сайты,</span></span>
-      <span class="hr__line hr__line--2"><span>которые</span></span>
-      <span class="hr__line hr__line--3"><span><i class="hr__dot" aria-hidden="true"></i>работают</span></span>
-      <span class="hr__line hr__line--4"><span>на бизнес</span></span>
+      <span class="hr__line hr__line--1"><span>Сайты</span></span>
+      <span class="hr__line hr__line--2"><span>для бизнеса</span></span>
+      <span class="hr__line hr__line--3"><span>и экспертов</span></span>
+      <span class="hr__line hr__line--4"><span>под ключ</span></span>
     </h1>
 
     <div class="hr__object" aria-hidden="true">
-      <PixelWord text="MALTSEV" appear="intro" delay={0.4} class="hr__px" />
       <div class="hr__float" data-float="22">
         {
           object && (
@@ -85,21 +83,20 @@ const mail = emailUrl('Заявка на разработку сайта');
 
     <div class="hr__offer">
       <p class="hr__lead">
-        Проектирую и разрабатываю сайты для бизнеса и специалистов: дизайн, код и запуск под ключ. ИИ
-        ускоряет рутину, решения и качество — за мной.
+        Дизайн, код и запуск в одних руках. ИИ берёт рутину, а решения и качество — на мне.
       </p>
       <div class="hr__btns">
         <a class="btn btn--accent hr__btn" href={url('/contacts/')} data-magnetic>
           Обсудить проект <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
         </a>
-        <a class="btn btn--ghost hr__btn" href={url('/#work')}>Смотреть работы</a>
+        <a class="btn btn--ghost hr__btn" href={url('/#work')}>Смотреть кейс</a>
       </div>
     </div>
 
     <div class="hr__stat">
       <p class="hr__stat-v">от {formatPrice(minPrice)}</p>
       <p class="hr__stat-l">
-        Цена и сроки известны до начала работ.{!pricingConfirmed && ' Цены предварительные.'}
+        Срок — от 7 рабочих дней. Точная цена — в предложении до старта.{!pricingConfirmed && ' Цены предварительные.'}
       </p>
     </div>
 
@@ -127,8 +124,8 @@ const mail = emailUrl('Заявка на разработку сайта');
     padding: clamp(28px, 3.4vw, 56px) clamp(24px, 3.4vw, 56px) 104px;
     border-radius: var(--radius-lg);
     background:
-      radial-gradient(45% 60% at 72% 42%, #f6f5f1 0%, rgba(246, 245, 241, 0) 70%),
-      linear-gradient(180deg, #e3e2dd, #d7d6d0);
+      radial-gradient(45% 60% at 72% 42%, var(--bg) 0%, rgba(246, 245, 241, 0) 70%),
+      linear-gradient(180deg, var(--stage-1), var(--stage-2));
     overflow: hidden;
   }
 
@@ -136,19 +133,7 @@ const mail = emailUrl('Заявка на разработку сайта');
     --banner-h: 43px;
   }
 
-  /* Пиксельное слово — графитовое, за нижней частью машины: читается по краям и под клавиатурой */
-  .hr__object :global(.hr__px) {
-    position: absolute;
-    z-index: -1;
-    left: -4%;
-    right: -4%;
-    bottom: 2%;
-    width: 108%;
-    height: auto;
-    color: var(--night);
-  }
-
-  /* Заголовок «лесенкой» — левая зона */
+  /* Заголовок — левая зона, ровная выключка по левому краю */
   .hr__title {
     position: relative;
     z-index: 1;
@@ -176,23 +161,6 @@ const mail = emailUrl('Заявка на разработку сайта');
 
   .hr__line > span {
     display: inline-block;
-  }
-
-  .hr__line--1 {
-    padding-left: 1.4em;
-  }
-
-  .hr__line--3 {
-    padding-left: 0.7em;
-  }
-
-  .hr__dot {
-    display: inline-block;
-    width: 0.16em;
-    height: 0.16em;
-    margin-right: 0.3em;
-    vertical-align: 0.06em;
-    background: var(--accent);
   }
 
   /* Машина и парящие элементы — правая зона */
@@ -245,8 +213,8 @@ const mail = emailUrl('Заявка на разработку сайта');
   }
 
   .hr__bit--f2 {
-    top: 46%;
-    left: -5%;
+    top: 50%;
+    left: 1%;
     width: 22%;
     animation: hr-bob 8s ease-in-out -4s infinite;
   }
@@ -291,7 +259,7 @@ const mail = emailUrl('Заявка на разработку сайта');
     width: 46px;
     height: 46px;
     border-radius: 10px;
-    color: #3b3a36;
+    color: var(--ink-2);
     transition:
       background-color var(--dur-fast) var(--ease-out),
       color var(--dur-fast) var(--ease-out),
@@ -319,9 +287,9 @@ const mail = emailUrl('Заявка на разработку сайта');
 
   .hr__lead {
     max-width: 46ch;
-    font-size: clamp(1.0625rem, 0.95rem + 0.35vw, 1.25rem);
+    font-size: var(--step-body);
     line-height: 1.5;
-    color: #24231f;
+    color: var(--ink);
   }
 
   .hr__btns {
@@ -340,7 +308,7 @@ const mail = emailUrl('Заявка на разработку сайта');
   }
 
   .hr__btns .btn--ghost:hover {
-    background: #ffffff;
+    background: var(--surface-solid);
   }
 
   .hr__stat {
@@ -368,8 +336,8 @@ const mail = emailUrl('Заявка на разработку сайта');
 
   .hr__stat-l {
     margin-top: 8px;
-    font-size: 0.9375rem;
-    color: #3b3a36;
+    font-size: var(--step-small);
+    color: var(--ink-2);
   }
 
   /* Подсказка о прокрутке: «выемка» снизу по центру */
@@ -385,7 +353,7 @@ const mail = emailUrl('Заявка на разработку сайта');
     padding: 14px 34px 10px;
     border-radius: 26px 26px 0 0;
     background: var(--bg);
-    font-size: 0.8125rem;
+    font-size: var(--fs-xs);
     line-height: 1.2;
     text-align: center;
     text-decoration: none;
@@ -531,9 +499,6 @@ const mail = emailUrl('Заявка на разработку сайта');
       padding-right: 0;
     }
 
-    .hr__line--1 {
-      padding-left: 1.1em;
-    }
 
     .hr__object {
       width: 100%;
@@ -559,6 +524,27 @@ const mail = emailUrl('Заявка на разработку сайта');
     .hr__btn {
       flex: 1 1 100%;
       justify-content: space-between;
+    }
+  }
+
+  /* Маленькие телефоны (375×667 и уже): объект меньше, чтобы кнопка попадала в первый экран. */
+  @media (max-width: 420px) {
+    .hr__stage {
+      gap: 14px;
+      padding-top: 68px;
+    }
+
+    .hr__object {
+      width: 66%;
+      margin-block: 0;
+    }
+
+    .hr__lead {
+      font-size: var(--fs-0);
+    }
+
+    .hr__btn {
+      min-height: 52px;
     }
   }
 </style>

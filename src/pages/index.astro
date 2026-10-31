@@ -4,9 +4,8 @@ import Base from '@/layouts/Base.astro';
 import HeroRetro from '@/components/HeroRetro.astro';
 import ManifestSplit from '@/components/ManifestSplit.astro';
 import WorkFeature from '@/components/WorkFeature.astro';
-import ServicesGrid from '@/components/ServicesGrid.astro';
 import ProcessSteps from '@/components/ProcessSteps.astro';
-import PricingCards from '@/components/PricingCards.astro';
+import Packages from '@/components/Packages.astro';
 import OwnerSplit from '@/components/OwnerSplit.astro';
 import FaqList from '@/components/FaqList.astro';
 import ContactSplit from '@/components/ContactSplit.astro';
@@ -22,9 +21,8 @@ const homeFaq = faq.filter((f) => f.home);
   <HeroRetro />
   <ManifestSplit />
   {featured && <WorkFeature project={featured} />}
-  <ServicesGrid />
-  <ProcessSteps />
-  <PricingCards />
+  <Packages />
+  <ProcessSteps compact />
   <OwnerSplit />
 
   <div class="section" id="faq">

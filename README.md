@@ -41,7 +41,7 @@ npm run dev
 | **Скриншоты в блоке «Этот сайт — первый кейс»** | `src/assets/case/` |
 | **Шрифты** | `src/styles/fonts.css` и `src/assets/fonts/` |
 | **Анимации** | `src/scripts/motion.ts` (GSAP), сборка первого экрана — CSS в `HeroGlass.astro` |
-| **Иконка и картинка для соцсетей** | `public/favicon.svg`, `public/og.png` |
+| **Иконка и картинка для соцсетей** | `public/favicon.svg`, `public/og.jpg` |
 
 ### Изображения
 

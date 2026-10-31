@@ -35,15 +35,15 @@ export const site = {
     telegram: { value: 'mltsv_srg', confirmed: true } as Confirmable<string>,
     email: { value: 'sergey_maltsev_00@vk.com', confirmed: true } as Confirmable<string>,
     /** Через какое время вы обычно отвечаете. Обещание клиенту. */
-    responseTime: { value: 'в течение 15 минут', confirmed: true } as Confirmable<string>,
+    responseTime: { value: 'в течение 15 минут в рабочее время', confirmed: true } as Confirmable<string>,
     workFormat: 'Удалённо, по всей России',
   },
 
   forms: {
     /**
      * ID формы Formspree (часть адреса https://formspree.io/f/<ID>).
-     * Пустая строка — форма показывает, что приём заявок ещё не подключён,
-     * и предлагает написать напрямую. Ничего не имитирует. Подключение отложено и не блокирует запуск.
+     * Пустая строка — форма собирает заявку и предлагает отправить её письмом или в Telegram.
+     * Сайт ничего не отправляет сам и ничего не имитирует. Подключение не блокирует запуск.
      */
     formspreeId: '',
   },
@@ -54,10 +54,11 @@ export const site = {
    * Страница политики остаётся черновиком и закрыта от индексации, пока они не подтверждены.
    */
   legal: {
-    /** Кто обрабатывает персональные данные — ФИО самозанятого/ИП. */
-    operatorName: { value: '[ФИО оператора]', confirmed: false } as Confirmable<string>,
-    operatorStatus: { value: '[самозанятый / ИП, ИНН]', confirmed: false } as Confirmable<string>,
-    policyDate: { value: '30 октября 2026', confirmed: false } as Confirmable<string>,
+    /** Кто обрабатывает персональные данные. */
+    operatorName: { value: 'Мальцев Сергей', confirmed: true } as Confirmable<string>,
+    /** Статус и ИНН (самозанятый или ИП). Пока не подтверждён — на странице политики не выводится. */
+    operatorStatus: { value: '', confirmed: false } as Confirmable<string>,
+    policyDate: { value: '31 октября 2026', confirmed: true } as Confirmable<string>,
   },
 
   /** Подтверждение содержания портфолио перед запуском. */

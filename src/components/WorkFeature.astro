@@ -83,8 +83,8 @@ const mobile = d.responsive.mobile;
     padding: clamp(28px, 4vw, 64px);
     border-radius: var(--radius-lg);
     background:
-      radial-gradient(55% 70% at 75% 45%, #f3f2ee 0%, rgba(243, 242, 238, 0) 70%),
-      linear-gradient(180deg, #e3e2dd, #d7d6d0);
+      radial-gradient(55% 70% at 75% 45%, var(--stage-glow) 0%, rgba(243, 242, 238, 0) 70%),
+      linear-gradient(180deg, var(--stage-1), var(--stage-2));
     overflow: hidden;
   }
 
@@ -104,7 +104,7 @@ const mobile = d.responsive.mobile;
   .wf__year {
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 0.9375rem;
+    font-size: var(--step-small);
     color: var(--muted);
   }
 
@@ -122,7 +122,7 @@ const mobile = d.responsive.mobile;
     justify-content: flex-end;
     gap: 6px;
     padding-inline: clamp(14px, 1.4vw, 22px);
-    border-left: 1px solid rgba(21, 21, 21, 0.14);
+    border-left: 1px solid var(--line);
   }
 
   .wf__facts div:first-child {
@@ -133,7 +133,7 @@ const mobile = d.responsive.mobile;
   .wf__facts dd {
     font-family: var(--font-head);
     font-weight: 650;
-    font-size: clamp(1.125rem, 0.95rem + 0.5vw, 1.4rem);
+    font-size: var(--fs-2);
     line-height: 1.05;
     letter-spacing: -0.03em;
     white-space: nowrap;
@@ -141,7 +141,7 @@ const mobile = d.responsive.mobile;
 
   .wf__facts dt {
     max-width: 16ch;
-    font-size: 0.8125rem;
+    font-size: var(--fs-xs);
     line-height: 1.35;
     color: var(--muted);
   }
@@ -176,12 +176,12 @@ const mobile = d.responsive.mobile;
     border-radius: 8px;
     background: var(--accent);
     font-family: var(--font-display);
-    font-size: 0.875rem;
+    font-size: var(--step-small);
     font-weight: 650;
   }
 
   .wf__name {
-    font-size: clamp(2rem, 1.2rem + 2.6vw, 3.75rem);
+    font-size: var(--fs-4);
     line-height: 0.95;
     letter-spacing: -0.04em;
     text-transform: uppercase;
@@ -190,7 +190,7 @@ const mobile = d.responsive.mobile;
   .wf__sum {
     max-width: 38ch;
     font-size: var(--step-body);
-    color: #24231f;
+    color: var(--ink);
   }
 
   .wf__cta {
@@ -219,7 +219,7 @@ const mobile = d.responsive.mobile;
     aspect-ratio: 1425 / 900;
     padding: var(--bezel);
     border-radius: 12px 12px 0 0;
-    background: #151515;
+    background: var(--ink);
     overflow: hidden;
     box-shadow: 0 40px 60px -30px rgba(21, 21, 21, 0.45);
   }
@@ -247,7 +247,7 @@ const mobile = d.responsive.mobile;
     aspect-ratio: 376 / 814;
     padding: var(--bezel);
     border-radius: 14px;
-    background: #151515;
+    background: var(--ink);
     overflow: hidden;
     box-shadow: 0 30px 50px -20px rgba(21, 21, 21, 0.5);
   }

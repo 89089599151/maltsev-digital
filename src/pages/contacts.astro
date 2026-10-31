@@ -2,8 +2,7 @@
 import Base from '@/layouts/Base.astro';
 import ContactLink from '@/components/ContactLink.astro';
 import PageHero from '@/components/PageHero.astro';
-import FormNotice from '@/components/FormNotice.astro';
-import { site } from '@/config/site';
+import { site, telegramUrl } from '@/config/site';
 import { plans, formatPrice } from '@/config/pricing';
 import { url } from '@/lib/url';
 import Icon from '@/components/Icon.astro';
@@ -25,13 +24,13 @@ const deadlines = ['Как можно скорее', 'В течение меся
   />
 
   <div class="ct section section--tight">
-    <section class="ct__intro" aria-labelledby="ct-title" data-stagger>
+    <section class="ct__intro" aria-labelledby="next-title" data-stagger>
       <div class="ct__direct">
         <ContactLink kind="telegram" variant="tile" />
         <ContactLink kind="email" variant="tile" />
       </div>
       <div class="ct__next tile tile--raised">
-        <h2 class="head-sm">Что будет после заявки</h2>
+        <h2 id="next-title" class="head-sm">Что будет после заявки</h2>
         <ol class="ct__steps">
           <li><strong>Отвечу</strong> {site.contacts.responseTime.value} и уточню детали.</li>
           <li><strong>Пришлю предложение</strong>: состав работ, сроки, стоимость, правки.</li>
@@ -42,12 +41,10 @@ const deadlines = ['Как можно скорее', 'В течение меся
 
     <section class="ct__form-wrap tile" aria-labelledby="brief-title">
       <h2 id="brief-title" class="head-sm">Бриф на разработку</h2>
-      <p class="ct__form-sub muted">Поля со звёздочкой обязательны. Остальное поможет точнее оценить проект.</p>
+      <p class="ct__form-sub muted">Поля со звёздочкой обязательны. Остальное поможет точнее оценить проект.{!endpoint && ' Заявка уйдёт письмом из вашей почты или сообщением в Telegram.'}</p>
 
-      {!endpoint && <div class="ct__notice"><FormNotice /></div>}
-
-      <form data-reveal class="brief" data-lead-form data-endpoint={endpoint} method="post" action={endpoint || undefined} novalidate>
-        <fieldset class="brief__set" disabled={!endpoint}>
+      <form data-reveal class="brief" data-lead-form data-endpoint={endpoint} data-mailto={endpoint ? undefined : site.contacts.email.value} data-telegram={endpoint ? undefined : (telegramUrl() ?? undefined)} method="post" action={endpoint || undefined} novalidate>
+        <fieldset class="brief__set">
           <legend class="sr-only">Заявка на разработку сайта</legend>
           <input type="hidden" name="_subject" value="Заявка на разработку сайта" />
           <input type="hidden" name="source" value="Страница контактов" />
@@ -135,9 +132,16 @@ const deadlines = ['Как можно скорее', 'В течение меся
 
           <div class="brief__submit">
             <button class="btn btn--accent" type="submit">
-              <span data-label>{endpoint ? 'Отправить заявку' : 'Форма не подключена'}</span>
+              <span data-label>{endpoint ? 'Отправить заявку' : 'Отправить на почту'}</span>
               <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
             </button>
+            {
+              !endpoint && telegramUrl() && (
+                <button class="btn btn--ink" type="button" data-send-telegram>
+                  Отправить в Telegram
+                </button>
+              )
+            }
             <p class="brief__status" data-status role="status" aria-live="polite"></p>
           </div>
         </fieldset>
@@ -207,9 +211,6 @@ const deadlines = ['Как можно скорее', 'В течение меся
     margin-top: 8px;
   }
 
-  .ct__notice {
-    margin-top: 24px;
-  }
 
   .brief {
     margin-top: 28px;
@@ -247,7 +248,7 @@ const deadlines = ['Как можно скорее', 'В течение меся
   .group legend {
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 1rem;
+    font-size: var(--fs-0);
     padding: 0;
   }
 
@@ -261,12 +262,12 @@ const deadlines = ['Как можно скорее', 'В течение меся
     width: 100%;
     min-height: 54px;
     padding: 14px 16px;
-    border: 2px solid rgba(21, 21, 21, 0.08);
+    border: 2px solid var(--line);
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.8);
     color: var(--ink);
     font-family: var(--font-display);
-    font-size: 1rem;
+    font-size: var(--fs-0);
     transition:
       border-color var(--dur-fast) var(--ease-out),
       background-color var(--dur-fast) var(--ease-out);
@@ -279,13 +280,13 @@ const deadlines = ['Как можно скорее', 'В течение меся
 
   input::placeholder,
   textarea::placeholder {
-    color: #6b6a64;
+    color: var(--muted);
   }
 
   input[type='text']:hover,
   textarea:hover,
   select:hover {
-    background: #ffffff;
+    background: var(--surface-solid);
   }
 
   input[type='text']:focus,
@@ -293,7 +294,7 @@ const deadlines = ['Как можно скорее', 'В течение меся
   select:focus {
     outline: none;
     border-color: var(--accent);
-    background: #ffffff;
+    background: var(--surface-solid);
   }
 
   [aria-invalid='true'] {
@@ -349,7 +350,7 @@ const deadlines = ['Как можно скорее', 'В течение меся
     background: rgba(255, 255, 255, 0.8);
     box-shadow: inset 0 0 0 1px var(--glass-edge);
     font-family: var(--font-display);
-    font-size: 0.9375rem;
+    font-size: var(--step-small);
     font-weight: 500;
     transition: background-color var(--dur-fast) var(--ease-out);
   }
@@ -377,12 +378,12 @@ const deadlines = ['Как можно скорее', 'В течение меся
 
   .pick--plan b {
     font-weight: 700;
-    font-size: 1.0625rem;
+    font-size: var(--step-body);
   }
 
   .pick--plan em {
     font-style: normal;
-    font-size: 0.875rem;
+    font-size: var(--step-small);
     opacity: 0.8;
   }
 
@@ -430,7 +431,7 @@ const deadlines = ['Как можно скорее', 'В течение меся
   }
 
   .brief__success .btn--ghost {
-    background: #ffffff;
+    background: var(--surface-solid);
     color: var(--ink);
   }
 

@@ -69,7 +69,7 @@ const href = isTg ? telegramUrl() : emailUrl('Заявка на разработ
     grid-column: 1;
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 1.125rem;
+    font-size: var(--step-body);
     letter-spacing: -0.01em;
     overflow-wrap: anywhere;
   }
@@ -92,7 +92,7 @@ const href = isTg ? telegramUrl() : emailUrl('Заявка на разработ
     font-weight: 400;
     font-style: italic;
     color: var(--muted);
-    font-size: 1rem;
+    font-size: var(--fs-0);
   }
 
   .cl--tile {
@@ -106,6 +106,6 @@ const href = isTg ? telegramUrl() : emailUrl('Заявка на разработ
   }
 
   .cl--tile .cl__value {
-    font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    font-size: var(--fs-2);
   }
 </style>

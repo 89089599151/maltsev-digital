@@ -166,7 +166,7 @@ const hints: Record<string, string> = {
   .pf-next__card p {
     max-width: 52ch;
     font-size: var(--step-body);
-    color: #3d1d06;
+    color: var(--on-accent-muted);
   }
 
   .filters {
@@ -239,7 +239,7 @@ const hints: Record<string, string> = {
   }
 
   .empty__main .btn--ghost {
-    background: #ffffff;
+    background: var(--surface-solid);
   }
 
   .empty__cats {
@@ -260,12 +260,12 @@ const hints: Record<string, string> = {
   .empty__cat-name {
     font-family: var(--font-head);
     font-weight: 700;
-    font-size: clamp(1.25rem, 1rem + 0.7vw, 1.625rem);
+    font-size: var(--fs-2);
     letter-spacing: -0.025em;
   }
 
   .empty__cat-hint {
-    font-size: 1rem;
+    font-size: var(--fs-0);
   }
 
   .empty__cat:not(.tile--accent) .empty__cat-hint {

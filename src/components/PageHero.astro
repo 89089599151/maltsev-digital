@@ -66,8 +66,8 @@ const hasAside = Astro.slots.has('default');
     padding: clamp(28px, 4vw, 64px);
     border-radius: var(--radius-lg);
     background:
-      radial-gradient(55% 70% at 80% 30%, #f3f2ee 0%, rgba(243, 242, 238, 0) 70%),
-      linear-gradient(180deg, #e3e2dd, #d7d6d0);
+      radial-gradient(55% 70% at 80% 30%, var(--stage-glow) 0%, rgba(243, 242, 238, 0) 70%),
+      linear-gradient(180deg, var(--stage-1), var(--stage-2));
     overflow: hidden;
     isolation: isolate;
   }
@@ -96,7 +96,7 @@ const hasAside = Astro.slots.has('default');
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    font-size: 0.9375rem;
+    font-size: var(--step-small);
     color: var(--muted);
   }
 
@@ -139,9 +139,9 @@ const hasAside = Astro.slots.has('default');
     max-width: 52ch;
     font-family: var(--font-display);
     font-weight: 500;
-    font-size: clamp(1.0625rem, 0.95rem + 0.5vw, 1.375rem);
+    font-size: var(--fs-1);
     line-height: 1.4;
-    color: #24231f;
+    color: var(--ink);
   }
 
   .ph__aside {

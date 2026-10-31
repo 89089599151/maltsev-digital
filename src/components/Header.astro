@@ -153,7 +153,7 @@ const current = Astro.url.pathname;
   .hdr__name {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 1.0625rem;
+    font-size: var(--step-body);
     letter-spacing: -0.02em;
   }
 
@@ -177,10 +177,10 @@ const current = Astro.url.pathname;
     border-radius: 10px;
     font-family: var(--font-display);
     font-weight: 500;
-    font-size: 0.9688rem;
+    font-size: var(--step-small);
     text-decoration: none;
     white-space: nowrap;
-    color: #3b3a36;
+    color: var(--ink-2);
     transition:
       background-color var(--dur-fast) var(--ease-out),
       color var(--dur-fast) var(--ease-out);
@@ -291,7 +291,7 @@ const current = Astro.url.pathname;
     color: var(--bg);
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 1.125rem;
+    font-size: var(--step-body);
     text-decoration: none;
   }
 

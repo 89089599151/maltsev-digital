@@ -62,7 +62,7 @@ const me = [
     padding-bottom: 0.4em;
     font-family: var(--font-display);
     font-weight: 500;
-    font-size: clamp(1.125rem, 0.95rem + 0.6vw, 1.5rem);
+    font-size: var(--fs-2);
     line-height: 1.35;
     letter-spacing: -0.015em;
   }
@@ -79,7 +79,11 @@ const me = [
     gap: clamp(20px, 2vw, 28px);
     padding: clamp(24px, 3vw, 44px);
     border-radius: var(--radius-lg);
-    background: var(--surface);
+  }
+
+  /* Левая колонка — контур на фоне страницы, правая — тёмная: одна плотная плашка вместо двух. */
+  .mf__card--ai {
+    box-shadow: inset 0 0 0 1px var(--line);
   }
 
   .mf__card--me {
@@ -88,7 +92,7 @@ const me = [
   }
 
   .mf__card-title {
-    font-size: clamp(1.75rem, 1.1rem + 1.8vw, 2.75rem);
+    font-size: var(--fs-4);
     line-height: 0.95;
     letter-spacing: -0.04em;
     text-transform: uppercase;
@@ -106,10 +110,10 @@ const me = [
     gap: 12px;
     align-items: baseline;
     padding-block: 14px;
-    border-top: 1px solid rgba(21, 21, 21, 0.1);
+    border-top: 1px solid var(--line);
     font-family: var(--font-display);
     font-weight: 500;
-    font-size: clamp(1.0625rem, 0.95rem + 0.35vw, 1.25rem);
+    font-size: var(--step-body);
     line-height: 1.3;
   }
 
@@ -134,10 +138,10 @@ const me = [
     align-self: flex-start;
     padding: 8px 12px;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.65);
+    background: var(--surface);
     font-family: var(--font-display);
     font-weight: 650;
-    font-size: 0.9375rem;
+    font-size: var(--step-small);
     color: var(--ink);
   }
 

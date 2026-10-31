@@ -6,7 +6,10 @@ import { url } from '@/lib/url';
 
 const { operatorName, operatorStatus, policyDate } = site.legal;
 const email = site.contacts.email;
-const draft = !operatorName.confirmed || !operatorStatus.confirmed || !policyDate.confirmed;
+// Без имени оператора политика не публикуется в поиске; статус (самозанятый/ИП) выводится, когда подтверждён.
+const draft = !operatorName.confirmed;
+const status = operatorStatus.confirmed && operatorStatus.value ? `, ${operatorStatus.value}` : '';
+const viaFormspree = Boolean(site.forms.formspreeId);
 ---
 
 <Base
@@ -18,18 +21,11 @@ const draft = !operatorName.confirmed || !operatorStatus.confirmed || !policyDat
 
   <div class="pv-page section section--tight">
 
-    {
-      draft && (
-        <p class="pv-draft tile tile--accent" role="note">
-          Черновик. Данные оператора и текст политики нужно проверить и подтвердить перед запуском сайта.
-        </p>
-      )
-    }
 
     <div class="pv-body prose">
       <h2>1. Кто обрабатывает данные</h2>
       <p>
-        Оператор персональных данных — {operatorName.value}, {operatorStatus.value} (далее — «Оператор»).
+        Оператор персональных данных — {operatorName.value}{status} (далее — «Оператор»).
         Связаться по вопросам обработки данных можно по электронной почте {email.confirmed ? email.value : '[адрес будет указан]'}.
       </p>
 
@@ -56,11 +52,21 @@ const draft = !operatorName.confirmed || !operatorStatus.confirmed || !policyDat
       </p>
 
       <h2>5. Как хранятся и передаются данные</h2>
-      <p>
-        Заявки с сайта передаются через сервис приёма форм Formspree (Formspree, Inc., США) и пересылаются
-        Оператору на электронную почту. Это означает трансграничную передачу данных. Оператор не передаёт
-        данные третьим лицам для рекламы и не продаёт их.
-      </p>
+      {
+        viaFormspree ? (
+          <p>
+            Заявки с сайта передаются через сервис приёма форм Formspree (Formspree, Inc., США) и пересылаются
+            Оператору на электронную почту. Это означает трансграничную передачу данных. Оператор не передаёт
+            данные третьим лицам для рекламы и не продаёт их.
+          </p>
+        ) : (
+          <p>
+            Сайт сам ничего не отправляет и не хранит. Форма собирает текст заявки, а отправляете его вы: письмом
+            из своей почты или сообщением в Telegram. Оператор получает только то, что вы отправили, и не передаёт
+            данные третьим лицам для рекламы и не продаёт их.
+          </p>
+        )
+      }
       <p>
         Данные хранятся до достижения целей обработки, но не дольше 3 лет с момента последнего обращения,
         либо до отзыва согласия.
@@ -88,11 +94,6 @@ const draft = !operatorName.confirmed || !operatorStatus.confirmed || !policyDat
     margin-top: var(--gap);
   }
 
-  .pv-draft {
-    grid-column: 1 / -1;
-    font-family: var(--font-display);
-    font-weight: 600;
-  }
 
   .pv-body {
     grid-column: 3 / 11;

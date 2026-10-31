@@ -20,7 +20,7 @@ interface Props {
 const {
   title,
   description = site.seo.defaultDescription,
-  ogImage = '/og.png',
+  ogImage = '/og.jpg',
   noindex = false,
   schema,
 } = Astro.props;
@@ -96,10 +96,13 @@ const orgSchema = {
     </div>
 
     <script>
-      // Motion-система загружается после страницы: первый экран анимирован на CSS и не ждёт её.
+      // Motion-система загружается после страницы, когда браузер свободен: первый экран анимирован на CSS
+      // и не ждёт её, а запуск не мешает вводу.
       const start = () => import('@/scripts/motion').then((m) => m.initMotion());
-      if (document.readyState === 'complete') start();
-      else window.addEventListener('load', start, { once: true });
+      const whenIdle = () =>
+        'requestIdleCallback' in window ? window.requestIdleCallback(start, { timeout: 800 }) : setTimeout(start, 200);
+      if (document.readyState === 'complete') whenIdle();
+      else window.addEventListener('load', whenIdle, { once: true });
     </script>
   </body>
 </html>

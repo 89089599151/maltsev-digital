@@ -53,24 +53,15 @@ const H = headingLevel;
     padding-right: 24px;
   }
 
+  /* Вопросы — список под линиями, без плашек: меньше серых карточек подряд. */
   .faq__list {
     grid-column: 5 / 13;
     display: grid;
-    gap: var(--gap);
+    border-top: 1px solid var(--line);
   }
 
   .faq__item {
-    border-radius: var(--radius);
-    background: var(--surface);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
-    box-shadow: inset 0 0 0 1px var(--glass-edge);
-    transition: background-color var(--dur) var(--ease-out);
-  }
-
-  .faq__item[open] {
-    background: var(--paper);
-    box-shadow: var(--glass-shadow);
+    border-bottom: 1px solid var(--line);
   }
 
   .faq__side :global(.head) {
@@ -85,24 +76,27 @@ const H = headingLevel;
     gap: 20px;
     align-items: center;
     min-height: 72px;
-    padding: 18px 24px;
+    padding: 18px 0;
     cursor: pointer;
     list-style: none;
-    border-radius: var(--radius);
   }
 
   summary::-webkit-details-marker {
     display: none;
   }
 
-  .faq__item:not([open]) summary:hover {
-    background: rgba(255, 255, 255, 0.5);
+  .faq__q {
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  summary:hover .faq__q {
+    color: var(--accent-text);
   }
 
   .faq__q {
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 1.25rem;
+    font-size: var(--fs-1);
     line-height: 1.25;
     letter-spacing: -0.015em;
   }
@@ -144,8 +138,8 @@ const H = headingLevel;
 
   .faq__a {
     max-width: 58ch;
-    padding: 0 24px 24px;
-    font-size: 1.0625rem;
+    padding: 0 56px 24px 0;
+    font-size: var(--step-body);
   }
 
   @media (max-width: 1023px) {
@@ -168,16 +162,20 @@ const H = headingLevel;
 
     summary {
       min-height: 64px;
-      padding: 16px 20px;
+      padding: 16px 0;
     }
 
     .faq__q {
-      font-size: 1.125rem;
+      font-size: var(--step-body);
+    }
+
+    .faq__a {
+      padding-right: 0;
     }
 
     .faq__a {
       padding: 0 20px 20px;
-      font-size: 1rem;
+      font-size: var(--fs-0);
     }
   }
 </style>

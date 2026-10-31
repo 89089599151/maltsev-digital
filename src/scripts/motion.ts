@@ -1,12 +1,11 @@
 /**
- * Motion-система сайта (GSAP + ScrollTrigger + SplitText).
+ * Motion-система сайта (GSAP + ScrollTrigger + SplitText; появления — CSS-переходы).
  *
  * Атрибуты в разметке:
  *  [data-intro="scene|pane"]  — первый экран: сборка на CSS, здесь только прокрутка;
  *  [data-split]                 — заголовок, строки поднимаются из-под маски;
  *  [data-reveal="" | "rise" | "wipe"] — появление: подъём, рост снизу, раскрытие слева;
  *  [data-stagger]               — дети контейнера появляются по очереди;
- *  [data-scrub-words]           — текст «прочитывается» словами при скролле;
  *  [data-speed="1.5"]           — параллакс (только крупные экраны);
  *  [data-tilt-area] / [data-tilt] / [data-float] — реакция на курсор;
  *  [data-magnetic]              — «магнитная» кнопка;
@@ -20,7 +19,10 @@ import { SplitText } from 'gsap/SplitText';
 
 const EASE = 'expo.out';
 
-export function initMotion(): void {
+/** Отдать управление браузеру между фазами, чтобы запуск не был одной длинной задачей. */
+const nextTask = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+export async function initMotion(): Promise<void> {
   const root = document.documentElement;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -30,19 +32,12 @@ export function initMotion(): void {
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const wide = window.matchMedia('(min-width: 1024px)').matches;
 
-  heroIntro();
-  splitHeadings();
-  reveals();
-  scrubWords();
-  footerBlocks();
-  pixels();
-  if (wide) {
-    parallax();
-    horizontalScroll();
-  }
-  if (finePointer) {
-    tilt();
-    magnetic();
+  const phases = [heroIntro, splitHeadings, reveals, footerBlocks, pixels];
+  if (wide) phases.push(parallax);
+  if (finePointer) phases.push(tilt, magnetic);
+  for (const run of phases) {
+    run();
+    await nextTask();
   }
 
   // Шрифты и картинки могли сдвинуть вёрстку — пересчитать позиции триггеров.
@@ -70,8 +65,36 @@ function heroIntro(): void {
   }
 }
 
+/**
+ * Вызвать cb, когда элементы заходят в окно; bottom сдвигает нижнюю границу
+ * (−10% — чуть выше края экрана, 25% — заранее). IntersectionObserver не заставляет браузер
+ * пересчитывать раскладку, в отличие от сотни ScrollTrigger, — запуск не блокирует ввод.
+ */
+function onEnter(els: Element[], cb: (batch: HTMLElement[]) => void, bottom = '-10%'): void {
+  const io = new IntersectionObserver(
+    (entries) => {
+      // Уже выше окна (быстрая прокрутка, переход по якорю) — тоже показать.
+      const batch = entries
+        .filter((e) => e.isIntersecting || e.boundingClientRect.bottom < 0)
+        .map((e) => e.target as HTMLElement);
+      if (!batch.length) return;
+      batch.forEach((el) => io.unobserve(el));
+      cb(batch);
+    },
+    { rootMargin: `0px 0px ${bottom} 0px` },
+  );
+  els.forEach((el) => io.observe(el));
+}
+
+/**
+ * Разбивка на строки требует замера раскладки, поэтому заголовок разбивается не при запуске,
+ * а когда подходит к экрану (за четверть окна до появления), — запуск не превращается в одну длинную задачу.
+ */
 function splitHeadings(): void {
-  gsap.utils.toArray<HTMLElement>('[data-split]').forEach((el) => {
+  const headings = gsap.utils.toArray<HTMLElement>('[data-split]');
+  const seen = new WeakSet<HTMLElement>();
+  const tweens = new WeakMap<HTMLElement, gsap.core.Tween>();
+  const split = (el: HTMLElement) =>
     SplitText.create(el, {
       type: 'lines',
       mask: 'lines',
@@ -83,116 +106,99 @@ function splitHeadings(): void {
           (m as HTMLElement).style.paddingTop = '0.16em';
           (m as HTMLElement).style.marginTop = '-0.16em';
         });
-        return gsap.from(self.lines, {
-          yPercent: 105,
-          duration: 1.05,
-          ease: EASE,
-          stagger: 0.08,
-          scrollTrigger: { trigger: el, start: 'top 88%', once: true },
-        });
+        // Повторная разбивка (смена ширины) после показа — без анимации.
+        if (seen.has(el)) return;
+        const tween = gsap.from(self.lines, { yPercent: 105, duration: 1.05, ease: EASE, stagger: 0.08, paused: true });
+        tweens.set(el, tween);
+        return tween;
       },
     });
-  });
+  const play = (batch: HTMLElement[]) =>
+    batch.forEach((el) => {
+      seen.add(el);
+      tweens.get(el)?.play();
+    });
+  onEnter(
+    headings,
+    (near) => {
+      near.forEach(split);
+      onEnter(near, play, '-12%');
+    },
+    '25%',
+  );
 }
 
+/**
+ * Появление при прокрутке — CSS-переходы (global.css, [data-reveal]); скрипт только ставит классы.
+ * Раньше начальное состояние задавал GSAP: он читал стиль каждого элемента, и браузер сотню раз
+ * пересчитывал страницу. Классы — только запись, без чтения.
+ */
 function reveals(): void {
   gsap.utils.toArray<HTMLElement>('[data-stagger]').forEach((group) => {
     Array.from(group.children).forEach((child) => {
       if (!child.hasAttribute('data-reveal')) child.setAttribute('data-reveal', '');
     });
   });
-
-  const kinds: Record<string, { from: gsap.TweenVars; to: gsap.TweenVars }> = {
-    '': { from: { autoAlpha: 0, y: 30 }, to: { autoAlpha: 1, y: 0 } },
-    rise: { from: { clipPath: 'inset(100% 0% 0% 0% round 22px)' }, to: { clipPath: 'inset(0% 0% 0% 0% round 22px)' } },
-    wipe: { from: { clipPath: 'inset(0% 100% 0% 0% round 22px)' }, to: { clipPath: 'inset(0% 0% 0% 0% round 22px)' } },
-  };
-
-  for (const [kind, v] of Object.entries(kinds)) {
-    const els = gsap.utils.toArray<HTMLElement>(`[data-reveal="${kind}"]`);
-    if (!els.length) continue;
-    gsap.set(els, v.from);
-    revealFailsafe(els, v.to);
-    ScrollTrigger.batch(els, {
-      start: 'top 90%',
-      once: true,
-      onEnter: (batch) =>
-        gsap.to(batch, {
-          ...v.to,
-          duration: kind ? 1.25 : 0.95,
-          ease: kind ? 'expo.inOut' : EASE,
-          stagger: 0.08,
-          overwrite: true,
-          clearProps: kind ? 'clipPath' : 'transform',
-        }),
-    });
-  }
-}
-
-/** Если элемент уже на экране, а анимация не дошла до конца за 1,6 с, показать его сразу. */
-function revealFailsafe(els: HTMLElement[], to: gsap.TweenVars): void {
-  if (!('IntersectionObserver' in window)) return;
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      if (!e.isIntersecting) continue;
-      const el = e.target as HTMLElement;
-      io.unobserve(el);
+  onEnter(gsap.utils.toArray<HTMLElement>('[data-reveal]'), (batch) =>
+    batch.forEach((el, i) => {
+      const delay = i * 80;
+      el.style.transitionDelay = `${delay}ms`;
+      el.classList.add('is-revealing', 'is-in');
       window.setTimeout(() => {
-        const cs = getComputedStyle(el);
-        if (Number(cs.opacity) < 0.95 || (cs.clipPath !== 'none' && !cs.clipPath.startsWith('inset(0'))) {
-          gsap.set(el, { ...to, clearProps: 'transform,clipPath' });
-        }
-      }, 1600);
-    }
-  });
-  els.forEach((el) => io.observe(el));
+        el.classList.remove('is-revealing');
+        el.style.transitionDelay = '';
+      }, delay + 1300);
+    }),
+  );
 }
 
-function scrubWords(): void {
-  gsap.utils.toArray<HTMLElement>('[data-scrub-words]').forEach((el) => {
-    // aria: none — текст остаётся читаемым для скринридеров без aria-label на абзаце.
-    // Анимируется цвет от читаемого серого (контраст ≈5:1) к основному.
-    const split = SplitText.create(el, { type: 'words', aria: 'none' });
-    gsap.fromTo(
-      split.words,
-      { color: '#6b6a64' },
-      {
-        color: '#151515',
-        ease: 'none',
-        stagger: 0.1,
-        scrollTrigger: { trigger: el, start: 'top 80%', end: 'bottom 45%', scrub: true },
-      },
-    );
-  });
+/**
+ * Твин, который готовится, когда элемент подходит к экрану, и играет, когда заходит в окно.
+ * GSAP замеряет цели при создании — для сотен пикселей это дорого, поэтому не при запуске.
+ */
+function playOnEnter(els: Element[], make: (el: HTMLElement) => gsap.core.Tween, bottom = '-10%'): void {
+  const tweens = new Map<Element, gsap.core.Tween>();
+  onEnter(
+    els,
+    (near) => {
+      near.forEach((el) => tweens.set(el, make(el)));
+      onEnter(near, (batch) => batch.forEach((el) => tweens.get(el)?.play()), bottom);
+    },
+    '25%',
+  );
 }
 
 function footerBlocks(): void {
   const mark = document.querySelector<HTMLElement>('[data-blocks]');
   if (!mark) return;
-  gsap.from(mark.children, {
-    scaleY: 0.15,
-    transformOrigin: '50% 100%',
-    duration: 1.2,
-    ease: EASE,
-    stagger: 0.06,
-    scrollTrigger: { trigger: mark, start: 'top 92%', once: true },
-  });
+  playOnEnter(
+    [mark],
+    (el) =>
+      gsap.from(el.children, {
+        scaleY: 0.15,
+        transformOrigin: '50% 100%',
+        duration: 1.2,
+        ease: EASE,
+        stagger: 0.06,
+        paused: true,
+      }),
+    '-8%',
+  );
 }
 
 /** Пиксельные слова собираются в случайном порядке, когда попадают на экран. */
 function pixels(): void {
-  gsap.utils.toArray<SVGSVGElement>('[data-pixels]').forEach((svg) => {
-    const rects = svg.querySelectorAll('rect');
-    gsap.from(rects, {
+  playOnEnter(gsap.utils.toArray<SVGSVGElement>('[data-pixels]'), (svg) =>
+    gsap.from(svg.querySelectorAll('rect'), {
       opacity: 0,
       scale: 0.2,
       transformOrigin: '50% 50%',
       duration: 0.5,
       ease: EASE,
       stagger: { each: 0.004, from: 'random' },
-      scrollTrigger: { trigger: svg, start: 'top 90%', once: true },
-    });
-  });
+      paused: true,
+    }),
+  );
 }
 
 function parallax(): void {
@@ -207,35 +213,6 @@ function parallax(): void {
         scrollTrigger: { trigger: el.closest('section') ?? el, start: 'top bottom', end: 'bottom top', scrub: true },
       },
     );
-  });
-}
-
-/**
- * Лента карточек едет горизонтально, пока секция закреплена.
- * Если секция выше окна, закрепление не включается — остаётся обычная горизонтальная прокрутка.
- */
-function horizontalScroll(): void {
-  gsap.utils.toArray<HTMLElement>('[data-hscroll]').forEach((section) => {
-    const viewport = section.querySelector<HTMLElement>('[data-hscroll-viewport]');
-    const track = section.querySelector<HTMLElement>('[data-hscroll-track]');
-    if (!viewport || !track) return;
-    if (section.offsetHeight > window.innerHeight - 40) return;
-
-    const distance = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
-    viewport.classList.add('is-pinned');
-    viewport.scrollLeft = 0;
-    gsap.to(track, {
-      x: () => -distance(),
-      ease: 'none',
-      scrollTrigger: {
-        trigger: section,
-        start: () => `top ${Math.max(0, (window.innerHeight - section.offsetHeight) / 2)}px`,
-        end: () => `+=${distance()}`,
-        pin: true,
-        scrub: 0.6,
-        invalidateOnRefresh: true,
-      },
-    });
   });
 }
 

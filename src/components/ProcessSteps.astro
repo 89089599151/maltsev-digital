@@ -1,196 +1,182 @@
 ---
 /**
- * «Как идёт работа»: семь этапов лентой карточек.
- * На широком экране лента едет горизонтально, пока секция закреплена (GSAP, data-hscroll).
- * Без скрипта — горизонтальная прокрутка с прилипанием; на телефоне — вертикальный список.
+ * «Как идёт работа».
+ * На главной (compact) — четыре укрупнённых шага в ряд и ссылка на подробный процесс.
+ * На странице услуг — все семь этапов списком: срок, что происходит и что нужно от вас.
+ * Секция статична: без закрепления и горизонтальной ленты, на любом экране читается сверху вниз.
  */
 import PixelWord from './PixelWord.astro';
 import SectionHead from './SectionHead.astro';
-import { stages } from '@/data/content';
+import { stages, stagesShort, type Stage } from '@/data/content';
 import { url } from '@/lib/url';
+
+interface Props {
+  compact?: boolean;
+}
+const { compact = false } = Astro.props;
+const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[] = compact ? stagesShort : stages;
 ---
 
-<section class="ps section" id="process" aria-labelledby="ps-title" data-hscroll>
+<section class:list={['ps section', compact ? 'ps--compact' : 'ps--full']} id="process" aria-labelledby="ps-title">
   <SectionHead
     id="ps-title"
     title="Как идёт работа"
-    text="Семь шагов от заявки до запуска. На каждом вы знаете, что происходит, сколько это займёт и что нужно от вас."
-    link={{ href: url('/contacts/'), label: 'Начать с заявки' }}
+    text={compact
+      ? 'Четыре шага от заявки до запуска. Каждый согласуем, прежде чем идти дальше.'
+      : 'Семь шагов от заявки до запуска. На каждом вы знаете, что происходит, сколько это займёт и что нужно от вас.'}
+    link={compact ? { href: url('/services/#process'), label: 'Все этапы подробно' } : { href: url('/contacts/'), label: 'Начать с заявки' }}
   />
 
-  <div class="ps__viewport" data-hscroll-viewport>
-    <ol class="ps__track" data-hscroll-track>
-      {
-        stages.map((s, i) => (
-          <li class:list={['ps__step', { 'ps__step--last': i === stages.length - 1 }]}>
-            <div class="ps__top">
-              <PixelWord text={String(i + 1).padStart(2, '0')} class="ps__num" />
-              <p class="ps__dur">{s.duration}</p>
-            </div>
-            <div class="ps__body">
-              <h3 class="ps__name">{s.name}</h3>
-              <p class="ps__text">{s.text}</p>
-            </div>
+  <ol class="ps__list" data-stagger>
+    {
+      list.map((s, i) => (
+        <li class="ps__step">
+          <PixelWord text={String(i + 1).padStart(2, '0')} class="ps__num" />
+          <div class="ps__head">
+            <h3 class="ps__name">{s.name}</h3>
+            <p class="ps__dur">{s.duration}</p>
+          </div>
+          <p class="ps__text">{s.text}</p>
+          {s.fromYou && (
             <p class="ps__you">
               <span>От вас</span>
               {s.fromYou}
             </p>
-          </li>
-        ))
-      }
-    </ol>
-  </div>
+          )}
+        </li>
+      ))
+    }
+  </ol>
 </section>
 
 <style>
-  .ps__viewport {
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    border-radius: var(--radius-lg);
-  }
-
-  .ps__viewport::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Когда работает GSAP, ленту двигает он, а не прокрутка. */
-  .ps__viewport:global(.is-pinned) {
-    overflow: hidden;
-  }
-
-  .ps__track {
+  .ps__list {
     list-style: none;
     padding: 0;
-    display: flex;
-    gap: var(--gap);
-    width: max-content;
-  }
-
-  .ps__step {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(24px, 2.4vw, 32px);
-    width: clamp(310px, 29vw, 440px);
-    min-height: 460px;
-    padding: clamp(26px, 2.8vw, 40px);
-    border-radius: var(--radius-lg);
-    background: var(--surface);
-    scroll-snap-align: start;
-  }
-
-  .ps__step:first-child {
-    background: var(--night);
-    color: var(--night-ink);
-  }
-
-  .ps__step--last {
-    background: var(--accent);
   }
 
   .ps__step :global(.ps__num) {
-    width: 72px;
+    width: 56px;
     height: auto;
-    color: var(--accent);
+    color: var(--accent-graphic);
   }
 
-  .ps__step--last :global(.ps__num) {
-    color: var(--ink);
-  }
-
-  .ps__top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .ps__body {
+  .ps__head {
     display: grid;
-    gap: 14px;
+    gap: 8px;
   }
 
   .ps__name {
-    font-size: clamp(1.5rem, 1rem + 1.1vw, 2.125rem);
-    line-height: 0.95;
-    letter-spacing: -0.04em;
+    font-size: var(--fs-2);
+    line-height: 1;
+    letter-spacing: -0.03em;
     text-transform: uppercase;
   }
 
+  .ps__dur {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-xs);
+    color: var(--accent-text);
+  }
+
   .ps__text {
-    font-size: 1rem;
+    font-size: var(--fs-0);
     line-height: 1.55;
     color: var(--muted);
   }
 
-  .ps__step:first-child .ps__text {
-    color: var(--night-muted);
-  }
-
-  .ps__step--last .ps__text {
-    color: #3d1d06;
-  }
-
-  .ps__dur {
-    flex: none;
-    padding: 6px 10px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.6);
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 0.875rem;
-    color: var(--ink);
-  }
-
-  /* Что нужно от клиента — внизу карточки, отдельной короткой репликой. */
   .ps__you {
     display: grid;
     gap: 4px;
-    margin-top: auto;
-    font-size: 0.9375rem;
-    line-height: 1.45;
-    color: var(--ink);
+    font-size: var(--fs-0);
+    line-height: 1.5;
   }
 
   .ps__you span {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 0.8125rem;
+    font-size: var(--fs-xs);
     letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--muted);
   }
 
-  .ps__step:first-child .ps__you span {
-    color: var(--night-muted);
+  /* Главная: четыре колонки под общей чертой. */
+  .ps--compact .ps__list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(24px, 3vw, 48px);
   }
 
-  .ps__step--last .ps__you span {
-    color: #3d1d06;
+  .ps--compact .ps__step {
+    display: grid;
+    align-content: start;
+    gap: 18px;
+    padding-top: clamp(20px, 2vw, 28px);
+    border-top: 2px solid var(--ink);
   }
 
-  .ps__step:first-child .ps__you {
-    color: var(--night-ink);
+  /* Услуги: строка на этап — номер, название и срок, описание, что нужно от вас. */
+  .ps--full .ps__list {
+    border-top: 1px solid var(--line);
   }
 
-  @media (max-width: 767px) {
-    .ps__viewport {
-      overflow: visible;
+  .ps--full .ps__step {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 3fr) minmax(0, 5fr) minmax(0, 4fr);
+    gap: 16px clamp(20px, 3vw, 48px);
+    align-items: start;
+    padding-block: clamp(22px, 2.4vw, 32px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  @media (max-width: 1023px) {
+    .ps--compact .ps__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .ps__track {
-      flex-direction: column;
-      width: auto;
+    .ps--full .ps__step {
+      grid-template-columns: 56px minmax(0, 1fr) minmax(0, 1fr);
     }
 
-    .ps__step {
-      width: auto;
-      min-height: 0;
-      border-radius: 22px;
+    .ps--full .ps__head {
+      grid-column: 2 / -1;
+    }
+
+    .ps--full .ps__text {
+      grid-column: 2;
     }
 
     .ps__step :global(.ps__num) {
-      width: 54px;
+      width: 48px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .ps--compact .ps__list {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+    }
+
+    .ps--compact .ps__step,
+    .ps--full .ps__step {
+      grid-template-columns: 40px minmax(0, 1fr);
+      gap: 10px 16px;
+    }
+
+    .ps--compact .ps__step > :not(:global(.ps__num)),
+    .ps--full .ps__step > :not(:global(.ps__num)) {
+      grid-column: 2;
+    }
+
+    .ps--compact .ps__step :global(.ps__num),
+    .ps--full .ps__step :global(.ps__num) {
+      grid-row: 1 / 4;
+    }
+
+    .ps__step :global(.ps__num) {
+      width: 40px;
     }
   }
 </style>
