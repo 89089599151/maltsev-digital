@@ -2,7 +2,7 @@
 /**
  * «Пакеты и цены» на главной: одна секция вместо отдельных «Что я делаю» и «Цены».
  * Три строки — название пакета, для кого, срок, цена «от», кнопка. Без карточек и картинок: строки
- * разделены линиями, средний пакет — тёмная полоса. Данные — src/config/pricing.ts.
+ * разделены линиями, средний пакет выделен тёмной акцентной полосой. Данные — src/config/pricing.ts.
  */
 import SectionHead from './SectionHead.astro';
 import Icon from './Icon.astro';
@@ -29,7 +29,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   <ul class="pk__list" data-stagger>
     {
       rows.map((p, i) => (
-        <li class:list={['pk__row', { 'pk__row--dark': i === 1 }]}>
+        <li class:list={['pk__row', { 'pk__row--featured': i === 1 }]}>
           <div class="pk__head">
             <h3 class="pk__name">{p.name}</h3>
             <p class="pk__types">{p.types}</p>
@@ -75,15 +75,15 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     border-bottom: 1px solid var(--line);
   }
 
-  .pk__row--dark {
+  .pk__row--featured {
     border-radius: var(--radius-lg);
     border-bottom-color: transparent;
     background: var(--night);
     color: var(--night-ink);
   }
 
-  /* Линия над тёмной полосой не нужна. */
-  .pk__row:has(+ .pk__row--dark) {
+  /* Линия над акцентной полосой не нужна. */
+  .pk__row:has(+ .pk__row--featured) {
     border-bottom-color: transparent;
   }
 
@@ -116,7 +116,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     color: var(--muted);
   }
 
-  .pk__row--dark .pk__for {
+  .pk__row--featured .pk__for {
     color: var(--night-muted);
   }
 
@@ -146,7 +146,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     letter-spacing: 0;
   }
 
-  .pk__row--dark .pk__price {
+  .pk__row--featured .pk__price {
     color: var(--accent-on-dark);
   }
 
@@ -220,7 +220,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
       padding-inline: 16px;
     }
 
-    .pk__row--dark {
+    .pk__row--featured {
       border-radius: 22px;
     }
 

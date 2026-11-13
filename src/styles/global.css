@@ -434,6 +434,8 @@ dd {
   text-decoration: none;
   transition:
     transform var(--dur-fast) var(--ease-out),
+    translate var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
     background-color var(--dur-fast) var(--ease-out),
     color var(--dur-fast) var(--ease-out);
   -webkit-tap-highlight-color: transparent;
@@ -448,7 +450,7 @@ dd {
   color: var(--accent-ink);
 }
 
-.btn--accent:hover {
+.btn--accent:is(:hover, :focus-visible) {
   background: var(--accent-hover);
 }
 
@@ -457,7 +459,7 @@ dd {
   color: var(--bg);
 }
 
-.btn--ink:hover {
+.btn--ink:is(:hover, :focus-visible) {
   background: var(--ink-hover);
 }
 
@@ -467,8 +469,9 @@ dd {
   box-shadow: inset 0 0 0 1px rgba(10, 11, 20, 0.22);
 }
 
-.btn--ghost:hover {
+.btn--ghost:is(:hover, :focus-visible) {
   background: var(--paper);
+  --btn-hover-ring: inset 0 0 0 1px var(--ink);
   box-shadow: inset 0 0 0 1px var(--ink);
 }
 
@@ -477,7 +480,7 @@ dd {
   color: var(--night-ink);
 }
 
-.btn--dark:hover {
+.btn--dark:is(:hover, :focus-visible) {
   background: var(--ink-hover);
 }
 
@@ -492,13 +495,75 @@ dd {
   transition: transform var(--dur-fast) var(--ease-out);
 }
 
-.btn:hover .arrow,
-a:hover > .arrow {
+.btn:is(:hover, :focus-visible) .arrow,
+a:is(:hover, :focus-visible) > .arrow {
   transform: translateX(4px);
 }
 
-/* --- Появление -------------------------------------------------------- */
+/* --- Карточки и ссылки ------------------------------------------------ */
 
+/* Отдельное translate складывается с transform появления и GSAP-наклоном.
+   Новые карточки подключаются атрибутом; знакомые блоки получают тот же отклик без JS. */
+:is([data-hover-card], .mf__card, .hn__stat, .ps--compact .ps__step, .pk__row, .pk__calc, .pc) {
+  transition:
+    translate 420ms var(--ease-out),
+    box-shadow 420ms var(--ease-out),
+    border-color var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out);
+}
+
+/* Фокус дочерней ссылки поднимает всю карточку, сохраняя её собственную обводку. */
+@media (prefers-reduced-motion: no-preference) {
+  :is([data-hover-card], .mf__card, .hn__stat, .ps--compact .ps__step, .pk__row, .pk__calc, .pc):focus-within {
+    translate: 0 var(--card-hover-lift, -7px);
+    box-shadow: var(--card-hover-shadow, var(--shadow-lift));
+  }
+
+  .btn:focus-visible:not([disabled], [aria-disabled='true']) {
+    translate: 0 -3px;
+    box-shadow: var(--btn-hover-ring, 0 0 0 transparent), var(--shadow-lift);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  :is([data-hover-card], .mf__card, .hn__stat, .ps--compact .ps__step, .pk__row, .pk__calc, .pc):hover {
+    translate: 0 var(--card-hover-lift, -7px);
+    box-shadow: var(--card-hover-shadow, var(--shadow-lift));
+  }
+
+  .btn:hover:not([disabled], [aria-disabled='true']) {
+    translate: 0 -3px;
+    box-shadow: var(--btn-hover-ring, 0 0 0 transparent), var(--shadow-lift);
+  }
+}
+
+/* JS добавляет самостоятельный декоративный слой: фон карточки и её псевдоэлементы свободны.
+   Изолированный отрицательный z-index держит свет над фоном, но под текстом и ссылками. */
+.has-spotlight {
+  position: relative;
+  isolation: isolate;
+}
+
+.motion-spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    310px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+    var(--spotlight-color, rgba(91, 113, 255, 0.18)),
+    transparent 72%
+  );
+  transition: opacity 350ms var(--ease-out);
+}
+
+.is-spotlit > .motion-spotlight {
+  opacity: 1;
+}
+
+/* --- Появление -------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -510,33 +575,65 @@ a:hover > .arrow {
     scroll-behavior: auto !important;
   }
 
+  :is([data-hover-card], .mf__card, .hn__stat, .ps--compact .ps__step, .pk__row, .pk__calc, .pc, .btn) {
+    translate: none !important;
+  }
+
+  .btn:active,
+  .btn .arrow,
+  a > .arrow {
+    transform: none !important;
+  }
+
+  .motion-spotlight {
+    display: none;
+  }
 }
 
 /* Появление при прокрутке. Скрипт (src/scripts/motion.ts) только ставит классы: .motion-ready на <html>
    при запуске и .is-in на элемент, когда тот заходит в окно. Без скрипта и при reduced-motion всё видно сразу. */
-.motion-ready [data-reveal]:not(.is-in) {
-  opacity: 0;
-  transform: translateY(30px);
+@media (prefers-reduced-motion: no-preference) {
+  .motion-ready [data-reveal]:not(.is-in) {
+    opacity: 0;
+    transform: translateY(var(--reveal-distance, 44px));
+  }
+
+  .motion-ready [data-reveal='rise']:not(.is-in) {
+    opacity: 1;
+    transform: translateY(24px);
+    clip-path: inset(100% 0% 0% 0% round 22px);
+  }
+
+  .motion-ready [data-reveal='wipe']:not(.is-in) {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0% 100% 0% 0% round 22px);
+  }
+
+  /* Задержка касается появления; наведение и фокус отвечают без ожидания своей очереди. */
+  .motion-ready [data-reveal].is-revealing {
+    transition:
+      opacity 850ms var(--ease-out) var(--reveal-delay, 0ms),
+      transform 1000ms var(--ease-out) var(--reveal-delay, 0ms),
+      clip-path 1050ms cubic-bezier(0.76, 0, 0.24, 1) var(--reveal-delay, 0ms),
+      translate 420ms var(--ease-out),
+      box-shadow 420ms var(--ease-out),
+      border-color var(--dur) var(--ease-out),
+      background-color var(--dur) var(--ease-out) !important;
+  }
 }
 
-.motion-ready [data-reveal='rise']:not(.is-in) {
-  opacity: 1;
-  transform: none;
-  clip-path: inset(100% 0% 0% 0% round 22px);
-}
+/* Срабатывает сразу при смене настройки, ещё до обработчика JS. */
+@media (prefers-reduced-motion: reduce) {
+  .motion-ready [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
 
-.motion-ready [data-reveal='wipe']:not(.is-in) {
-  opacity: 1;
-  transform: none;
-  clip-path: inset(0% 100% 0% 0% round 22px);
-}
-
-/* Переход действует только на время появления, чтобы не перебивать собственные переходы элемента. */
-.motion-ready [data-reveal].is-revealing {
-  transition:
-    opacity 950ms var(--ease-out),
-    transform 950ms var(--ease-out),
-    clip-path 1250ms cubic-bezier(0.87, 0, 0.13, 1) !important;
+  .split-line {
+    transform: none !important;
+  }
 }
 
 /* Переходы между страницами (нативные, без скриптов). */

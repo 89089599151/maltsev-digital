@@ -50,6 +50,14 @@ const fastest = plans[0];
       </p>
     </div>
 
+    <a class="hn__route" href={url('/services/#process')} aria-label="Как я веду проект: дизайн, разработка и запуск">
+      <span class="hn__route-art" aria-hidden="true">
+        <svg viewBox="0 0 300 50" fill="none"><path class="hn__route-track" d="M12 25H288" /><path class="hn__route-progress" d="M12 25H288" /><circle cx="12" cy="25" r="5" /><circle cx="150" cy="25" r="5" /><circle cx="288" cy="25" r="5" /></svg>
+        <span>Дизайн</span><span>Разработка</span><span>Запуск</span>
+      </span>
+      <span class="hn__route-bottom">От первого эскиза<br /><strong>до вашего домена</strong><i><Icon name="arrow" /></i></span>
+    </a>
+
     <p class="hn__note">Дизайн, код и запуск в одних руках. ИИ берёт рутину, а решения и качество — на мне.</p>
 
     <div class="hn__object" aria-hidden="true">
@@ -72,12 +80,12 @@ const fastest = plans[0];
     </div>
 
     <ul class="hn__stats">
-      <li class="hn__stat">
+      <li class="hn__stat" data-hover-card>
         <p class="hn__stat-v"><span>от</span> 7 <span>дней</span></p>
         <p class="hn__stat-l">срок запуска</p>
         <p class="hn__stat-t">Лендинг — за {fastest.timeline}. Дату называю до начала работы.</p>
       </li>
-      <li class="hn__stat">
+      <li class="hn__stat" data-hover-card>
         <p class="hn__stat-v">90+</p>
         <p class="hn__stat-l">скорость</p>
         <p class="hn__stat-t">Оценка Google Lighthouse у этого сайта — на телефоне и компьютере.</p>
@@ -106,7 +114,7 @@ const fastest = plans[0];
       <li class="hn__social-l" aria-hidden="true">Написать<br />напрямую</li>
     </ul>
 
-    <a class="hn__card" href={url('/#pricing')}>
+    <a class="hn__card" href={url('/#pricing')} data-hover-card>
       <span class="hn__card-pic" aria-hidden="true">
         {object && <Image src={object.src} alt="" widths={[320, 520]} sizes="260px" loading="eager" />}
       </span>
@@ -268,6 +276,19 @@ const fastest = plans[0];
     font-size: var(--step-small);
     line-height: 1.45;
     color: var(--ink-2);
+  }
+
+  .hn__route { display: none; }
+
+  @media (min-width: 1024px) {
+    .hn__route { position: relative; z-index: 2; display: grid; grid-column: 1 / 5; grid-row: 3; align-self: center; width: min(100%, 340px); padding-block: 18px 22px; text-decoration: none; color: var(--ink); }
+    .hn__route-art { display: grid; grid-template-columns: repeat(3,1fr); font-size: 11px; letter-spacing: .02em; color: var(--muted); }
+    .hn__route-art > svg { grid-column: 1 / -1; width: 100%; height: auto; overflow: visible; }
+    .hn__route-art > span:nth-last-child(2) { text-align: center; }.hn__route-art > span:last-child { text-align: right; }
+    .hn__route-track { stroke: var(--accent-soft); stroke-width: 1; }.hn__route-progress { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 276; stroke-dashoffset: 170; transition: stroke-dashoffset .8s var(--ease-out); }.hn__route-art circle { fill: var(--paper); stroke: var(--accent); stroke-width: 1.5; }
+    .hn__route-art circle:first-of-type { fill: var(--accent); }
+    .hn__route-bottom { position: relative; display: block; padding-top: 18px; font-size: var(--fs-xs); line-height: 1.5; }.hn__route-bottom strong { font-weight: 500; }.hn__route-bottom i { position: absolute; right: 0; bottom: 2px; display: grid; place-items: center; width: 35px; height: 35px; border: 1px solid var(--line); border-radius: 50%; color: var(--accent-text); transition: background-color .3s,color .3s,rotate .4s; }.hn__route-bottom :global(svg) { width: 15px; }
+    .hn__route:hover .hn__route-progress,.hn__route:focus-visible .hn__route-progress { stroke-dashoffset: 0; }.hn__route:hover i,.hn__route:focus-visible i { background: var(--accent); color: white; rotate: -30deg; }
   }
 
   /* --- Объект ----------------------------------------------------------------- */
@@ -558,6 +579,7 @@ const fastest = plans[0];
 
     .hn__aside,
     .hn__cta,
+    .hn__route,
     .hn__note,
     .hn__stats,
     .hn__social,

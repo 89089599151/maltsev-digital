@@ -1,61 +1,124 @@
 /**
- * Motion-система сайта (GSAP + ScrollTrigger + SplitText; появления — CSS-переходы).
+ * Motion-система сайта: GSAP для строк/параллакса, CSS для появления и карточек.
  *
- * Атрибуты в разметке:
- *  [data-intro="scene|pane"]  — первый экран: сборка на CSS, здесь только прокрутка;
- *  [data-split]                 — заголовок, строки поднимаются из-под маски;
- *  [data-reveal="" | "rise" | "wipe"] — появление: подъём, рост снизу, раскрытие слева;
- *  [data-stagger]               — дети контейнера появляются по очереди;
- *  [data-speed="1.5"]           — параллакс (только крупные экраны);
- *  [data-tilt-area] / [data-tilt] / [data-float] — реакция на курсор;
- *  [data-magnetic]              — «магнитная» кнопка.
+ * [data-split] / [data-reveal="" | "rise" | "wipe"] / [data-stagger] — появления;
+ * [data-intro="scene|pane"] / [data-speed] — реакция на прокрутку;
+ * [data-tilt-area] / [data-tilt] / [data-float] / [data-magnetic] — курсор;
+ * [data-hover-card] — подъём при наведении и фокусе, работает и без JS;
+ * [data-spotlight] — мягкий свет под содержимым, только на десктопе с мышью.
  *
- * Без скрипта и при prefers-reduced-motion весь контент виден сразу.
+ * Без скрипта весь контент виден. Смена reduced-motion останавливает эффекты,
+ * возвращает исходную разметку заголовков и сразу показывает все блоки.
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 
 const EASE = 'expo.out';
+const POINTER_MEDIA = '(min-width: 1024px) and (hover: hover) and (pointer: fine)';
+const seenHeadings = new WeakSet<HTMLElement>();
+let disposeMotion: (() => void) | undefined;
 
-/** Отдать управление браузеру между фазами, чтобы запуск не был одной длинной задачей. */
+/** Между фазами браузер может обработать ввод и отрисовать страницу. */
 const nextTask = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
-export async function initMotion(): Promise<void> {
-  const root = document.documentElement;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+/** Все отложенные эффекты принадлежат одному запуску и могут быть отменены вместе. */
+class MotionScope {
+  active = true;
+  readonly controller = new AbortController();
+  private readonly context = gsap.context(() => {});
+  private readonly cleanups: (() => void)[] = [];
+  private readonly timers = new Set<number>();
 
-  gsap.registerPlugin(ScrollTrigger, SplitText);
-  root.classList.add('motion-ready');
-
-  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  const wide = window.matchMedia('(min-width: 1024px)').matches;
-
-  const phases = [heroIntro, splitHeadings, reveals, footerBlocks];
-  if (wide) phases.push(parallax);
-  if (finePointer) phases.push(tilt, magnetic);
-  for (const run of phases) {
-    run();
-    await nextTask();
+  run(callback: () => void): void {
+    if (this.active) this.context.add(callback);
   }
 
-  // Шрифты и картинки могли сдвинуть вёрстку — пересчитать позиции триггеров.
-  document.fonts?.ready.then(() => ScrollTrigger.refresh());
+  cleanup(callback: () => void): void {
+    this.cleanups.push(callback);
+  }
+
+  after(delay: number, callback: () => void): void {
+    const timer = window.setTimeout(() => {
+      this.timers.delete(timer);
+      if (this.active) callback();
+    }, delay);
+    this.timers.add(timer);
+  }
+
+  stop(): void {
+    if (!this.active) return;
+    this.active = false;
+    document.documentElement.classList.remove('motion-ready');
+    this.controller.abort();
+    this.timers.forEach((timer) => window.clearTimeout(timer));
+    this.cleanups.reverse().forEach((cleanup) => cleanup());
+    this.context.revert();
+  }
 }
 
-/** Сборка первого экрана — CSS-анимация (HeroGlass). Здесь только реакция на прокрутку. */
-function heroIntro(): void {
+export async function initMotion(): Promise<void> {
+  disposeMotion?.();
+  gsap.registerPlugin(ScrollTrigger, SplitText);
+
+  const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const desktop = window.matchMedia('(min-width: 1024px)');
+  const pointer = window.matchMedia(POINTER_MEDIA);
+  let scope: MotionScope | undefined;
+  const update = async () => {
+    scope?.stop();
+    scope = undefined;
+    if (preference.matches) return;
+
+    const current = new MotionScope();
+    scope = current;
+    document.documentElement.classList.add('motion-ready');
+    const phases = [heroIntro, reveals, splitHeadings, footerBlocks];
+    if (desktop.matches) phases.push(parallax);
+    if (pointer.matches) phases.push(pointerEffects);
+
+    try {
+      for (const phase of phases) {
+        if (!current.active) return;
+        current.run(() => phase(current));
+        await nextTask();
+      }
+      // Шрифты могут сдвинуть триггеры, но отменённый запуск не должен их создавать заново.
+      void document.fonts?.ready.then(() => {
+        if (current.active) ScrollTrigger.refresh();
+      });
+    } catch (error) {
+      current.stop();
+      console.warn('Motion disabled; content remains available.', error);
+    }
+  };
+
+  const onPreferenceChange = () => { void update(); };
+  preference.addEventListener('change', onPreferenceChange);
+  desktop.addEventListener('change', onPreferenceChange);
+  pointer.addEventListener('change', onPreferenceChange);
+  disposeMotion = () => {
+    preference.removeEventListener('change', onPreferenceChange);
+    desktop.removeEventListener('change', onPreferenceChange);
+    pointer.removeEventListener('change', onPreferenceChange);
+    scope?.stop();
+  };
+  await update();
+}
+
+/** Вступление первого экрана остаётся CSS-анимацией. */
+function heroIntro(scope: MotionScope): void {
   const scene = document.querySelector<HTMLElement>('[data-intro="scene"]');
   const pane = document.querySelector<HTMLElement>('[data-intro="pane"]');
   const hero = pane?.closest('section');
   if (!pane || !hero) return;
-  const startScrollMotion = () => {
+  const startScrollMotion = () => scope.run(() => {
     const st = { trigger: hero, start: 'top top', end: 'bottom top', scrub: true };
     gsap.to(pane, { y: -40, scale: 0.97, ease: 'none', scrollTrigger: st });
     if (scene) gsap.to(scene, { y: 120, rotate: 6, ease: 'none', scrollTrigger: { ...st } });
-  };
+  });
 
-  // GSAP должен считывать конечную позицию, а не transform вступительной CSS-анимации.
+  // Считывать конечную позицию после CSS-вступления, а не его промежуточный кадр.
   const introAnimations = [pane, scene].flatMap((element) => element?.getAnimations() ?? []);
   if (introAnimations.length) {
     void Promise.allSettled(introAnimations.map((animation) => animation.finished)).then(startScrollMotion);
@@ -64,188 +127,224 @@ function heroIntro(): void {
   }
 }
 
-/**
- * Вызвать cb, когда элементы заходят в окно; bottom сдвигает нижнюю границу
- * (−10% — чуть выше края экрана, 25% — заранее). IntersectionObserver не заставляет браузер
- * пересчитывать раскладку, в отличие от сотни ScrollTrigger, — запуск не блокирует ввод.
- */
-function onEnter(els: Element[], cb: (batch: HTMLElement[]) => void, bottom = '-10%'): void {
-  const io = new IntersectionObserver(
-    (entries) => {
-      // Уже выше окна (быстрая прокрутка, переход по якорю) — тоже показать.
-      const batch = entries
-        .filter((e) => e.isIntersecting || e.boundingClientRect.bottom < 0)
-        .map((e) => e.target as HTMLElement);
-      if (!batch.length) return;
-      batch.forEach((el) => io.unobserve(el));
-      cb(batch);
-    },
-    { rootMargin: `0px 0px ${bottom} 0px` },
-  );
-  els.forEach((el) => io.observe(el));
+/** IntersectionObserver не требует синхронного замера всех карточек при запуске. */
+function onEnter(scope: MotionScope, els: Element[], callback: (batch: HTMLElement[]) => void, bottom = '-6%'): void {
+  if (!els.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    if (!scope.active) return;
+    // Якорь или быстрая прокрутка тоже должны раскрыть уже пройденный контент.
+    const batch = entries
+      .filter((entry) => entry.isIntersecting || entry.boundingClientRect.bottom < 0)
+      .map((entry) => entry.target as HTMLElement);
+    if (!batch.length) return;
+    batch.forEach((element) => observer.unobserve(element));
+    scope.run(() => callback(batch));
+  }, { rootMargin: `0px 0px ${bottom} 0px` });
+  scope.cleanup(() => observer.disconnect());
+  els.forEach((element) => observer.observe(element));
 }
 
-/**
- * Разбивка на строки требует замера раскладки, поэтому заголовок разбивается не при запуске,
- * а когда подходит к экрану (за четверть окна до появления), — запуск не превращается в одну длинную задачу.
- */
-function splitHeadings(): void {
-  const headings = gsap.utils.toArray<HTMLElement>('[data-split]');
-  const seen = new WeakSet<HTMLElement>();
+/** Строки замеряются только при подходе заголовка к экрану. */
+function splitHeadings(scope: MotionScope): void {
+  const headings = gsap.utils.toArray<HTMLElement>('[data-split]').filter((element) => !seenHeadings.has(element));
   const tweens = new WeakMap<HTMLElement, gsap.core.Tween>();
-  const split = (el: HTMLElement) =>
-    SplitText.create(el, {
-      type: 'lines',
-      mask: 'lines',
-      linesClass: 'split-line',
-      autoSplit: true,
-      onSplit(self) {
-        // Маска строки режет всё выше её верхнего края — дать место бревису Й и точкам Ё.
-        self.masks.forEach((m) => {
-          (m as HTMLElement).style.paddingTop = '0.16em';
-          (m as HTMLElement).style.marginTop = '-0.16em';
-        });
-        // Повторная разбивка (смена ширины) после показа — без анимации.
-        if (seen.has(el)) return;
-        const tween = gsap.from(self.lines, { yPercent: 105, duration: 1.05, ease: EASE, stagger: 0.08, paused: true });
-        tweens.set(el, tween);
-        return tween;
-      },
+  onEnter(scope, headings, (near) => {
+    near.forEach((element) => {
+      const split = SplitText.create(element, {
+        type: 'lines',
+        mask: 'lines',
+        linesClass: 'split-line',
+        autoSplit: true,
+        onSplit(self) {
+          // Оставить место для бревиса Й и точек Ё над строкой.
+          self.masks.forEach((mask) => {
+            (mask as HTMLElement).style.paddingTop = '0.16em';
+            (mask as HTMLElement).style.marginTop = '-0.16em';
+          });
+          if (seenHeadings.has(element)) return;
+          const tween = gsap.from(self.lines, {
+            yPercent: 112, duration: 0.95, ease: EASE, stagger: 0.09, paused: true,
+          });
+          tweens.set(element, tween);
+          return tween;
+        },
+      });
+      scope.cleanup(() => split.revert());
     });
-  const play = (batch: HTMLElement[]) =>
-    batch.forEach((el) => {
-      seen.add(el);
-      tweens.get(el)?.play();
-    });
-  onEnter(
-    headings,
-    (near) => {
-      near.forEach(split);
-      onEnter(near, play, '-12%');
-    },
-    '25%',
-  );
+    onEnter(scope, near, (batch) => batch.forEach((element) => {
+      seenHeadings.add(element);
+      tweens.get(element)?.play();
+    }), '-5%');
+  }, '25%');
 }
 
-/**
- * Появление при прокрутке — CSS-переходы (global.css, [data-reveal]); скрипт только ставит классы.
- * Раньше начальное состояние задавал GSAP: он читал стиль каждого элемента, и браузер сотню раз
- * пересчитывал страницу. Классы — только запись, без чтения.
- */
-function reveals(): void {
-  gsap.utils.toArray<HTMLElement>('[data-stagger]').forEach((group) => {
+/** CSS управляет появлением, JS только назначает очередь внутри каждой группы. */
+function reveals(scope: MotionScope): void {
+  const groups = new WeakMap<Element, Element>();
+  document.querySelectorAll('[data-stagger]').forEach((group) => {
     Array.from(group.children).forEach((child) => {
       if (!child.hasAttribute('data-reveal')) child.setAttribute('data-reveal', '');
+      groups.set(child, group);
     });
   });
-  onEnter(gsap.utils.toArray<HTMLElement>('[data-reveal]'), (batch) =>
-    batch.forEach((el, i) => {
-      const delay = i * 80;
-      el.style.transitionDelay = `${delay}ms`;
-      el.classList.add('is-revealing', 'is-in');
-      window.setTimeout(() => {
-        el.classList.remove('is-revealing');
-        el.style.transitionDelay = '';
-      }, delay + 1300);
-    }),
-  );
-}
-
-/**
- * Твин, который готовится, когда элемент подходит к экрану, и играет, когда заходит в окно.
- * GSAP замеряет цели при создании — для сотен пикселей это дорого, поэтому не при запуске.
- */
-function playOnEnter(els: Element[], make: (el: HTMLElement) => gsap.core.Tween, bottom = '-10%'): void {
-  const tweens = new Map<Element, gsap.core.Tween>();
-  onEnter(
-    els,
-    (near) => {
-      near.forEach((el) => tweens.set(el, make(el)));
-      onEnter(near, (batch) => batch.forEach((el) => tweens.get(el)?.play()), bottom);
-    },
-    '25%',
-  );
-}
-
-function footerBlocks(): void {
-  const mark = document.querySelector<HTMLElement>('[data-blocks]');
-  if (!mark) return;
-  playOnEnter(
-    [mark],
-    (el) =>
-      gsap.from(el.children, {
-        scaleY: 0.15,
-        transformOrigin: '50% 100%',
-        duration: 1.2,
-        ease: EASE,
-        stagger: 0.06,
-        paused: true,
-      }),
-    '-8%',
-  );
-}
-
-function parallax(): void {
-  gsap.utils.toArray<HTMLElement>('[data-speed]').forEach((el) => {
-    const speed = Number(el.dataset.speed) || 1;
-    gsap.fromTo(
-      el,
-      { yPercent: speed * 8 },
-      {
-        yPercent: -speed * 8,
-        ease: 'none',
-        scrollTrigger: { trigger: el.closest('section') ?? el, start: 'top bottom', end: 'bottom top', scrub: true },
-      },
-    );
+  const elements = gsap.utils.toArray<HTMLElement>('[data-reveal]');
+  scope.cleanup(() => elements.forEach((element) => {
+    element.classList.remove('is-revealing');
+    element.style.removeProperty('--reveal-delay');
+  }));
+  // Клавиатурный переход не должен приводить фокус в ещё скрытую карточку.
+  document.addEventListener('focusin', (event) => {
+    let element = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-reveal]') : null;
+    while (element) {
+      element.classList.add('is-in');
+      element.classList.remove('is-revealing');
+      element.style.removeProperty('--reveal-delay');
+      element = element.parentElement?.closest<HTMLElement>('[data-reveal]') ?? null;
+    }
+  }, { signal: scope.controller.signal });
+  onEnter(scope, elements.filter((element) => !element.classList.contains('is-in')), (batch) => {
+    const positions = new Map<Element, number>();
+    batch.forEach((element) => {
+      const group = groups.get(element);
+      const position = group ? positions.get(group) ?? 0 : 0;
+      if (group) positions.set(group, position + 1);
+      // Длинный список не задерживает последние элементы на несколько секунд.
+      const delay = Math.min(position, 4) * 95;
+      element.style.setProperty('--reveal-delay', `${delay}ms`);
+      element.classList.add('is-revealing', 'is-in');
+      scope.after(delay + 1150, () => {
+        element.classList.remove('is-revealing');
+        element.style.removeProperty('--reveal-delay');
+      });
+    });
   });
 }
 
-function tilt(): void {
-  gsap.utils.toArray<HTMLElement>('[data-tilt-area]').forEach((area) => {
+function footerBlocks(scope: MotionScope): void {
+  const mark = document.querySelector<HTMLElement>('[data-blocks]');
+  if (!mark) return;
+  onEnter(scope, [mark], (near) => {
+    const tween = gsap.from(mark.children, {
+      scaleY: 0.15, transformOrigin: '50% 100%', duration: 1.15, ease: EASE, stagger: 0.065, paused: true,
+    });
+    onEnter(scope, near, () => { tween.play(); }, '-5%');
+  }, '25%');
+}
+
+function parallax(_scope: MotionScope): void {
+  gsap.utils.toArray<HTMLElement>('[data-speed]').forEach((element) => {
+    const speed = Number(element.dataset.speed) || 1;
+    gsap.fromTo(element, { yPercent: speed * 8 }, {
+      yPercent: -speed * 8, ease: 'none',
+      scrollTrigger: { trigger: element.closest('section') ?? element, start: 'top bottom', end: 'bottom top', scrub: true },
+    });
+  });
+}
+
+/** Один замер только активной области за кадр; никакой геометрии всех карточек при запуске. */
+function pointerEffects(scope: MotionScope): void {
+  const viewportChanges = new Set<() => void>();
+  const options = { signal: scope.controller.signal, passive: true };
+  const invalidate = () => viewportChanges.forEach((callback) => callback());
+  window.addEventListener('scroll', invalidate, { ...options, capture: true });
+  window.addEventListener('resize', invalidate, options);
+
+  const track = (
+    element: HTMLElement,
+    move: (x: number, y: number, bounds: DOMRect) => void,
+    leave: () => void,
+  ) => {
+    let frame = 0;
+    let bounds: DOMRect | undefined;
+    let pointer: PointerEvent | undefined;
+    const apply = () => {
+      frame = 0;
+      if (!pointer || !scope.active) return;
+      bounds ??= element.getBoundingClientRect();
+      if (bounds.width && bounds.height) move(pointer.clientX - bounds.left, pointer.clientY - bounds.top, bounds);
+    };
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(apply); };
+    const onMove = (event: PointerEvent) => {
+      if (event.pointerType === 'touch' || !window.matchMedia(POINTER_MEDIA).matches) return;
+      pointer = event;
+      schedule();
+    };
+    const reset = () => {
+      pointer = undefined;
+      bounds = undefined;
+      cancelAnimationFrame(frame);
+      frame = 0;
+      leave();
+    };
+    viewportChanges.add(() => {
+      bounds = undefined;
+      if (pointer) schedule();
+    });
+    element.addEventListener('pointerenter', onMove, options);
+    element.addEventListener('pointermove', onMove, options);
+    element.addEventListener('pointerleave', reset, options);
+    element.addEventListener('pointercancel', reset, options);
+    window.addEventListener('blur', reset, options);
+    scope.cleanup(() => cancelAnimationFrame(frame));
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-tilt-area]').forEach((area) => {
     const tilts = Array.from(area.querySelectorAll<HTMLElement>('[data-tilt]'));
     const floats = Array.from(area.querySelectorAll<HTMLElement>('[data-float]'));
     if (!tilts.length && !floats.length) return;
-    if (tilts.length) gsap.set(tilts, { transformPerspective: 1400 });
-    let raf = 0;
-    let nx = 0;
-    let ny = 0;
-    const apply = () => {
-      raf = 0;
-      tilts.forEach((t) => {
-        const amp = Number(t.dataset.tilt) || 4;
-        gsap.to(t, { rotateX: -ny * amp, rotateY: nx * amp, duration: 0.8, ease: 'power3.out', overwrite: 'auto' });
+    let apply: ((x: number, y: number) => void) | undefined;
+    track(area, (x, y, bounds) => {
+      if (!apply) scope.run(() => {
+        gsap.set(tilts, { transformPerspective: 1400 });
+        const targets = [
+          ...tilts.map((element) => ({
+            x: gsap.quickTo(element, 'rotateY', { duration: 0.65, ease: 'power3.out' }),
+            y: gsap.quickTo(element, 'rotateX', { duration: 0.65, ease: 'power3.out' }),
+            amplitude: Number(element.dataset.tilt) || 4, invertY: -1,
+          })),
+          ...floats.map((element) => ({
+            x: gsap.quickTo(element, 'x', { duration: 0.95, ease: 'power3.out' }),
+            y: gsap.quickTo(element, 'y', { duration: 0.95, ease: 'power3.out' }),
+            amplitude: Number(element.dataset.float) || 20, invertY: 1,
+          })),
+        ];
+        apply = (nx, ny) => targets.forEach((target) => {
+          target.x(nx * target.amplitude);
+          target.y(ny * target.amplitude * target.invertY);
+        });
       });
-      floats.forEach((f) => {
-        const amp = Number(f.dataset.float) || 20;
-        gsap.to(f, { x: nx * amp, y: ny * amp, duration: 1.2, ease: 'power3.out', overwrite: 'auto' });
-      });
-    };
-    area.addEventListener('pointermove', (e) => {
-      const r = area.getBoundingClientRect();
-      nx = (e.clientX - r.left) / r.width - 0.5;
-      ny = (e.clientY - r.top) / r.height - 0.5;
-      if (!raf) raf = requestAnimationFrame(apply);
-    });
-    area.addEventListener('pointerleave', () => {
-      nx = 0;
-      ny = 0;
-      if (!raf) raf = requestAnimationFrame(apply);
-    });
+      apply?.(x / bounds.width - 0.5, y / bounds.height - 0.5);
+    }, () => apply?.(0, 0));
   });
-}
 
-function magnetic(): void {
-  gsap.utils.toArray<HTMLElement>('[data-magnetic]').forEach((el) => {
-    const x = gsap.quickTo(el, 'x', { duration: 0.6, ease: 'power3.out' });
-    const y = gsap.quickTo(el, 'y', { duration: 0.6, ease: 'power3.out' });
-    el.addEventListener('pointermove', (e) => {
-      const r = el.getBoundingClientRect();
-      x((e.clientX - (r.left + r.width / 2)) * 0.22);
-      y((e.clientY - (r.top + r.height / 2)) * 0.32);
+  document.querySelectorAll<HTMLElement>('[data-magnetic]').forEach((element) => {
+    let x: gsap.QuickToFunc | undefined;
+    let y: gsap.QuickToFunc | undefined;
+    track(element, (px, py, bounds) => {
+      if (!x || !y) scope.run(() => {
+        x = gsap.quickTo(element, 'x', { duration: 0.55, ease: 'power3.out' });
+        y = gsap.quickTo(element, 'y', { duration: 0.55, ease: 'power3.out' });
+      });
+      x?.((px - bounds.width / 2) * 0.18);
+      y?.((py - bounds.height / 2) * 0.24);
+    }, () => { x?.(0); y?.(0); });
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-spotlight]').forEach((element) => {
+    // Отдельный слой сохраняет авторские ::before/::after и остаётся под текстом/ссылками.
+    const light = document.createElement('span');
+    light.className = 'motion-spotlight';
+    light.setAttribute('aria-hidden', 'true');
+    element.classList.add('has-spotlight');
+    element.append(light);
+    scope.cleanup(() => {
+      light.remove();
+      element.classList.remove('has-spotlight', 'is-spotlit');
     });
-    el.addEventListener('pointerleave', () => {
-      x(0);
-      y(0);
-    });
+    track(element, (x, y) => {
+      light.style.setProperty('--spotlight-x', `${x}px`);
+      light.style.setProperty('--spotlight-y', `${y}px`);
+      element.classList.add('is-spotlit');
+    }, () => element.classList.remove('is-spotlit'));
   });
 }

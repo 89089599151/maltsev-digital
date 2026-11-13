@@ -1,5 +1,14 @@
 # Задания на генерацию изображений — v3, белая тема с синим акцентом (GPT Image)
 
+## 14 ноября — объёмная сборка сайта для страницы услуг
+
+Готовый файл: `src/assets/gen/services-assembly.png`. Создан встроенным генератором с прозрачным фоном.
+Используется в `ServicesHero.astro`; отрисовка интерфейса и тарифов остаётся настоящей вёрсткой.
+
+```text
+Use case: stylized-concept. Asset type: transparent 3D sculpture for the services page of a premium independent web designer, on a white/electric-blue website. Primary request: a beautiful sculptural website being assembled in space: three large rounded rectangular browser-like glass panels floating in an elegant fanned, slightly exploded arrangement, held together by a fluid looping electric-blue glass ribbon. One main front panel is frosted white glass with tasteful embossed abstract interface blocks (one large image rectangle and two clean lines, no actual letters), two rear panels are clear cobalt-blue refractive glass. A single polished chrome arrow cursor rests at the lower-right edge of the front panel. Three-quarter view from slightly above, sophisticated product photography, tactile polished glass, soft silver edges, bright studio lighting, white specular highlights, saturated electric blue #1A2FFB and clear icy blue, no purple/pink/orange. Composition: coherent single connected object centered within a landscape 3:2 canvas, occupies 80 percent, all corners and the cursor fully inside with clear margins. Transparent alpha background, no outer haze, no floor, no ground shadow, no pedestal, no text, no logos, no watermark. Crisp high-end CGI, elegant restrained arrangement, visually striking and readable at medium size.
+```
+
 Вторая версия (ретро-оранжевый набор) больше не подходит: сайт перешёл на белую тему с холодным
 лавандовым полем и одним акцентом — синим электриком `#1A2FFB`. Старые промпты остались в истории git.
 

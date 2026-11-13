@@ -2,27 +2,11 @@
 import Base from '@/layouts/Base.astro';
 import Estimator from '@/components/Estimator.astro';
 import ProcessSteps from '@/components/ProcessSteps.astro';
-import PageHero from '@/components/PageHero.astro';
-import { plans, addons, extraPagePrice, paymentTerms, formatPrice, pricingConfirmed } from '@/config/pricing';
+import ServicesHero from '@/components/ServicesHero.astro';
+import PricingCards from '@/components/PricingCards.astro';
+import { plans, addons, extraPagePrice, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
 import Icon from '@/components/Icon.astro';
-
-const looks = ['raised', 'deep', 'raised'];
-
-// Таблица сравнения: строка — возможность, значения по тарифам.
-const compare: { label: string; values: [string, string, string] }[] = [
-  { label: 'Страниц', values: ['1', 'до 8', 'до 15'] },
-  { label: 'Дизайн', values: ['По стилю или с нуля', 'Индивидуальный', 'Авторская концепция'] },
-  { label: 'Адаптив под все экраны', values: ['Да', 'Да', 'Да'] },
-  { label: 'Форма заявки', values: ['Да', 'Да', 'Да'] },
-  { label: 'Анимации', values: ['Базовые', 'Появление, интерактив', 'Сложные, 3D, WebGL'] },
-  { label: 'Портфолио, блог, каталог', values: ['—', 'Да', 'Да'] },
-  { label: 'SEO', values: ['Базовое', 'SEO-структура', 'SEO-структура'] },
-  { label: 'Яндекс Метрика и цели', values: ['—', 'Да', 'Да'] },
-  { label: 'Интеграции: CRM, оплата', values: ['—', '—', 'Да'] },
-  { label: 'Поддержка после запуска', values: ['—', '—', '1 месяц'] },
-  { label: 'Срок', values: [plans[0].timeline, plans[1].timeline, plans[2].timeline] },
-];
 
 const schema = {
   '@context': 'https://schema.org',
@@ -43,84 +27,8 @@ const schema = {
   description="Три пакета с фиксированной ценой: START, BUSINESS и PREMIUM. Что входит и не входит, сроки, правки, калькулятор стоимости и этапы работы."
   schema={pricingConfirmed ? schema : undefined}
 >
-  <PageHero
-    id="sv-title"
-    title="Услуги и цены"
-    word="Цена"
-    lead="Делаю сайты под ключ: от структуры и текстов до запуска на вашем домене. Три пакета с понятным составом и фиксированной стоимостью."
-  >
-    <div class="sv-fact">
-      <p class="sv-fact__k">Оплата</p>
-      <p class="sv-fact__v">{paymentTerms}</p>
-    </div>
-    <div class="sv-fact sv-fact--accent">
-      <p class="sv-fact__k">Цена не растёт</p>
-      <p class="sv-fact__v">
-        Сумма фиксируется в предложении и меняется, только если меняется задача.
-        {!pricingConfirmed && ' Цены на сайте — предварительные.'}
-      </p>
-    </div>
-  </PageHero>
-
-  <!-- Подробно о каждом тарифе -->
-  <section class="section" aria-labelledby="detail-title">
-    <h2 id="detail-title" class="head sv-h2">Что входит в тарифы</h2>
-    <div class="cols">
-      {
-        plans.map((p, i) => (
-          <article class={`col tile tile--${looks[i]}`} id={`plan-${p.id}`} aria-labelledby={`col-${p.id}`} data-reveal style={`--i:${i}`}>
-            <header class="col__head">
-              <h3 id={`col-${p.id}`} class="col__name">{p.name}</h3>
-              <p class="col__price"><span>от</span> {formatPrice(p.price)}</p>
-              <p class="col__for">{p.forWhom}</p>
-            </header>
-
-            <ul class="col__list col__list--yes" aria-label={`Главное в ${p.name}`}>
-              {p.includes.slice(0, 4).map((x) => <li>{x}</li>)}
-            </ul>
-
-            <a class={`btn ${i === 1 ? 'btn--accent' : 'btn--ink'} col__btn`} href={url(`/contacts/?plan=${p.id}`)}>
-              Заказать {p.name} <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
-            </a>
-          </article>
-        ))
-      }
-    </div>
-  </section>
-
-  <!-- Сравнение -->
-  <section class="section cmp" aria-labelledby="cmp-title">
-    <div class="cmp__side">
-      <h2 id="cmp-title" class="head">Сравнение</h2>
-      <p>Если сомневаетесь между двумя тарифами, опишите задачу — подскажу, какой подойдёт, и не стану продавать лишнее.</p>
-    </div>
-    <div class="cmp__wrap" tabindex="0" role="region" aria-label="Таблица сравнения пакетов">
-      <table class="cmp__table">
-        <thead>
-          <tr>
-            <th scope="col"><span class="sr-only">Возможность</span></th>
-            {plans.map((p) => <th scope="col">{p.name}</th>)}
-          </tr>
-        </thead>
-        <tbody>
-          {
-            compare.map((row) => (
-              <tr>
-                <th scope="row">{row.label}</th>
-                {row.values.map((v) => (
-                  <td class:list={{ 'is-none': v === '—' }}>{v === '—' ? <span aria-label="Нет">—</span> : v}</td>
-                ))}
-              </tr>
-            ))
-          }
-          <tr class="cmp__price">
-            <th scope="row">Стоимость</th>
-            {plans.map((p) => <td>от {formatPrice(p.price)}</td>)}
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+  <ServicesHero />
+  <PricingCards />
 
   <Estimator />
 
@@ -161,237 +69,6 @@ const schema = {
 </Base>
 
 <style>
-  .sv-fact {
-    display: grid;
-    gap: 10px;
-    padding: 20px 22px;
-    border-radius: var(--radius);
-    background: rgba(255, 255, 255, 0.7);
-  }
-
-  .sv-fact--accent {
-    background: var(--accent);
-    color: var(--accent-ink);
-  }
-
-  .sv-fact__k {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: var(--step-small);
-    letter-spacing: 0;
-  }
-
-  .sv-fact__v {
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: var(--step-body);
-    line-height: 1.35;
-  }
-
-  .sv-h2 {
-    margin-bottom: 40px;
-    max-width: 16ch;
-  }
-
-  /* Колонки тарифов */
-  .cols {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--gap);
-    align-items: stretch;
-  }
-
-  .col {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(28px, 2.8vw, 40px);
-    padding: clamp(26px, 3vw, 44px);
-    border-radius: var(--radius-lg);
-  }
-
-  /* Как карточки тарифов на главной: лёгкое увеличение под курсором. */
-  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-    .col {
-      transition:
-        scale var(--dur) var(--ease-out),
-        box-shadow var(--dur) var(--ease-out);
-    }
-
-    .col:hover {
-      scale: 1.02;
-      box-shadow: var(--shadow-lift);
-    }
-  }
-
-  .col__name {
-    font-size: var(--fs-3);
-    letter-spacing: -0.02em;
-  }
-
-  .col__price {
-    margin-top: 10px;
-    font-family: var(--font-head);
-    font-weight: 600;
-    font-size: var(--fs-4);
-    line-height: 1;
-    letter-spacing: -0.04em;
-  }
-
-  .col__price span {
-    font-size: 0.5em;
-    letter-spacing: 0;
-  }
-
-  .col__for {
-    max-width: 34ch;
-    margin-top: 16px;
-    line-height: 1.5;
-    color: var(--muted);
-  }
-
-  .tile--deep .col__for {
-    color: var(--night-muted);
-  }
-
-  .col__list {
-    list-style: none;
-    padding: 0;
-    display: grid;
-    gap: 12px;
-    font-size: var(--fs-0);
-    line-height: 1.45;
-  }
-
-  .col__list li {
-    display: grid;
-    grid-template-columns: 14px 1fr;
-    gap: 12px;
-    align-items: baseline;
-  }
-
-  .col__list--yes li::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
-    transform: translateY(-1px);
-  }
-
-  .col__btn {
-    width: 100%;
-    margin-top: auto;
-  }
-
-  /* Сравнение */
-  .cmp {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--gap);
-    align-items: start;
-  }
-
-  .cmp__side {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: 16px clamp(24px, 4vw, 64px);
-    align-items: end;
-    margin-bottom: clamp(16px, 2vw, 24px);
-  }
-
-  .cmp__side p {
-    max-width: 46ch;
-    color: var(--ink-2);
-  }
-
-  .cmp__wrap {
-    grid-column: 1 / -1;
-    overflow-x: auto;
-    border-radius: var(--radius-lg);
-    background: var(--surface);
-  }
-
-  .cmp__table {
-    width: 100%;
-    min-width: 640px;
-    border-collapse: collapse;
-    font-size: var(--fs-0);
-  }
-
-  .cmp__table th,
-  .cmp__table td {
-    padding: 16px 20px;
-    text-align: left;
-    vertical-align: top;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .cmp__table thead th {
-    font-family: var(--font-head);
-    font-weight: 600;
-    font-size: var(--fs-1);
-    letter-spacing: -0.02em;
-  }
-
-  /* Подсвеченный пакет: по умолчанию PREMIUM (4-я колонка), при наведении — колонка под курсором. */
-  .cmp__table :is(th, td):nth-child(n + 2) {
-    transition:
-      background-color var(--dur) var(--ease-out),
-      color var(--dur) var(--ease-out);
-  }
-
-  .cmp__table :is(th, td):nth-child(4) {
-    background: rgba(26, 47, 251, 0.08);
-  }
-
-  .cmp__table:has(:is(th, td):nth-child(2):hover) :is(th, td):nth-child(4),
-  .cmp__table:has(:is(th, td):nth-child(3):hover) :is(th, td):nth-child(4) {
-    background: transparent;
-  }
-
-  .cmp__table:has(:is(th, td):nth-child(2):hover) :is(th, td):nth-child(2),
-  .cmp__table:has(:is(th, td):nth-child(3):hover) :is(th, td):nth-child(3) {
-    background: rgba(26, 47, 251, 0.08);
-  }
-
-  /* Название подсвеченного пакета — акцентом. */
-  .cmp__table thead th:nth-child(4),
-  .cmp__table:has(:is(th, td):nth-child(2):hover) thead th:nth-child(2),
-  .cmp__table:has(:is(th, td):nth-child(3):hover) thead th:nth-child(3) {
-    color: var(--accent-deep);
-  }
-
-  .cmp__table:has(:is(th, td):nth-child(2):hover) thead th:nth-child(4),
-  .cmp__table:has(:is(th, td):nth-child(3):hover) thead th:nth-child(4) {
-    color: inherit;
-  }
-
-  .cmp__table th:first-child,
-  .cmp__table td:first-child {
-    padding-left: clamp(20px, 2.4vw, 32px);
-  }
-
-  .cmp__table tbody th {
-    font-family: var(--font-display);
-    font-weight: 500;
-    color: var(--muted);
-    width: 26%;
-  }
-
-  .cmp__table td.is-none {
-    color: var(--muted);
-  }
-
-  .cmp__price th,
-  .cmp__price td {
-    border-bottom: 0;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: var(--step-body);
-    color: var(--ink);
-  }
-
   /* Дополнительно */
   .extras {
     display: grid;
@@ -544,14 +221,6 @@ const schema = {
   }
 
   @media (max-width: 1023px) {
-    .cols {
-      grid-template-columns: 1fr;
-    }
-
-    .cmp__side {
-      grid-template-columns: 1fr;
-    }
-
     .extras__head,
     .extras__list {
       grid-column: 1 / -1;
@@ -563,13 +232,8 @@ const schema = {
   }
 
   @media (max-width: 767px) {
-    .cmp,
     .extras {
       grid-template-columns: 1fr;
-    }
-
-    .col {
-      padding: 22px;
     }
 
     .extras__item {

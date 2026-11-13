@@ -1,0 +1,75 @@
+---
+import { plans, formatPrice, pricingConfirmed } from '@/config/pricing';
+import { url } from '@/lib/url';
+import Icon from './Icon.astro';
+
+const titles = ['Для первого запуска', 'Для роста бизнеса', 'Для особой идеи'];
+const scopes = ['Одна страница', 'До 8 страниц', 'До 15 страниц'];
+---
+
+<section class="formats section" id="plans" aria-labelledby="detail-title">
+  <div class="formats__head">
+    <div><p class="formats__eyebrow">Формат под вашу задачу</p><h2 id="detail-title">Один подход.<br /><span>Три масштаба.</span></h2></div>
+    <p>От одной страницы до сайта с нестандартной логикой. В каждом варианте — дизайн, разработка и запуск в одних руках.</p>
+  </div>
+  <div class="formats__grid" data-stagger>
+    {plans.map((p, i) => (
+      <article class={`plan plan--${p.id}`} id={`plan-${p.id}`} aria-labelledby={`col-${p.id}`} data-hover-card data-spotlight>
+        <div class="plan__top"><span>{p.name}</span><span>0{i + 1}</span></div>
+        <div class={`plan__visual plan__visual--${i}`} aria-hidden="true">
+          <div class="plan__window plan__window--back"></div>
+          <div class="plan__window plan__window--front"><span></span><i></i><b></b></div>
+          <span class="plan__cursor"><Icon name="arrow" /></span>
+          <span class="plan__orbit"></span>
+        </div>
+        <header>
+          <h3 id={`col-${p.id}`}>{titles[i]}</h3>
+          <p class="plan__description">{p.forWhom}</p>
+        </header>
+        <p class="plan__price"><span>от</span> {formatPrice(p.price)}</p>
+        {!pricingConfirmed && <p class="plan__preliminary">Предварительная цена</p>}
+        <dl class="plan__facts"><div><dt>Объём</dt><dd>{scopes[i]}</dd></div><div><dt>Срок</dt><dd>{p.timeline}</dd></div></dl>
+        <ul class="plan__highlights">{p.highlights.map(item => <li><Icon name="check" /><span>{item}</span></li>)}</ul>
+        <a class={`btn ${i === 0 ? 'btn--ink' : 'plan__choose'}`} href={url(`/contacts/?plan=${p.id}`)} data-magnetic>Выбрать {p.name} <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
+        <details class="plan__details">
+          <summary>Полный состав и условия <span aria-hidden="true">+</span></summary>
+          <div class="plan__full">
+            <h4>Входит в стоимость</h4><ul>{p.includes.map(item => <li>{item}</li>)}</ul>
+            <h4>Отдельно от пакета</h4><ul>{p.excludes.map(item => <li>{item}</li>)}</ul>
+            <h4>Правки</h4><p>{p.revisions}</p>
+            <h4>Что получите</h4><p>{p.result}</p>
+          </div>
+        </details>
+      </article>
+    ))}
+  </div>
+  <div class="formats__base" data-reveal>
+    <p><span>В каждом проекте</span>Хорошая база — уже внутри.</p>
+    <ul><li><Icon name="check" /> Адаптивная версия</li><li><Icon name="check" /> Базовое SEO</li><li><Icon name="check" /> Ваш домен и исходники</li></ul>
+    <a href="#calculator" aria-label="Перейти к калькулятору"><Icon name="arrow" /></a>
+  </div>
+</section>
+
+<style>
+  .formats__head { display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: 30px; margin-bottom: 38px; }.formats__eyebrow { margin-bottom: 18px; color: var(--accent-text); font-size: var(--fs-xs); }.formats h2 { font-size: var(--step-display); line-height: 1; font-weight: 330; letter-spacing: -.055em; }.formats h2 span { color: var(--muted); }.formats__head > p { justify-self: end; max-width: 36ch; padding-bottom: 5px; color: var(--ink-2); font-size: var(--fs-1); line-height: 1.5; }
+  .formats__grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--gap); align-items: start; }
+  .plan { position: relative; isolation: isolate; padding: clamp(24px,2.6vw,40px); border-radius: var(--radius-lg); overflow: hidden; background: var(--paper); color: var(--ink); --plan-muted: var(--muted); --plan-line: var(--line); --plan-art: var(--accent); --card-hover-shadow: 0 28px 60px -35px rgba(26,47,251,.35); }
+  .plan--business { background: var(--accent); color: white; --plan-muted: #e0e4ff; --plan-line: rgba(255,255,255,.25); --plan-art: #dfe3ff; --spotlight-color: rgba(255,255,255,.14); }
+  .plan--premium { background: var(--night); color: var(--night-ink); --plan-muted: #bdc1d7; --plan-line: rgba(255,255,255,.2); --plan-art: #8d99ff; }
+  .plan__top { display: flex; justify-content: space-between; font-size: var(--fs-xs); letter-spacing: .08em; }.plan__top span:last-child { color: var(--plan-muted); }
+  .plan__visual { position: relative; height: 140px; margin: 22px 0 26px; perspective: 700px; }
+  .plan__window { position: absolute; width: 160px; height: 100px; left: 50%; top: 22px; border: 1.5px solid var(--plan-art); border-radius: 12px; transform: translateX(-50%) rotate(-8deg); color: var(--plan-art); background: linear-gradient(145deg,color-mix(in srgb,var(--plan-art) 13%,transparent),transparent); transition: transform .7s var(--ease-out); }
+  .plan__window--front::before { content: '•••'; position: absolute; top: 5px; left: 10px; letter-spacing: 3px; font-size: 10px; }.plan__window--front::after { content: ''; position: absolute; top: 22px; left: 0; right: 0; border-bottom: 1px solid var(--plan-line); }.plan__window > span { position: absolute; left: 14px; top: 37px; width: 48px; height: 45px; background: var(--plan-art); border-radius: 6px; opacity: .8; }.plan__window > i,.plan__window > b { position: absolute; left: 74px; right: 14px; top: 42px; height: 5px; border-radius: 4px; background: var(--plan-art); opacity: .6; }.plan__window > b { right: 34px; top: 55px; opacity: .3; }
+  .plan__window--back { opacity: 0; }.plan__cursor { position: absolute; top: 93px; left: calc(50% + 55px); display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; color: var(--plan-art); background: var(--paper); rotate: -35deg; transition: translate .7s var(--ease-out); }.plan__cursor :global(svg) { width: 17px; }
+  .plan--business .plan__cursor { color: var(--accent); }.plan--premium .plan__cursor { color: var(--accent); }
+  .plan__visual--1 .plan__window--back { opacity: .5; transform: translateX(-38%) translateY(-12px) rotate(10deg); }.plan__visual--2 .plan__window--back { opacity: .6; transform: translateX(-65%) translateY(-10px) rotate(-18deg); }.plan__visual--2 .plan__window--front { transform: translateX(-43%) rotate(9deg); }.plan__visual--2 .plan__orbit { position: absolute; top: 12px; left: 50%; width: 200px; height: 125px; border: 1px solid var(--plan-art); border-radius: 50%; rotate: -25deg; translate: -50% 0; opacity: .35; }
+  .plan h3 { font-size: clamp(1.55rem,1.7vw,2rem); font-weight: 400; line-height: 1.1; letter-spacing: -.04em; }.plan__description { margin-top: 14px; min-height: 6em; color: var(--plan-muted); font-size: var(--fs-0); line-height: 1.5; }.plan__price { margin-top: 24px; font-size: clamp(2.2rem,3vw,3rem); font-weight: 350; letter-spacing: -.06em; line-height: 1.1; white-space: nowrap; }.plan__price > span { font-size: .4em; letter-spacing: 0; }.plan__preliminary { font-size: var(--fs-xs); }
+  .plan__facts { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-block: 22px; margin-top: 20px; border-block: 1px solid var(--plan-line); }.plan__facts dt { font-size: 11px; color: var(--plan-muted); margin-bottom: 7px; }.plan__facts dd { font-size: var(--fs-xs); font-weight: 500; line-height: 1.4; }
+  .plan__highlights { display: grid; align-content: start; gap: 12px; min-height: 210px; padding: 24px 0; list-style: none; }.plan__highlights li { display: flex; align-items: flex-start; gap: 10px; font-size: var(--fs-xs); line-height: 1.45; }.plan__highlights :global(svg) { flex: 0 0 14px; width: 14px; height: 18px; color: var(--plan-art); }
+  .plan > .btn { width: 100%; }.plan__choose { background: white; color: var(--accent-text); }.plan__choose:hover { background: #e8ebff; color: var(--accent-text); }
+  .plan__details { margin-top: 10px; }.plan__details summary { display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 50px; cursor: pointer; list-style: none; font-size: var(--fs-xs); color: var(--plan-muted); }.plan__details summary::-webkit-details-marker { display: none; }.plan__details summary > span { font-size: 22px; transition: rotate .35s var(--ease-out); }.plan__details[open] summary > span { rotate: 45deg; }.plan__full { border-top: 1px solid var(--plan-line); padding-top: 10px; font-size: var(--fs-xs); line-height: 1.5; }.plan__full h4 { margin: 16px 0 10px; font-size: inherit; font-weight: 600; }.plan__full ul { display: grid; gap: 7px; padding-left: 16px; color: var(--plan-muted); }.plan__full p { color: var(--plan-muted); }
+  .formats__base { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 28px 0; margin-top: 18px; border-bottom: 1px solid var(--line); }.formats__base > p { display: grid; gap: 6px; font-size: var(--fs-0); }.formats__base > p span { font-size: 11px; color: var(--muted); }.formats__base ul { display: flex; flex-wrap: wrap; gap: 15px 24px; list-style: none; padding: 0; }.formats__base li { display: flex; gap: 8px; font-size: var(--fs-xs); }.formats__base li :global(svg) { width: 14px; color: var(--accent); }.formats__base > a { display: grid; place-items: center; flex: 0 0 46px; width: 46px; height: 46px; background: var(--accent-soft); color: var(--accent-text); border-radius: 50%; }.formats__base > a :global(svg) { width: 20px; }
+  @media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) { .plan:hover .plan__window--front { transform: translateX(-50%) translateY(-8px) rotate(0); }.plan:hover .plan__cursor { translate: -6px -7px; } }
+  @media (max-width: 1100px) and (min-width:768px) { .plan { padding: 22px; }.plan h3 { min-height: 2.2em; }.plan__description { min-height: 7.5em; }.plan__highlights { min-height: 260px; }.plan__facts { grid-template-columns: 1fr; }.plan__price { font-size: 2rem; } }
+  @media (max-width: 767px) { .formats__head { grid-template-columns: 1fr; gap: 22px; }.formats__head > p { justify-self: start; font-size: var(--step-body); }.formats__grid { grid-template-columns: 1fr; }.plan { padding: 28px; }.plan__visual { height: 118px; }.plan__description,.plan__highlights { min-height: 0; }.plan__price { font-size: 2.75rem; }.formats__base { align-items: flex-start; flex-wrap: wrap; }.formats__base ul { width: calc(100% - 65px); display: grid; }.formats__base > p { width: 100%; } }
+</style>
