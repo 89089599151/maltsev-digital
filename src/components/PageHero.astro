@@ -1,28 +1,27 @@
 ---
 /**
- * Первый экран внутренних страниц: серая сцена, как у главной, крупный капс-заголовок,
- * пояснение и пиксельное слово. Справа — необязательный слот (факты, фото, кнопки).
+ * Первый экран внутренних страниц: светлая сцена, крупный тонкий заголовок, пояснение
+ * и короткое слово-метка в углу. Справа — необязательный слот (факты, фото, кнопки).
  */
-import PixelWord from './PixelWord.astro';
 import { url } from '@/lib/url';
 
 interface Props {
   id: string;
   title: string;
   lead?: string;
-  /** Пиксельное слово в углу сцены — только из глифов pixel-font. */
-  pixel?: string;
+  /** Короткое слово-метка в углу сцены: «Цена», «404», «01». */
+  word?: string;
   crumbs?: { href: string; label: string }[];
   /** Для длинных заголовков: меньший кегль и ниже сцена. */
   compact?: boolean;
 }
-const { id, title, lead, pixel, crumbs, compact = false } = Astro.props;
+const { id, title, lead, word, crumbs, compact = false } = Astro.props;
 const hasAside = Astro.slots.has('default');
 ---
 
 <section class:list={['ph', { 'ph--aside': hasAside, 'ph--compact': compact }]} aria-labelledby={id}>
   <div class="ph__stage">
-    {pixel && <PixelWord text={pixel} appear="intro" delay={0.2} class="ph__px" />}
+    {word && <p class="ph__word" aria-hidden="true">{word}</p>}
     <div class="ph__main">
       {
         crumbs && (
@@ -66,7 +65,7 @@ const hasAside = Astro.slots.has('default');
     padding: clamp(28px, 4vw, 64px);
     border-radius: var(--radius-lg);
     background:
-      radial-gradient(55% 70% at 80% 30%, var(--stage-glow) 0%, rgba(243, 242, 238, 0) 70%),
+      radial-gradient(55% 70% at 80% 30%, var(--stage-glow) 0%, rgba(255, 255, 255, 0) 70%),
       linear-gradient(180deg, var(--stage-1), var(--stage-2));
     overflow: hidden;
     isolation: isolate;
@@ -76,13 +75,16 @@ const hasAside = Astro.slots.has('default');
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   }
 
-  .ph__stage :global(.ph__px) {
+  .ph__word {
     position: absolute;
     z-index: -1;
-    top: clamp(24px, 3.4vw, 56px);
+    top: clamp(10px, 1.6vw, 28px);
     right: clamp(24px, 3.4vw, 56px);
-    width: clamp(160px, 26vw, 420px);
-    height: auto;
+    font-family: var(--font-head);
+    font-weight: 250;
+    font-size: clamp(4.5rem, 2rem + 9vw, 11rem);
+    line-height: 1;
+    letter-spacing: -0.07em;
     color: var(--accent);
   }
 
@@ -118,9 +120,8 @@ const hasAside = Astro.slots.has('default');
 
   .ph__title {
     font-size: var(--step-display);
-    line-height: 0.9;
-    letter-spacing: -0.04em;
-    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: -0.045em;
     max-width: 12ch;
     overflow-wrap: anywhere;
     hyphens: auto;
@@ -181,11 +182,10 @@ const hasAside = Astro.slots.has('default');
       border-radius: 24px;
     }
 
-    .ph__stage :global(.ph__px) {
-      top: 18px;
+    .ph__word {
+      top: 10px;
       right: 18px;
-      width: 120px;
-      opacity: 0.8;
+      font-size: 3.5rem;
     }
 
     .ph__main {

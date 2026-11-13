@@ -2,7 +2,6 @@
 import { url } from '@/lib/url';
 import { site } from '@/config/site';
 import ContactLink from './ContactLink.astro';
-import PixelWord from './PixelWord.astro';
 import Icon from './Icon.astro';
 
 
@@ -12,8 +11,9 @@ const year = new Date().getFullYear();
 <footer class="ftr" aria-labelledby="ftr-title">
   <h2 id="ftr-title" class="sr-only">{site.brand.name.value}</h2>
   <div class="ftr__mark">
-    <PixelWord text={site.brand.short} class="ftr__px" />
-    <PixelWord text={site.brand.second} class="ftr__px ftr__px--b" />
+    <p class="ftr__word" aria-hidden="true">
+      <span class="tone-mute">Maltsev</span> Digital
+    </p>
   </div>
 
   <div class="ftr__grid">
@@ -53,25 +53,21 @@ const year = new Date().getFullYear();
     padding-bottom: var(--margin);
   }
 
+  /* Название во всю ширину: тонкий крупный набор, первое слово приглушено. */
   .ftr__mark {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: clamp(10px, 1.4vw, 22px);
-    padding: clamp(28px, 4vw, 64px);
+    container-type: inline-size;
+    padding: clamp(20px, 3vw, 44px) clamp(20px, 3.4vw, 56px);
     border-radius: var(--radius-lg);
-    background: var(--surface-2);
+    background: var(--paper);
   }
 
-  .ftr__mark :global(.ftr__px) {
-    width: 100%;
-    height: auto;
-    color: var(--ink);
-  }
-
-  .ftr__mark :global(.ftr__px--b) {
-    width: 86%;
-    justify-self: end;
-    color: var(--accent);
+  .ftr__word {
+    font-family: var(--font-head);
+    font-weight: 300;
+    font-size: 17cqw;
+    line-height: 1.1;
+    letter-spacing: -0.06em;
+    white-space: nowrap;
   }
 
   .ftr__grid {

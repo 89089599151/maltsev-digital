@@ -1,0 +1,798 @@
+---
+/**
+ * Первый экран — белая сцена в скруглённой раме, на широком экране вместе с шапкой (она лежит внутри).
+ * Слева сверху — тонкий крупный заголовок и кнопка, в центре — большой объект, слева снизу — две
+ * карточки с фактами, справа — короткая реплика, высокая карточка с ценой и квадраты прямых контактов.
+ * Под рамой — метки сетки и подсказка о прокрутке.
+ *
+ * Объект: src/assets/gen/hero-object-v2.png (IMAGE_GENERATION_PROMPTS.md). Пока файла нет — стеклянная
+ * скульптура из прошлого набора.
+ */
+import { Image } from 'astro:assets';
+import ContactIcon from './ContactIcon.astro';
+import Icon from './Icon.astro';
+import { minPrice, formatPrice, pricingConfirmed, plans } from '@/config/pricing';
+import { site, telegramUrl, emailUrl } from '@/config/site';
+import { genImage } from '@/lib/gen';
+import { url } from '@/lib/url';
+import avatar from '@/assets/photos/owner-avatar.webp';
+
+const object = genImage('hero-object-v2') ?? genImage('hero-object') ?? genImage('hero-sculpture');
+const tg = telegramUrl();
+const mail = emailUrl('Заявка на разработку сайта');
+const fastest = plans[0];
+---
+
+<section class="hn" aria-labelledby="hn-title" data-tilt-area>
+  <div class="hn__stage">
+    <div class="hn__head">
+      <h1 id="hn-title" class="hn__title">
+        <span class="hn__line hn__line--1"><span>Сайты для бизнеса</span></span>
+        <span class="hn__line hn__line--2">
+          <span>
+            и экспертов под ключ
+            <svg class="hn__spark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 0c.7 6.9 4.9 11.3 12 12-7.1.7-11.3 5.1-12 12-.7-6.9-4.9-11.3-12-12C7.100 11.300 11.300 6.900 12 0Z" />
+            </svg>
+          </span>
+        </span>
+      </h1>
+      <p class="hn__aside">От идеи<br />до запуска</p>
+    </div>
+
+    <div class="hn__cta">
+      <a class="hn__btn" href={url('/contacts/')} data-magnetic>
+        <span>Обсудить проект</span>
+        <span class="hn__btn-go" aria-hidden="true"><Icon name="arrow" /></span>
+      </a>
+      <p class="hn__cta-note">
+        Отвечу {site.contacts.responseTime.value}. Цену и срок фиксирую письменно до старта.
+      </p>
+    </div>
+
+    <p class="hn__note">Дизайн, код и запуск в одних руках. ИИ берёт рутину, а решения и качество — на мне.</p>
+
+    <div class="hn__object" aria-hidden="true">
+      <div class="hn__float" data-float="26">
+        {
+          object && (
+            <Image
+              class="hn__img"
+              src={object.src}
+              alt=""
+              widths={[480, 768, 1100, 1536]}
+              sizes="(max-width: 1023px) 92vw, 56vw"
+              quality={82}
+              loading="eager"
+              fetchpriority="high"
+            />
+          )
+        }
+      </div>
+    </div>
+
+    <ul class="hn__stats">
+      <li class="hn__stat">
+        <p class="hn__stat-v"><span>от</span> 7 <span>дней</span></p>
+        <p class="hn__stat-l">срок запуска</p>
+        <p class="hn__stat-t">Лендинг — за {fastest.timeline}. Дату называю до начала работы.</p>
+      </li>
+      <li class="hn__stat">
+        <p class="hn__stat-v">90+</p>
+        <p class="hn__stat-l">скорость</p>
+        <p class="hn__stat-t">Оценка Google Lighthouse у этого сайта — на телефоне и компьютере.</p>
+      </li>
+    </ul>
+
+    <ul class="hn__social" aria-label="Написать напрямую">
+      {
+        tg && (
+          <li>
+            <a href={tg} target="_blank" rel="noopener" aria-label={`Telegram: @${site.contacts.telegram.value}`}>
+              <ContactIcon kind="telegram" />
+            </a>
+          </li>
+        )
+      }
+      {
+        mail && (
+          <li>
+            <a href={mail} aria-label={`Почта: ${site.contacts.email.value}`}>
+              <ContactIcon kind="email" />
+            </a>
+          </li>
+        )
+      }
+      <li class="hn__social-l" aria-hidden="true">Написать<br />напрямую</li>
+    </ul>
+
+    <a class="hn__card" href={url('/#pricing')}>
+      <span class="hn__card-pic" aria-hidden="true">
+        {object && <Image src={object.src} alt="" widths={[320, 520]} sizes="260px" loading="eager" />}
+      </span>
+      <span class="hn__card-body">
+        <span class="hn__card-v"><span>от</span> {formatPrice(minPrice)}</span>
+        <span class="hn__card-l">сайт под ключ</span>
+        <svg class="hn__card-spark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 0c.7 6.9 4.9 11.3 12 12-7.1.7-11.3 5.1-12 12-.7-6.9-4.9-11.3-12-12C7.100 11.300 11.300 6.900 12 0Z" />
+        </svg>
+        <span class="hn__card-t">
+          Три пакета с понятным составом. Точная цена — в предложении до старта.{!pricingConfirmed && ' Цены предварительные.'}
+        </span>
+        <span class="hn__card-who">
+          <Image src={avatar} alt="" width={36} height={36} loading="eager" />
+          <span>{site.brand.owner.value}<br /><i>делаю сам, без посредников</i></span>
+        </span>
+      </span>
+    </a>
+  </div>
+
+  <a class="hn__scroll" href="#manifest">
+    <i aria-hidden="true"></i>
+    <i aria-hidden="true"></i>
+    <span>Листайте дальше</span>
+    <i aria-hidden="true"></i>
+    <i aria-hidden="true"></i>
+  </a>
+</section>
+
+<style>
+  .hn {
+    padding-top: 4px;
+  }
+
+  .hn__stage {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 22px;
+    padding: 28px 20px 20px;
+    border-radius: 26px;
+    /* Белая сцена: холодное свечение за объектом, чтобы стекло не висело в пустоте. */
+    background:
+      radial-gradient(46% 52% at 58% 56%, rgba(26, 47, 251, 0.13) 0%, rgba(26, 47, 251, 0) 70%),
+      radial-gradient(30% 34% at 74% 30%, rgba(125, 211, 252, 0.16) 0%, rgba(125, 211, 252, 0) 70%),
+      var(--paper);
+    overflow: hidden;
+  }
+
+  /* --- Заголовок -------------------------------------------------------------- */
+  .hn__head {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px 28px;
+  }
+
+  .hn__title {
+    display: grid;
+    font-family: var(--font-head);
+    font-weight: 300;
+    font-size: clamp(2.375rem, 10.6vw, 4.5rem);
+    line-height: 1.02;
+    letter-spacing: -0.055em;
+  }
+
+  /* Отступ сверху — место для бревиса Й и точек Ё, которые иначе срезает overflow. */
+  .hn__line {
+    display: block;
+    overflow: hidden;
+    padding-top: 0.14em;
+    margin-top: -0.14em;
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
+  }
+
+  .hn__line > span {
+    display: inline-block;
+  }
+
+  .hn__spark {
+    display: inline-block;
+    width: 0.3em;
+    height: 0.3em;
+    margin-left: 0.12em;
+    vertical-align: 0.34em;
+    fill: var(--accent);
+  }
+
+  .hn__aside {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: var(--fs-xs);
+    line-height: 1.35;
+    color: var(--ink-2);
+  }
+
+  /* --- Кнопка: контурная пилюля с синим кругом-стрелкой ------------------------ */
+  .hn__cta {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 22px;
+  }
+
+  .hn__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+    min-height: 60px;
+    padding: 6px 6px 6px 26px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--font-display);
+    font-weight: 550;
+    font-size: var(--fs-0);
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .hn__btn-go {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: 1.15rem;
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .hn__btn:hover {
+    background: var(--ink-hover);
+  }
+
+  .hn__btn:hover .hn__btn-go {
+    transform: rotate(-45deg);
+  }
+
+  .hn__cta-note {
+    max-width: 32ch;
+    font-size: var(--fs-xs);
+    line-height: 1.4;
+    color: var(--muted);
+  }
+
+  .hn__note {
+    position: relative;
+    z-index: 2;
+    max-width: 34ch;
+    font-size: var(--step-small);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  /* --- Объект ----------------------------------------------------------------- */
+  .hn__object {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 620px);
+    justify-self: center;
+    aspect-ratio: 3 / 2;
+    pointer-events: none;
+  }
+
+  .hn__float {
+    position: absolute;
+    inset: 0;
+    animation: hn-bob 8s ease-in-out infinite;
+  }
+
+  .hn__img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 46px 44px rgba(26, 47, 251, 0.22));
+  }
+
+  @keyframes hn-bob {
+    0%,
+    100% {
+      translate: 0 0;
+      rotate: 0deg;
+    }
+
+    50% {
+      translate: 0 -14px;
+      rotate: 1.4deg;
+    }
+  }
+
+  /* --- Карточки с фактами ------------------------------------------------------ */
+  .hn__stats {
+    position: relative;
+    z-index: 2;
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .hn__stat {
+    display: grid;
+    align-content: start;
+    padding: 18px 18px 20px;
+    border-radius: 22px;
+    background: var(--bg);
+  }
+
+  .hn__stat-v {
+    font-family: var(--font-head);
+    font-weight: 380;
+    font-size: clamp(1.875rem, 1.2rem + 1.6vw, 2.625rem);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    color: var(--accent-text);
+    white-space: nowrap;
+  }
+
+  .hn__stat-v span {
+    font-size: 0.5em;
+    letter-spacing: -0.02em;
+  }
+
+  .hn__stat-l {
+    margin-top: 2px;
+    font-family: var(--font-display);
+    font-weight: 550;
+    font-size: var(--fs-0);
+    letter-spacing: -0.02em;
+  }
+
+  .hn__stat-t {
+    margin-top: 14px;
+    font-size: var(--fs-xs);
+    line-height: 1.4;
+    color: var(--muted);
+  }
+
+  /* --- Прямые контакты: два квадрата «лесенкой» -------------------------------- */
+  .hn__social {
+    position: relative;
+    z-index: 2;
+    list-style: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hn__social a {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow: inset 0 0 0 1px rgba(10, 11, 20, 0.24);
+    color: var(--ink);
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  .hn__social a:hover {
+    background: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .hn__social a:active {
+    transform: scale(0.94);
+  }
+
+  .hn__social-l {
+    margin-left: 6px;
+    font-size: var(--fs-xs);
+    line-height: 1.3;
+    color: var(--muted);
+  }
+
+  /* --- Высокая карточка с ценой ------------------------------------------------ */
+  .hn__card {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 38% minmax(0, 1fr);
+    padding: 8px;
+    border-radius: 26px;
+    background: var(--paper);
+    box-shadow:
+      inset 0 0 0 1px rgba(10, 11, 20, 0.14),
+      0 30px 60px -34px rgba(16, 32, 200, 0.5);
+    color: var(--ink);
+    text-decoration: none;
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .hn__card:hover {
+    transform: translateY(-4px);
+  }
+
+  /* Тёмная вставка с объектом — единственное тёмное пятно первого экрана. */
+  .hn__card-pic {
+    display: grid;
+    place-items: center;
+    min-height: 132px;
+    border-radius: 19px;
+    background:
+      radial-gradient(70% 70% at 50% 60%, rgba(61, 79, 255, 0.55) 0%, rgba(61, 79, 255, 0) 72%),
+      var(--night);
+    overflow: hidden;
+  }
+
+  .hn__card-pic img {
+    width: 150%;
+    max-width: none;
+    height: auto;
+    transition: transform 900ms var(--ease-out);
+  }
+
+  .hn__card:hover .hn__card-pic img {
+    transform: scale(1.08) rotate(-4deg);
+  }
+
+  .hn__card-body {
+    display: grid;
+    justify-items: start;
+    align-content: start;
+    padding: 12px 12px 10px 16px;
+  }
+
+  .hn__card-v {
+    font-family: var(--font-head);
+    font-weight: 380;
+    font-size: clamp(1.75rem, 1.2rem + 1.3vw, 2.375rem);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    color: var(--accent-text);
+    white-space: nowrap;
+  }
+
+  .hn__card-v span {
+    font-size: 0.5em;
+    letter-spacing: -0.02em;
+  }
+
+  .hn__card-l {
+    margin-top: 2px;
+    font-family: var(--font-display);
+    font-weight: 550;
+    font-size: var(--fs-0);
+    letter-spacing: -0.02em;
+  }
+
+  .hn__card-spark {
+    display: none;
+    fill: var(--ink);
+  }
+
+  .hn__card-t {
+    margin-top: 10px;
+    font-size: var(--fs-xs);
+    line-height: 1.4;
+    color: var(--muted);
+  }
+
+  .hn__card-who {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-xs);
+    line-height: 1.25;
+    text-align: left;
+  }
+
+  .hn__card-who img {
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .hn__card-who i {
+    font-style: normal;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  /* --- Под рамой: метки сетки и подсказка о прокрутке -------------------------- */
+  .hn__scroll {
+    display: grid;
+    grid-template-columns: auto 1fr auto 1fr auto;
+    align-items: center;
+    justify-items: center;
+    padding: 14px 6px 0;
+    font-family: var(--font-display);
+    font-weight: 550;
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .hn__scroll:hover {
+    color: var(--accent-text);
+  }
+
+  /* Крестик «+»: две линии по 1,5px. */
+  .hn__scroll i {
+    width: 11px;
+    height: 11px;
+    background:
+      linear-gradient(currentColor, currentColor) center / 100% 1.5px no-repeat,
+      linear-gradient(currentColor, currentColor) center / 1.5px 100% no-repeat;
+    color: var(--ink);
+  }
+
+  /* --- Сборка первого экрана: CSS, стартует с первой отрисовки, не ждёт скриптов. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hn__line > span {
+      animation: hn-line 1.1s var(--ease-out) backwards;
+    }
+
+    .hn__line--1 > span { animation-delay: 0.08s; }
+    .hn__line--2 > span { animation-delay: 0.18s; }
+
+    .hn__spark {
+      animation: hn-spark 1.2s var(--ease-out) 0.7s backwards;
+    }
+
+    .hn__object {
+      animation: hn-object 1.6s var(--ease-out) 0.1s backwards;
+    }
+
+    .hn__aside,
+    .hn__cta,
+    .hn__note,
+    .hn__stats,
+    .hn__social,
+    .hn__card {
+      animation: hn-up 0.9s var(--ease-out) 0.5s backwards;
+    }
+
+    .hn__card {
+      animation-delay: 0.62s;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hn__float {
+      animation: none;
+    }
+  }
+
+  @keyframes hn-line {
+    from {
+      transform: translateY(110%);
+    }
+  }
+
+  @keyframes hn-spark {
+    from {
+      scale: 0;
+      rotate: -120deg;
+    }
+  }
+
+  /* Без затухания: объект — LCP-элемент, он должен быть виден с первой отрисовки. */
+  @keyframes hn-object {
+    from {
+      scale: 0.88;
+      rotate: -5deg;
+    }
+  }
+
+  @keyframes hn-up {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+  }
+
+  /* --- Планшет: карточка с ценой рядом с фактами ------------------------------- */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .hn__stage {
+      padding: 36px 32px 28px;
+    }
+
+    .hn__card {
+      grid-template-columns: 200px minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 420px) {
+    .hn__stat {
+      padding: 16px 14px 18px;
+    }
+
+    .hn__btn {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  /* --- Широкий экран: композиция референса, шапка внутри сцены ----------------- */
+  @media (min-width: 1024px) {
+    /* Сцена поднимается под шапку и почти до краёв окна; контент выровнен по полям шапки. */
+    :global(.page:not(:has(.pv))) .hn {
+      margin-top: calc(-1 * (var(--hdr-inset) + 68px));
+    }
+
+    .hn {
+      padding-top: 0;
+      margin-inline: calc(var(--margin) - var(--page-pad));
+    }
+
+    .hn__stage {
+      --pad-x: calc(var(--page-pad) - var(--margin));
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-template-rows: auto auto 1fr auto;
+      column-gap: var(--gap);
+      row-gap: 0;
+      min-height: min(calc(100svh - var(--margin) - 48px), 1000px);
+      padding: calc(var(--hdr-inset) + 56px + clamp(28px, 6vh, 84px)) var(--pad-x) clamp(22px, 3.4vh, 40px);
+      border-radius: var(--radius-lg);
+    }
+
+    .hn__head {
+      grid-column: 1 / 11;
+      grid-row: 1;
+      flex-wrap: nowrap;
+    }
+
+    /* Заголовок и подпись не сжимаются: иначе маска строки срезает искру в конце. */
+    .hn__title,
+    .hn__aside {
+      flex: none;
+    }
+
+    /* На низких экранах (ноутбуки 1280×720, 1366×768) заголовок ограничен высотой окна. */
+    .hn__title {
+      font-size: min(clamp(3rem, 0.4rem + 5vw, 5.75rem), 11vh);
+      white-space: nowrap;
+    }
+
+    .hn__aside {
+      padding-top: 1.1em;
+    }
+
+    /* Пояснение — под кнопкой: рядом с ней оно упиралось бы в объект. */
+    .hn__cta {
+      grid-column: 1 / 5;
+      grid-row: 2;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+      margin-top: clamp(20px, 3.4vh, 40px);
+    }
+
+    .hn__note {
+      grid-column: 10 / 13;
+      grid-row: 1;
+      justify-self: end;
+      max-width: 30ch;
+      padding-top: 0.6em;
+      font-size: var(--fs-xs);
+    }
+
+    /* Объект — по центру сцены, чуть правее и ниже заголовка. */
+    .hn__object {
+      position: absolute;
+      left: 57%;
+      top: 58%;
+      width: clamp(480px, 54%, 900px);
+      translate: -50% -50%;
+    }
+
+    .hn__stats {
+      grid-column: 1 / 5;
+      grid-row: 4;
+      align-self: end;
+      gap: var(--gap);
+    }
+
+    .hn__social {
+      grid-column: 8 / 10;
+      grid-row: 4;
+      align-self: end;
+      justify-self: end;
+      display: grid;
+      grid-template-columns: 56px 56px auto;
+      grid-template-rows: 56px 56px;
+      gap: 8px;
+      margin-right: clamp(8px, 1.4vw, 28px);
+    }
+
+    /* «Лесенка»: первый квадрат выше и правее, второй ниже и левее — как в референсе. */
+    .hn__social li:nth-child(1) {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .hn__social li:nth-child(2) {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .hn__social-l {
+      grid-column: 2 / 4;
+      grid-row: 2;
+      align-self: center;
+      margin-left: 8px;
+    }
+
+    .hn__card {
+      grid-column: 10 / 13;
+      grid-row: 2 / 5;
+      align-self: end;
+      justify-self: end;
+      width: min(100%, 290px);
+      margin-top: 20px;
+      grid-template-columns: minmax(0, 1fr);
+      text-align: center;
+    }
+
+    .hn__card-pic {
+      aspect-ratio: 5 / 4;
+      min-height: 0;
+    }
+
+    .hn__card-body {
+      justify-items: center;
+      padding: 18px 14px 14px;
+    }
+
+    .hn__card-spark {
+      display: block;
+      width: 26px;
+      height: 26px;
+      margin-top: 14px;
+    }
+
+    .hn__card-t {
+      margin-top: 14px;
+    }
+  }
+
+  /* Невысокий широкий экран: объект меньше, карточки компактнее. */
+  @media (min-width: 1024px) and (max-height: 800px) {
+    .hn__stage {
+      padding-top: calc(var(--hdr-inset) + 56px + 24px);
+    }
+
+    .hn__object {
+      width: clamp(440px, 48%, 720px);
+    }
+
+    .hn__stat {
+      padding: 14px 16px 16px;
+    }
+
+    .hn__stat-t {
+      margin-top: 8px;
+    }
+
+    .hn__card-pic {
+      aspect-ratio: 16 / 9;
+    }
+
+    .hn__card-spark {
+      display: none;
+    }
+  }
+</style>

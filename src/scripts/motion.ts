@@ -8,8 +8,7 @@
  *  [data-stagger]               — дети контейнера появляются по очереди;
  *  [data-speed="1.5"]           — параллакс (только крупные экраны);
  *  [data-tilt-area] / [data-tilt] / [data-float] — реакция на курсор;
- *  [data-magnetic]              — «магнитная» кнопка;
- *  [data-pixels]                — пиксельное слово собирается из пикселей при появлении.
+ *  [data-magnetic]              — «магнитная» кнопка.
  *
  * Без скрипта и при prefers-reduced-motion весь контент виден сразу.
  */
@@ -32,7 +31,7 @@ export async function initMotion(): Promise<void> {
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const wide = window.matchMedia('(min-width: 1024px)').matches;
 
-  const phases = [heroIntro, splitHeadings, reveals, footerBlocks, pixels];
+  const phases = [heroIntro, splitHeadings, reveals, footerBlocks];
   if (wide) phases.push(parallax);
   if (finePointer) phases.push(tilt, magnetic);
   for (const run of phases) {
@@ -183,21 +182,6 @@ function footerBlocks(): void {
         paused: true,
       }),
     '-8%',
-  );
-}
-
-/** Пиксельные слова собираются в случайном порядке, когда попадают на экран. */
-function pixels(): void {
-  playOnEnter(gsap.utils.toArray<SVGSVGElement>('[data-pixels]'), (svg) =>
-    gsap.from(svg.querySelectorAll('rect'), {
-      opacity: 0,
-      scale: 0.2,
-      transformOrigin: '50% 50%',
-      duration: 0.5,
-      ease: EASE,
-      stagger: { each: 0.004, from: 'random' },
-      paused: true,
-    }),
   );
 }
 

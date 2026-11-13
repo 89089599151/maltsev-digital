@@ -5,7 +5,6 @@
  * На странице услуг — все семь этапов списком: срок, что происходит и что нужно от вас.
  * Секция статична: без закрепления и горизонтальной ленты, на любом экране читается сверху вниз.
  */
-import PixelWord from './PixelWord.astro';
 import SectionHead from './SectionHead.astro';
 import { stages, stagesShort, type Stage } from '@/data/content';
 import { url } from '@/lib/url';
@@ -31,10 +30,10 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
     {
       list.map((s, i) => (
         <li class="ps__step">
-          <PixelWord text={String(i + 1).padStart(2, '0')} class="ps__num" />
+          <span class="ps__num num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
           <div class="ps__head">
             <h3 class="ps__name">{s.name}</h3>
-            <p class="ps__dur">{s.duration}</p>
+            <p class="ps__dur"><span class="chip chip--line">{s.duration}</span></p>
           </div>
           <p class="ps__text">{s.text}</p>
           {s.fromYou && (
@@ -55,10 +54,14 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
     padding: 0;
   }
 
-  .ps__step :global(.ps__num) {
-    width: 56px;
-    height: auto;
-    color: var(--accent-graphic);
+  /* Номер шага: тонкие крупные цифры акцентом. */
+  .ps__num {
+    font-family: var(--font-head);
+    font-weight: 300;
+    font-size: clamp(2.25rem, 1.4rem + 2vw, 3.25rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    color: var(--accent-text);
   }
 
   .ps__head {
@@ -67,17 +70,14 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
   }
 
   .ps__name {
+    font-weight: 500;
     font-size: var(--fs-2);
-    line-height: 1;
-    letter-spacing: -0.03em;
-    text-transform: uppercase;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
   }
 
   .ps__dur {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: var(--fs-xs);
-    color: var(--accent-text);
+    display: flex;
   }
 
   .ps__text {
@@ -95,26 +95,53 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
 
   .ps__you span {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 600;
     font-size: var(--fs-xs);
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
+    letter-spacing: 0;
     color: var(--muted);
   }
 
-  /* Главная: четыре колонки под общей чертой. */
+  /* Главная: четыре белые карточки в ряд, последняя — акцентная (запуск). */
   .ps--compact .ps__list {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: clamp(24px, 3vw, 48px);
+    gap: var(--gap);
   }
 
   .ps--compact .ps__step {
     display: grid;
     align-content: start;
     gap: 18px;
-    padding-top: clamp(20px, 2vw, 28px);
-    border-top: 2px solid var(--ink);
+    padding: clamp(20px, 1.8vw, 28px);
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+  }
+
+  /* Воздух под номером одинаковый во всех карточках — названия шагов стоят на одной линии. */
+  .ps--compact .ps__num {
+    margin-bottom: clamp(36px, 5vw, 88px);
+  }
+
+  .ps--compact .ps__head {
+    gap: 12px;
+  }
+
+  .ps--compact .ps__step:last-child {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .ps--compact .ps__step:last-child .ps__num {
+    color: var(--accent-ink);
+  }
+
+  .ps--compact .ps__step:last-child .ps__text {
+    color: var(--on-accent-muted);
+  }
+
+  .ps--compact .ps__step:last-child :global(.chip) {
+    color: var(--accent-ink);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
   }
 
   /* Услуги: строка на этап — номер, название и срок, описание, что нужно от вас. */
@@ -148,35 +175,35 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
       grid-column: 2;
     }
 
-    .ps__step :global(.ps__num) {
-      width: 48px;
-    }
   }
 
   @media (max-width: 767px) {
     .ps--compact .ps__list {
       grid-template-columns: minmax(0, 1fr);
-      gap: 28px;
     }
 
-    .ps--compact .ps__step,
+    .ps--compact .ps__step {
+      gap: 14px;
+      border-radius: 22px;
+    }
+
+    .ps--compact .ps__num {
+      margin-bottom: 12px;
+    }
+
     .ps--full .ps__step {
       grid-template-columns: 40px minmax(0, 1fr);
       gap: 10px 16px;
     }
 
-    .ps--compact .ps__step > :not(:global(.ps__num)),
-    .ps--full .ps__step > :not(:global(.ps__num)) {
+    .ps--full .ps__step > :not(.ps__num) {
       grid-column: 2;
     }
 
-    .ps--compact .ps__step :global(.ps__num),
-    .ps--full .ps__step :global(.ps__num) {
+    .ps--full .ps__step .ps__num {
       grid-row: 1 / 4;
-    }
-
-    .ps__step :global(.ps__num) {
-      width: 40px;
+      font-size: 1.75rem;
+      line-height: 1.1;
     }
   }
 </style>

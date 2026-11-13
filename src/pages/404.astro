@@ -17,7 +17,7 @@ const links = [
 ---
 
 <Base title="Страница не найдена" description="Такой страницы нет. Перейдите на главную или в другой раздел." noindex>
-  <PageHero id="nf-title" title="Такой страницы нет" pixel="404" lead="Возможно, адрес изменился или в нём опечатка. Вот куда можно перейти:">
+  <PageHero id="nf-title" title="Такой страницы нет" word="404" lead="Возможно, адрес изменился или в нём опечатка. Вот куда можно перейти:">
     <Fragment slot="actions">
       <ul class="nf__links">
         {
@@ -40,7 +40,7 @@ const links = [
     justify-self: end;
     width: clamp(140px, 16vw, 240px);
     height: auto;
-    filter: drop-shadow(0 24px 24px rgba(21, 21, 21, 0.2));
+    filter: hue-rotate(208deg) saturate(1.25) drop-shadow(0 24px 24px rgba(10, 11, 20, 0.2));
     animation: nf-spin 24s linear infinite;
   }
 
@@ -73,12 +73,13 @@ const links = [
     border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.75);
     font-family: var(--font-display);
-    font-weight: 650;
+    font-weight: 560;
     text-decoration: none;
     transition: background-color var(--dur-fast) var(--ease-out);
   }
 
   .nf__link:hover {
     background: var(--accent);
+    color: var(--accent-ink);
   }
 </style>

@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '@/layouts/Base.astro';
-import HeroRetro from '@/components/HeroRetro.astro';
+import HeroNova from '@/components/HeroNova.astro';
 import ManifestSplit from '@/components/ManifestSplit.astro';
 import WorkFeature from '@/components/WorkFeature.astro';
 import ProcessSteps from '@/components/ProcessSteps.astro';
@@ -18,7 +18,7 @@ const homeFaq = faq.filter((f) => f.home);
 ---
 
 <Base>
-  <HeroRetro />
+  <HeroNova />
   <ManifestSplit />
   {featured && <WorkFeature project={featured} />}
   <Packages />

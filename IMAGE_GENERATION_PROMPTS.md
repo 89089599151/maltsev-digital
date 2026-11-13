@@ -1,165 +1,85 @@
-# Задания на генерацию изображений — v2, ретро-оранжевый набор (GPT Image)
+# Задания на генерацию изображений — v3, белая тема с синим акцентом (GPT Image)
 
-Первая версия (синее стекло и хром) больше не подходит: сайт перешёл на тёплую светлую палитру
-с оранжевым и пиксельной типографикой. Старые промпты остались в истории git.
+Вторая версия (ретро-оранжевый набор) больше не подходит: сайт перешёл на белую тему с холодным
+лавандовым полем и одним акцентом — синим электриком `#1A2FFB`. Старые промпты остались в истории git.
 
-**Как генерировать.** ChatGPT → создать изображение (GPT Image). В каждом запросе вставляйте
-промпт задания и в конце — блок «Общий стиль». Просите PNG с прозрачным фоном. Если прозрачность
-не получилась — фон ровный `#DEDDD8` без градиента и теней, я вырежу сам.
+**Как генерировать.** ChatGPT → создать изображение (GPT Image). В запрос вставьте промпт задания
+и в конце — блок «Общий стиль». Просите PNG с прозрачным фоном. Если прозрачность не получилась —
+фон ровный белый `#FFFFFF` без градиента и теней, я вырежу сам.
 
 **Как отдать.** Пришлите PNG с именем из задания. Я положу его в `src/assets/gen/`, сайт подхватит
-файл автоматически, а временная оранжевая перекраска старой картинки отключится сама.
+файл сам: сейчас в центре первого экрана временно стоит стеклянная лента из первого набора
+(`hero-sculpture.png`), она отключится автоматически.
 
-**Порядок важности:** 01 (первый экран) → 02–04 (парящие элементы) → 05–08 (услуги) → 09 (по желанию).
-Начните с IMG-01: от него зависит, как выглядит первая страница. Сделайте 3–4 варианта и выберите
-лучший, остальные можно не присылать.
+Нужна одна картинка — IMG-01. Сделайте 3–4 варианта и выберите лучший.
+
+## Выполнено 14 ноября 2026
+
+Встроенным генератором изображений подготовлена уточнённая версия медузы с прозрачностью:
+`src/assets/gen/hero-object-v2.png`. Первый экран использует её и сохраняет исходник как запасной.
+Изображения для кейса — реальные снимки сайта, а не сгенерированные макеты.
+
+Финальный запрос редактирования (исходник — `hero-object.png`, прозрачный фон включён):
+
+```text
+Use case: background-extraction. Asset type: premium 3D glass jellyfish hero for the white-and-electric-blue Maltsev Digital website. Edit target: the supplied blue glass jellyfish image. Preserve its elegant jellyfish silhouette, bell in upper right, ribbon tentacles sweeping lower left, electric-blue #1A2FFB glass, white specular highlights, subtle silver edges, and three-quarter view. Remove the entire black/blue backdrop AND every diffuse outer glow or halo around the object. Produce genuinely transparent alpha outside the jellyfish with clean edges so it composites naturally on white or near-black. Preserve luminous glass details only INSIDE the object, no opaque rectangular background, no added objects, no text, no watermarks. Keep the entire jellyfish inside a horizontal 3:2 canvas with 10% clear margin around all extremities. High-end polished studio render, crisp glass refraction, no floor, no ground shadow.
+```
 
 ---
 
-## Общий стиль — добавлять в конец каждого промпта
+## Превью для соцсетей — выполнено
+
+Файл `public/og-white-blue.jpg`, 1200×630. Встроенный генератор заменил прежнюю скульптуру
+на новую медузу, сохранив заголовок, бренд и подписи. Результат сжат в JPEG для быстрой загрузки.
+Исходное `public/og.jpg` сохранено. Запрос:
+
+```text
+Use case: precise-object-edit. Asset type: 1200x630 social sharing preview for Maltsev Digital. Image 1 is the edit target: keep its whole layout, typography, every word and every character, blue m brand mark, white rounded card, pale lavender outer margin, left title and the three bottom pills completely unchanged. Image 2 is the supporting insert: the new blue glass jellyfish. Change ONLY the blue-and-chrome infinity-loop object on the right of Image 1: remove it and replace it with the jellyfish from Image 2, attractively fitted entirely in the right half, clear glass with electric-blue #1A2FFB accents. Bell at upper right, tentacles sweeping toward lower left. Give it clean natural edges on the white card, no black field and no dark halo, no clipping outside the card. Do not overlap or obscure any existing text or pills. Keep text exactly: MALTSEV DIGITAL; Сайты для бизнеса и экспертов под ключ; от 29 000 ₽; от 7 рабочих дней; один исполнитель. No new text, no added decorations, no watermark. Preserve the wide 1200:630 composition.
+```
+
+## Общий стиль — добавлять в конец промпта
 
 ```
-Style: retro-futuristic 1980s industrial design shown as a premium 3D product render. Materials: warm off-white matte plastic (#F2F0EA), light warm grey soft-touch plastic (#D7D6D0), glossy safety-orange plastic accents (#FF6700), small graphite-black details (#202020), a few tiny brushed-steel screws. Chunky geometric forms with softly rounded edges, visible panel seams, tiny vents and buttons, toy-like but precise and expensive. Soft studio lighting from the top left with a large softbox, gentle ambient occlusion, a very soft contact shadow under the object only. Clean, calm, minimal, lots of empty space. Original design, no brand marks. No text, no letters, no numbers, no logos anywhere, including on screens. Transparent background.
+Style: premium 3D product render, the look of a modern creative studio website. Materials: clear and deep-blue glass with strong refraction and soft caustics, electric blue (#1A2FFB) as the main color, lighter azure and white highlights, a small amount of polished silver chrome as an accent. Smooth flowing organic forms, no hard edges. Bright, clean studio lighting from the top left, crisp white speculars, gentle inner glow inside the glass, no outer glow or halo around the object. The object floats in empty space. No floor, no shadow on the ground, no background scene. No text, no letters, no numbers, no logos. Transparent background.
 ```
 
-**Палитра:** тёплый белый пластик, светло-серый, оранжевый `#FF6700` как акцент (не больше 30% объекта),
-графит. **Нельзя для всех картинок:** текст и буквы (в том числе на экранах), логотипы и знакомые
-бренды (Apple, Macintosh, IBM, Polaroid и т. п.), люди и руки, синий и фиолетовый, неон и свечение,
-хром «жидкий металл», стекло как основной материал, пол, стол, подставка, фон-пейзаж, шум, мультяшный
-и пластилиновый вид, «AI-глянец» с пересветом.
+**Палитра:** синий `#1A2FFB` (основной), голубой и белые блики, немного серебряного хрома.
+**Нельзя:** оранжевый, фиолетовый и розовый; пиксели, кубики и ретро-техника; текст и логотипы; люди
+и руки; тёмный фон и внешнее свечение вокруг объекта (на белой странице оно даёт грязный ореол);
+пол, подставка, пейзаж; шум и зерно.
 
 ---
 
-## IMG-01 · `hero-machine.png` — главный объект первого экрана
+## IMG-01 · `hero-object.png` — главный объект первого экрана
 
-**Назначение.** Символ бренда: «машина, которая собирает сайты». Стоит в центре серой сцены первого
-экрана, за ней — крупный заголовок, вокруг парят курсор, окно и кубики (IMG-02…04). Должна читаться
-с первого взгляда и на телефоне.
+**Назначение.** Единственный крупный объект на белой сцене первого экрана: стоит в центре, чуть
+правее и ниже заголовка, справа его частично перекрывает белая карточка с ценой. Тот же файл
+в уменьшенном виде стоит на тёмной вставке этой карточки, поэтому он должен хорошо смотреться
+и на белом, и на почти чёрном.
 
 **Формат.** 1536×1024 (горизонтально, 3:2), прозрачный PNG.
 
-**Промпт — основной вариант (ретро-компьютер):**
+**Промпт — основной вариант (медуза, как на референсе):**
 
 ```
-A single hero object: an original retro-futuristic desktop computer that builds websites. A chunky all-in-one unit with a deep rounded CRT body in warm off-white plastic, a recessed screen with a slightly curved glass, a thick orange bezel ring around the screen, a small detached keyboard with oversized keys (a few keys orange) connected by a coiled graphite cable, a floppy-style slot and two small dials on the front. The screen shows an abstract orange-and-cream pixel-art layout of a web page built from simple rectangles and squares, no readable text. From the top of the screen a few small pixel cubes (cream and orange) float upward, as if the page is being assembled out of the machine. Three-quarter view from slightly above, camera at 35 mm, object centered and occupying about 65% of the frame width, generous empty space on all sides.
+A single hero object: a stylized jellyfish made of deep electric-blue glass. A large smooth translucent bell (dome) with a glossy surface and soft inner glow, visible delicate ribs inside the dome, a ruffled edge, and long flowing translucent tentacles and ribbon-like arms trailing down and slightly to the left, as if drifting in slow water. The glass is saturated blue in the thick parts and almost clear azure in the thin parts, with white specular highlights along the top of the bell and thin silver-chrome edges on a few ribbons. Three-quarter view, slightly from below, the bell in the upper right, tentacles sweeping to the lower left. The object occupies about 70% of the frame width, nothing is cropped, generous empty space on all sides.
 ```
 
-**Вариант B (сборочный автомат):**
+**Вариант B (абстрактная лента — ближе к тому, что стоит сейчас):**
 
 ```
-A single hero object: an original retro-futuristic assembly machine that prints websites. A compact boxy device in warm off-white plastic with an orange articulated arm on top, the arm placing a small cream-colored pixel cube onto a growing stack of cubes that forms a tiny web page layout on a tray in front of the machine. Round porthole window on the side showing more cubes inside, two chunky orange buttons, a graphite rubber base. Three-quarter view from slightly above, 35 mm, object centered, about 65% of the frame width, generous empty space.
+A single hero object: an abstract continuous ribbon of thick deep-blue glass twisted into a soft infinity-like loop, one side of the ribbon polished silver chrome, the other clear electric-blue glass with caustics inside. Smooth, heavy, liquid form. Three-quarter view from slightly above, object centered and occupying about 70% of the frame width, nothing cropped, generous empty space.
 ```
 
-**Вариант C (монитор на ножках):**
+**Вариант C (капля-сфера):**
 
 ```
-A single hero object: an original retro-futuristic monitor-robot. A rounded CRT monitor in warm off-white plastic standing on four short orange legs with graphite feet, a small antenna with an orange ball on top, side handles, a front panel with dials. The screen shows an abstract pixel-art web page made of orange and cream rectangles, no readable text. Slight playful tilt, three-quarter view from slightly above, 35 mm, centered, about 60% of the frame width, generous empty space.
+A single hero object: a large soft blob of deep electric-blue glass, like a drop of liquid frozen in weightlessness, with two smaller drops separating from it on the right side. Inside the glass — smooth swirling layers of lighter azure. One thin silver-chrome ring loosely orbits the main drop at an angle. Three-quarter view, object centered, about 60% of the frame width, nothing cropped, generous empty space.
 ```
 
-**Композиция.** Объект по центру, ничего не обрезано, слева и справа запас по 15–20% — на десктопе
-слева от объекта стоит заголовок, на телефоне картинка кадрируется ближе к квадрату.
-**Камера.** Чуть сверху, три четверти, без сильной перспективы.
-**Интеграция.** `src/components/HeroRetro.astro` → `.hr__machine`. После получения файла пересоберу
-композицию первого экрана: объект справа от заголовка без наложения на текст, пиксельное слово за ним.
-**Анимация.** Медленное парение (±10 px, 7 с), лёгкий наклон за курсором, на прокрутке уходит вниз.
-
----
-
-## IMG-02 · `float-cursor.png` — парящий курсор
-
-**Назначение.** Маленький объект возле главного: «действие, клик, заявка».
-**Формат.** 1024×1024, прозрачный PNG.
-
-```
-A single chunky 3D mouse-pointer arrow built from small extruded pixel cubes, like voxel art: glossy safety-orange cubes with a thin off-white outline layer, slightly thick, floating at a playful angle. Three-quarter view, centered, occupying about 55% of the frame, lots of empty space.
-```
-
-**Интеграция.** `.hr__bit--f1`, справа сверху от объекта. **Анимация.** Своё покачивание (6 с), сильнее
-реагирует на курсор, чем главный объект.
-
----
-
-## IMG-03 · `float-window.png` — парящее окно браузера
-
-**Назначение.** «Сайт» как предмет: маленькое окно, будто вылетевшее из машины.
-**Формат.** 1024×1024, прозрачный PNG.
-
-```
-A small chunky 3D browser window as a physical object: an off-white plastic frame with rounded corners and noticeable thickness, an orange title bar strip with three small round graphite buttons, the window area filled with an abstract pixel layout of cream and orange rectangles, no readable text. Tilted in three-quarter view about 20 degrees, centered, occupying about 55% of the frame.
-```
-
-**Интеграция.** `.hr__bit--f2`, слева от объекта. **Анимация.** Покачивание 8 с, сдвиг за курсором.
-
----
-
-## IMG-04 · `float-cubes.png` — парящие пиксельные кубики
-
-**Назначение.** «Сборка из блоков» — связывает 3D-объект с пиксельной типографикой сайта.
-**Формат.** 1024×1024, прозрачный PNG.
-
-```
-A loose floating cluster of eight small 3D cubes, like pixels coming apart: five off-white matte plastic cubes, two glossy safety-orange cubes, one graphite cube, rounded edges, slightly different rotations, arranged in a loose diagonal group with small gaps. Centered, occupying about 50% of the frame.
-```
-
-**Интеграция.** `.hr__bit--f3`, внизу справа от объекта. **Анимация.** Покачивание 7,5 с.
-
----
-
-## IMG-05 · `svc-landing.png` — услуга «Лендинг»
-
-**Назначение.** Объект в карточке услуги, 150 px на десктопе. Метафора: громко рассказать об одном
-предложении.
-**Формат.** 1024×1024, прозрачный PNG.
-
-```
-A single object: an original retro-futuristic megaphone in warm off-white plastic with a glossy orange bell, a graphite grip with a trigger, a small coiled cable. Three-quarter view, slight upward tilt, centered, occupying about 70% of the frame.
-```
-
-## IMG-06 · `svc-business.png` — услуга «Сайт компании»
-
-**Метафора:** несколько страниц и разделов — модульное здание.
-
-```
-A single object: a small retro-futuristic modular tower made of four stacked plastic modules of slightly different sizes, off-white and light grey, one module orange, each module with tiny window slits and vents, a short antenna on top. Three-quarter view from slightly above, centered, occupying about 70% of the frame.
-```
-
-## IMG-07 · `svc-catalog.png` — услуга «Каталог»
-
-**Метафора:** карточки товаров — картотека.
-
-```
-A single object: a retro-futuristic card-index box in off-white plastic with a slightly open drawer, a row of cards inside with orange tabs sticking out, a graphite pull handle. Three-quarter view from slightly above, centered, occupying about 70% of the frame.
-```
-
-## IMG-08 · `svc-personal.png` — услуга «Сайт специалиста»
-
-**Метафора:** личный бренд и портфолио — камера.
-
-```
-A single object: an original retro-futuristic instant camera in off-white plastic with a large round lens ring in orange, a small graphite viewfinder, a blank cream-colored photo card sliding out of the front slot. Three-quarter view, centered, occupying about 70% of the frame.
-```
-
-**Для IMG-05…08.** Одинаковый ракурс, свет и масштаб: в сетке 2×2 они должны выглядеть как серия.
-**Интеграция.** `src/components/ServicesGrid.astro` → `.sv__obj`, в правом верхнем углу карточки.
-**Анимация.** При наведении на карточку объект поворачивается на −10° и немного растёт.
-
----
-
-## IMG-09 · `float-plane.png` — бумажный самолётик (по желанию)
-
-**Назначение.** Акцент в блоке заявки «Расскажите о задаче» на тёмном фоне.
-**Формат.** 1024×1024, прозрачный PNG.
-
-```
-A single paper plane folded from thick off-white and safety-orange plastic sheets, crisp folds, in flight, three-quarter view from below-left, centered, occupying about 60% of the frame. Lit so it reads well on a dark graphite background.
-```
-
----
-
-## Проверка перед отправкой
-
-- На изображении нет текста, букв и цифр, в том числе на экранах.
-- Оранжевый — акцент, а не основной цвет объекта.
-- Фон прозрачный или ровный `#DEDDD8`.
-- Объект целиком в кадре, вокруг есть пустое место.
-- IMG-01…04 выглядят как одна сцена, IMG-05…08 — как одна серия.
+**Композиция.** Основная масса объекта — в центре и справа, слева вверху пусто: там заголовок
+и кнопка. Ничего не обрезано, по краям запас 10–15%.
+**Камера.** Три четверти, без сильной перспективы.
+**Интеграция.** `src/components/HeroNova.astro`: `genImage('hero-object')`, запасной —
+`hero-sculpture`. Размер и положение на сцене — `.hn__object`, вставка в карточке — `.hn__card-pic`.
+**Анимация.** Медленное парение (±14 px, 8 с) и лёгкий сдвиг за курсором — уже есть в коде.

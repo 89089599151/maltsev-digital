@@ -1,10 +1,11 @@
 ---
-import PixelWord from './PixelWord.astro';
+import LogoMark from './LogoMark.astro';
 import { url, isActive } from '@/lib/url';
 import { site } from '@/config/site';
 import Icon from './Icon.astro';
 
 const nav = [
+  { href: '/', label: 'Главная' },
   { href: '/portfolio/', label: 'Работы' },
   { href: '/services/', label: 'Услуги и цены' },
   { href: '/about/', label: 'Обо мне' },
@@ -16,7 +17,7 @@ const current = Astro.url.pathname;
 <header class="hdr" data-header>
   <div class="hdr__row">
     <a class="hdr__brand" href={url('/')} aria-label={`${site.brand.name.value} — на главную`}>
-      <PixelWord text="M" appear="none" class="hdr__mark" />
+      <LogoMark class="hdr__mark" />
       <span class="hdr__name">{site.brand.short}<span> {site.brand.second}</span></span>
     </a>
     <nav class="hdr__nav" aria-label="Основная навигация">
@@ -32,7 +33,7 @@ const current = Astro.url.pathname;
         }
       </ul>
     </nav>
-    <a class="hdr__cta btn btn--ink" href={url('/contacts/')} data-magnetic>
+    <a class="hdr__cta btn btn--accent" href={url('/contacts/')} data-magnetic>
       Обсудить проект <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
     </a>
     <button class="hdr__menu" type="button" aria-haspopup="dialog" aria-controls="site-menu" data-menu-open>
@@ -44,13 +45,12 @@ const current = Astro.url.pathname;
     <div class="menu__board">
       <div class="menu__top">
         <a class="hdr__brand" href={url('/')} aria-label="На главную">
-          <PixelWord text="M" appear="none" class="hdr__mark" />
+          <LogoMark class="hdr__mark" />
           <span class="hdr__name">{site.brand.short}<span> {site.brand.second}</span></span>
         </a>
         <button class="menu__close" type="button" data-menu-close>Закрыть</button>
       </div>
       <ul class="menu__list">
-        <li><a href={url('/')}>Главная</a></li>
         {nav.map((item) => (
           <li>
             <a href={url(item.href)} aria-current={isActive(current, item.href) ? 'page' : undefined}>
@@ -66,6 +66,7 @@ const current = Astro.url.pathname;
 
 <script>
   // Шапка прячется при прокрутке вниз и возвращается при прокрутке вверх.
+  // Наверху страницы она прозрачная (на главной лежит на сцене первого экрана), при прокрутке — с фоном.
   const header = document.querySelector<HTMLElement>('[data-header]');
   if (header) {
     let lastY = window.scrollY;
@@ -75,8 +76,10 @@ const current = Astro.url.pathname;
       const y = window.scrollY;
       const hide = y > lastY && y > 240 && !header.contains(document.activeElement);
       header.classList.toggle('is-hidden', hide);
+      header.classList.toggle('is-scrolled', y > 8);
       lastY = y;
     };
+    update();
     window.addEventListener('scroll', () => {
       if (!ticking) {
         ticking = true;
@@ -114,12 +117,23 @@ const current = Astro.url.pathname;
     top: 0;
     z-index: 50;
     padding-block: var(--margin) 12px;
-    background: linear-gradient(var(--bg) 70%, rgba(246, 245, 241, 0));
+    background: linear-gradient(var(--bg) 70%, rgba(241, 242, 250, 0));
     transition: transform var(--dur) var(--ease-out);
   }
 
   .hdr.is-hidden {
     transform: translateY(-110%);
+  }
+
+  :global(.js) .hdr:not(.is-scrolled) {
+    background: none;
+  }
+
+  /* Главная, широкий экран: шапка внутри белой сцены первого экрана (HeroNova) — с отступом от её края. */
+  @media (min-width: 1024px) {
+    :global(body:has(.hn)) .hdr {
+      padding-top: calc(var(--margin) + var(--hdr-inset));
+    }
   }
 
   .hdr__row {
@@ -133,15 +147,15 @@ const current = Astro.url.pathname;
   .hdr__brand {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     justify-self: start;
     min-height: 44px;
     text-decoration: none;
   }
 
   .hdr__brand :global(.hdr__mark) {
-    width: 30px;
-    height: auto;
+    width: 32px;
+    height: 32px;
     color: var(--accent);
     transition: transform var(--dur) var(--ease-out);
   }
@@ -152,9 +166,10 @@ const current = Astro.url.pathname;
 
   .hdr__name {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 560;
     font-size: var(--step-body);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
   }
 
   .hdr__name span {
@@ -162,19 +177,22 @@ const current = Astro.url.pathname;
     font-weight: 500;
   }
 
+  /* Плашка-навигация: контурная пилюля, активный раздел — тёмная пилюля внутри. */
   .hdr__nav ul {
     list-style: none;
     display: flex;
     gap: 2px;
     padding: 5px;
-    border-radius: 14px;
-    background: var(--surface-2);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: inset 0 0 0 1px var(--line);
+    backdrop-filter: blur(14px);
   }
 
   .hdr__nav a {
     display: block;
-    padding: 10px 16px;
-    border-radius: 10px;
+    padding: 10px 18px;
+    border-radius: 999px;
     font-family: var(--font-display);
     font-weight: 500;
     font-size: var(--step-small);
@@ -187,27 +205,34 @@ const current = Astro.url.pathname;
   }
 
   .hdr__nav a:hover {
-    background: var(--surface-3);
+    background: rgba(10, 11, 20, 0.07);
     color: var(--ink);
   }
 
   .hdr__nav a[aria-current='page'] {
-    background: var(--paper);
-    color: var(--ink);
-    box-shadow: 0 1px 2px rgba(21, 21, 21, 0.1);
+    background: var(--ink);
+    color: var(--bg);
   }
 
   .hdr__cta {
     justify-self: end;
     min-height: 50px;
+    white-space: nowrap;
+  }
+
+  /* Узкий десктоп: пункты навигации плотнее, чтобы логотип и кнопка остались в одну строку. */
+  @media (min-width: 1024px) and (max-width: 1199px) {
+    .hdr__nav a {
+      padding-inline: 12px;
+    }
   }
 
   .hdr__menu {
     display: none;
     justify-self: end;
     min-height: 46px;
-    padding-inline: 18px;
-    border-radius: var(--radius-sm);
+    padding-inline: 20px;
+    border-radius: 999px;
     background: var(--ink);
     color: var(--bg);
     font-family: var(--font-display);
@@ -228,7 +253,7 @@ const current = Astro.url.pathname;
   }
 
   .menu::backdrop {
-    background: rgba(21, 21, 21, 0.4);
+    background: rgba(10, 11, 20, 0.4);
   }
 
   .menu__board {
@@ -247,8 +272,8 @@ const current = Astro.url.pathname;
 
   .menu__close {
     min-height: 46px;
-    padding-inline: 18px;
-    border-radius: var(--radius-sm);
+    padding-inline: 20px;
+    border-radius: 999px;
     background: var(--surface-2);
     font-family: var(--font-display);
     font-weight: 600;
@@ -269,15 +294,15 @@ const current = Astro.url.pathname;
     border-radius: var(--radius);
     background: var(--surface);
     font-family: var(--font-display);
-    font-weight: 650;
+    font-weight: 400;
     font-size: clamp(1.625rem, 7vw, 2.25rem);
-    letter-spacing: -0.035em;
-    text-transform: uppercase;
+    letter-spacing: -0.04em;
     text-decoration: none;
   }
 
   .menu__list a[aria-current='page'] {
-    background: var(--accent);
+    background: var(--ink);
+    color: var(--bg);
   }
 
   .menu__cta {
@@ -285,12 +310,12 @@ const current = Astro.url.pathname;
     justify-content: space-between;
     align-items: center;
     min-height: 64px;
-    padding-inline: 20px;
-    border-radius: var(--radius);
-    background: var(--ink);
-    color: var(--bg);
+    padding-inline: 24px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 600;
     font-size: var(--step-body);
     text-decoration: none;
   }

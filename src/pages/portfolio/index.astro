@@ -33,7 +33,7 @@ const hints: Record<string, string> = {
   <PageHero
     id="pf-title"
     title="Работы"
-    pixel="01"
+    word="01"
     lead="Каждый проект — с задачей, решениями и ссылкой на живой сайт. Первый кейс — этот сайт: он сделан тем же способом, каким будет сделан ваш."
   />
 
@@ -133,13 +133,13 @@ const hints: Record<string, string> = {
     padding: clamp(28px, 4vw, 56px);
     border-radius: var(--radius-lg);
     background: var(--accent);
+    color: var(--accent-ink);
   }
 
   .pf-next__title {
     font-size: var(--step-head);
-    line-height: 0.95;
-    letter-spacing: -0.04em;
-    text-transform: uppercase;
+    line-height: 1.02;
+    letter-spacing: -0.045em;
   }
 
   .pf-next__obj {
@@ -149,7 +149,7 @@ const hints: Record<string, string> = {
     width: clamp(140px, 15vw, 220px);
     height: auto;
     transform: translateY(-50%) rotate(-6deg);
-    filter: drop-shadow(0 24px 24px rgba(61, 29, 6, 0.28));
+    filter: grayscale(1) brightness(1.5) drop-shadow(0 24px 24px rgba(4, 10, 90, 0.4));
     pointer-events: none;
   }
 
@@ -259,7 +259,7 @@ const hints: Record<string, string> = {
 
   .empty__cat-name {
     font-family: var(--font-head);
-    font-weight: 700;
+    font-weight: 600;
     font-size: var(--fs-2);
     letter-spacing: -0.025em;
   }

@@ -5,7 +5,6 @@
  */
 import { Image } from 'astro:assets';
 import ContactIcon from './ContactIcon.astro';
-import PixelWord from './PixelWord.astro';
 import { site, telegramUrl, emailUrl } from '@/config/site';
 import { url } from '@/lib/url';
 import avatar from '@/assets/photos/owner-avatar.webp';
@@ -19,7 +18,6 @@ const mail = emailUrl('Заявка на разработку сайта');
 <section class="ct section" id="contact" aria-labelledby="ct-title">
   <div class="ct__stage">
     <div class="ct__info">
-      <PixelWord text="ПРИВЕТ" class="ct__px" appear="scroll" />
       <h2 id="ct-title" class="ct__title" data-split>Расскажите о задаче</h2>
       <p class="ct__sub">
         Отвечу {site.contacts.responseTime.value}: задам пару вопросов и пришлю план со сроками и ценой.
@@ -141,17 +139,10 @@ const mail = emailUrl('Заявка на разработку сайта');
     gap: clamp(18px, 2vw, 26px);
   }
 
-  .ct__info :global(.ct__px) {
-    width: clamp(120px, 12vw, 180px);
-    height: auto;
-    color: var(--accent);
-  }
-
   .ct__title {
     font-size: clamp(2.5rem, 1rem + 4.4vw, 5.5rem);
-    line-height: 0.9;
-    letter-spacing: -0.04em;
-    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: -0.045em;
     max-width: 10ch;
   }
 
@@ -177,7 +168,7 @@ const mail = emailUrl('Заявка на разработку сайта');
     min-height: 76px;
     padding: 14px 18px;
     border-radius: var(--radius);
-    background: rgba(246, 245, 241, 0.08);
+    background: rgba(241, 242, 250, 0.08);
     color: var(--night-ink);
     text-decoration: none;
     transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
@@ -185,7 +176,7 @@ const mail = emailUrl('Заявка на разработку сайта');
 
   .ct__link:hover {
     background: var(--accent);
-    color: var(--ink);
+    color: var(--accent-ink);
   }
 
   .ct__ico {
@@ -193,14 +184,14 @@ const mail = emailUrl('Заявка на разработку сайта');
     place-items: center;
     width: 44px;
     height: 44px;
-    border-radius: 10px;
+    border-radius: 50%;
     background: var(--accent);
-    color: var(--ink);
+    color: var(--accent-ink);
   }
 
   .ct__link:hover .ct__ico {
-    background: var(--ink);
-    color: var(--accent);
+    background: var(--paper);
+    color: var(--accent-text);
   }
 
   .ct__lt {
@@ -216,7 +207,7 @@ const mail = emailUrl('Заявка на разработку сайта');
 
   .ct__lv {
     font-family: var(--font-display);
-    font-weight: 650;
+    font-weight: 560;
     overflow-wrap: anywhere;
   }
 
@@ -263,10 +254,9 @@ const mail = emailUrl('Заявка на разработку сайта');
 
   .ct__card-t {
     font-family: var(--font-head);
-    font-weight: 650;
+    font-weight: 560;
     font-size: var(--fs-2);
     letter-spacing: -0.03em;
-    text-transform: uppercase;
   }
 
 
@@ -373,7 +363,7 @@ const mail = emailUrl('Заявка на разработку сайта');
     background: var(--accent);
     color: var(--accent-ink);
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 600;
     font-size: var(--step-body);
     transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
   }
@@ -426,7 +416,7 @@ const mail = emailUrl('Заявка на разработку сайта');
     gap: 6px;
     min-height: 44px;
     font-family: var(--font-display);
-    font-weight: 650;
+    font-weight: 560;
     text-decoration: none;
     border-bottom: 2px solid var(--accent);
     padding-bottom: 2px;

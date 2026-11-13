@@ -20,7 +20,7 @@ const me = [
 
 <section class="mf section" id="manifest" aria-labelledby="mf-title">
   <div class="mf__head">
-    <h2 id="mf-title" class="mf__title" data-split>ИИ ускоряет.<br />Решаю&nbsp;я.</h2>
+    <h2 id="mf-title" class="mf__title"><span class="tone-mute">ИИ ускоряет.</span><br />Решаю&nbsp;я.</h2>
     <p class="mf__lead" data-reveal>
       Нейросети забирают у разработки рутину. Освободившееся время уходит на то, что определяет результат.
     </p>
@@ -52,19 +52,18 @@ const me = [
 
   .mf__title {
     font-size: var(--step-display);
-    line-height: 0.9;
-    letter-spacing: -0.04em;
-    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: -0.045em;
   }
 
   .mf__lead {
     max-width: 40ch;
     padding-bottom: 0.4em;
     font-family: var(--font-display);
-    font-weight: 500;
+    font-weight: 400;
     font-size: var(--fs-2);
     line-height: 1.35;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
   }
 
   .mf__grid {
@@ -83,7 +82,7 @@ const me = [
 
   /* Левая колонка — контур на фоне страницы, правая — тёмная: одна плотная плашка вместо двух. */
   .mf__card--ai {
-    box-shadow: inset 0 0 0 1px var(--line);
+    background: var(--paper);
   }
 
   .mf__card--me {
@@ -92,10 +91,10 @@ const me = [
   }
 
   .mf__card-title {
+    font-weight: 360;
     font-size: var(--fs-4);
-    line-height: 0.95;
-    letter-spacing: -0.04em;
-    text-transform: uppercase;
+    line-height: 1.02;
+    letter-spacing: -0.045em;
   }
 
   .mf__list {
@@ -119,34 +118,36 @@ const me = [
 
   .mf__list li::before {
     content: '';
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
     background: var(--ink);
   }
 
   .mf__card--me .mf__list li {
-    border-color: rgba(246, 245, 241, 0.14);
+    border-color: rgba(241, 242, 250, 0.14);
   }
 
   .mf__card--me .mf__list li::before {
-    background: var(--accent);
+    background: var(--accent-on-dark);
   }
 
   .mf__foot {
     margin-top: auto;
     justify-self: start;
     align-self: flex-start;
-    padding: 8px 12px;
-    border-radius: 8px;
-    background: var(--surface);
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--bg);
     font-family: var(--font-display);
-    font-weight: 650;
+    font-weight: 550;
     font-size: var(--step-small);
     color: var(--ink);
   }
 
   .mf__card--me .mf__foot {
     background: var(--accent);
+    color: var(--accent-ink);
   }
 
   @media (max-width: 1023px) {

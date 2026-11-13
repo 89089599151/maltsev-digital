@@ -46,7 +46,7 @@ const schema = {
   <PageHero
     id="sv-title"
     title="Услуги и цены"
-    pixel="ЦЕНА"
+    word="Цена"
     lead="Делаю сайты под ключ: от структуры и текстов до запуска на вашем домене. Три пакета с понятным составом и фиксированной стоимостью."
   >
     <div class="sv-fact">
@@ -171,14 +171,14 @@ const schema = {
 
   .sv-fact--accent {
     background: var(--accent);
+    color: var(--accent-ink);
   }
 
   .sv-fact__k {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 600;
     font-size: var(--step-small);
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
   }
 
   .sv-fact__v {
@@ -231,7 +231,7 @@ const schema = {
   .col__price {
     margin-top: 10px;
     font-family: var(--font-head);
-    font-weight: 700;
+    font-weight: 600;
     font-size: var(--fs-4);
     line-height: 1;
     letter-spacing: -0.04em;
@@ -273,6 +273,7 @@ const schema = {
     content: '';
     width: 8px;
     height: 8px;
+    border-radius: 50%;
     background: var(--accent);
     transform: translateY(-1px);
   }
@@ -328,7 +329,7 @@ const schema = {
 
   .cmp__table thead th {
     font-family: var(--font-head);
-    font-weight: 700;
+    font-weight: 600;
     font-size: var(--fs-1);
     letter-spacing: -0.02em;
   }
@@ -341,7 +342,7 @@ const schema = {
   }
 
   .cmp__table :is(th, td):nth-child(4) {
-    background: rgba(255, 103, 0, 0.08);
+    background: rgba(26, 47, 251, 0.08);
   }
 
   .cmp__table:has(:is(th, td):nth-child(2):hover) :is(th, td):nth-child(4),
@@ -351,10 +352,10 @@ const schema = {
 
   .cmp__table:has(:is(th, td):nth-child(2):hover) :is(th, td):nth-child(2),
   .cmp__table:has(:is(th, td):nth-child(3):hover) :is(th, td):nth-child(3) {
-    background: rgba(255, 103, 0, 0.08);
+    background: rgba(26, 47, 251, 0.08);
   }
 
-  /* Название подсвеченного пакета — оранжевым. */
+  /* Название подсвеченного пакета — акцентом. */
   .cmp__table thead th:nth-child(4),
   .cmp__table:has(:is(th, td):nth-child(2):hover) thead th:nth-child(2),
   .cmp__table:has(:is(th, td):nth-child(3):hover) thead th:nth-child(3) {
@@ -386,7 +387,7 @@ const schema = {
   .cmp__price td {
     border-bottom: 0;
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 600;
     font-size: var(--step-body);
     color: var(--ink);
   }
@@ -468,7 +469,7 @@ const schema = {
 
   .extras__toggle:hover:not(:disabled) {
     background: var(--accent);
-    color: var(--ink);
+    color: var(--accent-ink);
   }
 
   .extras__toggle:active:not(:disabled) {
@@ -477,7 +478,7 @@ const schema = {
 
   .extras__toggle[aria-pressed='true'] {
     background: var(--accent);
-    color: var(--ink);
+    color: var(--accent-ink);
   }
 
   .extras__toggle[aria-pressed='true']:hover {
@@ -502,7 +503,7 @@ const schema = {
 
   .extras__mirror strong {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 600;
     white-space: nowrap;
   }
 
@@ -512,7 +513,7 @@ const schema = {
 
   .extras__name {
     font-family: var(--font-display);
-    font-weight: 650;
+    font-weight: 560;
     font-size: var(--step-body);
   }
 
@@ -523,7 +524,7 @@ const schema = {
 
   .extras__price {
     font-family: var(--font-head);
-    font-weight: 700;
+    font-weight: 600;
     font-size: var(--step-body);
     white-space: nowrap;
   }

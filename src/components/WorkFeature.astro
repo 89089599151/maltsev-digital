@@ -83,7 +83,7 @@ const mobile = d.responsive.mobile;
     padding: clamp(28px, 4vw, 64px);
     border-radius: var(--radius-lg);
     background:
-      radial-gradient(55% 70% at 75% 45%, var(--stage-glow) 0%, rgba(243, 242, 238, 0) 70%),
+      radial-gradient(55% 70% at 75% 45%, var(--stage-glow) 0%, rgba(255, 255, 255, 0) 70%),
       linear-gradient(180deg, var(--stage-1), var(--stage-2));
     overflow: hidden;
   }
@@ -132,7 +132,7 @@ const mobile = d.responsive.mobile;
 
   .wf__facts dd {
     font-family: var(--font-head);
-    font-weight: 650;
+    font-weight: 560;
     font-size: var(--fs-2);
     line-height: 1.05;
     letter-spacing: -0.03em;
@@ -173,18 +173,19 @@ const mobile = d.responsive.mobile;
 
   .wf__tag {
     padding: 8px 14px;
-    border-radius: 8px;
+    border-radius: 999px;
     background: var(--accent);
+    color: var(--accent-ink);
     font-family: var(--font-display);
     font-size: var(--step-small);
-    font-weight: 650;
+    font-weight: 550;
   }
 
   .wf__name {
-    font-size: var(--fs-4);
-    line-height: 0.95;
-    letter-spacing: -0.04em;
-    text-transform: uppercase;
+    font-weight: 360;
+    font-size: var(--fs-5);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
   }
 
   .wf__sum {
@@ -221,7 +222,7 @@ const mobile = d.responsive.mobile;
     border-radius: 12px 12px 0 0;
     background: var(--ink);
     overflow: hidden;
-    box-shadow: 0 40px 60px -30px rgba(21, 21, 21, 0.45);
+    box-shadow: 0 40px 60px -30px rgba(10, 11, 20, 0.45);
   }
 
   .wf__screen img {
@@ -236,7 +237,7 @@ const mobile = d.responsive.mobile;
     height: clamp(10px, 1.2vw, 18px);
     margin-inline: -6%;
     border-radius: 0 0 14px 14px;
-    background: linear-gradient(#c9c8c2, #a9a8a2);
+    background: linear-gradient(#cfd3e6, #aeb3cc);
   }
 
   .wf__phone {
@@ -249,7 +250,7 @@ const mobile = d.responsive.mobile;
     border-radius: 14px;
     background: var(--ink);
     overflow: hidden;
-    box-shadow: 0 30px 50px -20px rgba(21, 21, 21, 0.5);
+    box-shadow: 0 30px 50px -20px rgba(10, 11, 20, 0.5);
   }
 
   .wf__phone img {

@@ -20,13 +20,15 @@ interface Props {
 const {
   title,
   description = site.seo.defaultDescription,
-  ogImage = '/og.jpg',
+  ogImage = '/og-white-blue.jpg',
   noindex = false,
   schema,
 } = Astro.props;
 
 const fullTitle = title ? `${title} — ${site.brand.name.value}` : site.seo.defaultTitle;
-const canonical = new URL(Astro.url.pathname, Astro.site).href;
+// Astro отдаёт служебную страницу как 404.html даже при trailingSlash: 'always'.
+const canonicalPath = Astro.url.pathname === url('/404/') ? url('/404.html') : Astro.url.pathname;
+const canonical = new URL(canonicalPath, Astro.site).href;
 const ogUrl = new URL(url(ogImage), Astro.site).href;
 
 const orgSchema = {
@@ -50,7 +52,7 @@ const orgSchema = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
-    <meta name="theme-color" content="#f6f5f1" />
+    <meta name="theme-color" content="#f1f2fa" />
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
     <link rel="icon" href={url("/icon-32.png")} sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href={url('/apple-touch-icon.png')} />

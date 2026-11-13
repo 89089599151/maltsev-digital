@@ -65,9 +65,10 @@ const H = headingLevel;
   }
 
   .faq__side :global(.head) {
-    line-height: 0.95;
-    letter-spacing: -0.04em;
-    text-transform: uppercase;
+    font-weight: 360;
+    font-size: var(--fs-5);
+    line-height: 1.02;
+    letter-spacing: -0.05em;
   }
 
   summary {
@@ -106,7 +107,7 @@ const H = headingLevel;
     width: 36px;
     height: 36px;
     justify-self: end;
-    border-radius: 10px;
+    border-radius: 50%;
     background: var(--ink);
     color: var(--bg);
     transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
@@ -114,7 +115,7 @@ const H = headingLevel;
 
   .faq__item[open] .faq__icon {
     background: var(--accent);
-    color: var(--ink);
+    color: var(--accent-ink);
   }
 
   .faq__icon i {

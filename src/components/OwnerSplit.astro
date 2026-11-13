@@ -3,7 +3,6 @@
  * «Кто делает сайт»: фото слева, рассказ и факты справа — на серой сцене.
  */
 import { Image } from 'astro:assets';
-import PixelWord from './PixelWord.astro';
 import { site } from '@/config/site';
 import { url } from '@/lib/url';
 import owner from '@/assets/photos/owner.webp';
@@ -26,7 +25,6 @@ const facts = [
         sizes="(max-width: 1023px) 92vw, 42vw"
         loading="lazy"
       />
-      <PixelWord text="M" class="ow__mark" />
     </div>
 
     <div class="ow__body">
@@ -68,7 +66,7 @@ const facts = [
     padding: clamp(12px, 1.2vw, 18px);
     padding-right: clamp(24px, 4vw, 72px);
     border-radius: var(--radius-lg);
-    background: var(--surface);
+    background: var(--paper);
   }
 
   .ow__photo {
@@ -86,15 +84,6 @@ const facts = [
     object-position: 50% 30%;
   }
 
-  .ow__photo :global(.ow__mark) {
-    position: absolute;
-    left: 20px;
-    bottom: 20px;
-    width: 44px;
-    height: auto;
-    color: var(--accent);
-  }
-
   .ow__body {
     display: grid;
     gap: clamp(18px, 2vw, 26px);
@@ -102,17 +91,16 @@ const facts = [
   }
 
   .ow__title {
-    font-size: var(--step-head);
-    line-height: 0.95;
-    letter-spacing: -0.04em;
-    text-transform: uppercase;
+    font-size: var(--fs-5);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
   }
 
   .ow__name {
     font-family: var(--font-head);
-    font-weight: 650;
+    font-weight: 450;
     font-size: var(--fs-3);
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
   }
 
   .ow__role {
@@ -134,9 +122,9 @@ const facts = [
     display: flex;
     flex-direction: column-reverse;
     gap: 4px;
-    padding: 14px 16px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.7);
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: var(--bg);
   }
 
   .ow__facts dt {
@@ -146,7 +134,7 @@ const facts = [
 
   .ow__facts dd {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 600;
     font-size: var(--step-body);
   }
 
@@ -167,7 +155,7 @@ const facts = [
     align-items: flex-end;
     min-height: 44px;
     font-family: var(--font-display);
-    font-weight: 650;
+    font-weight: 560;
     text-decoration: none;
     border-bottom: 2px solid var(--accent);
     padding-bottom: 2px;

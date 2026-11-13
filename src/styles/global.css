@@ -1,62 +1,66 @@
 /* ==========================================================================
    MALTSEV DIGITAL — дизайн-система (DESIGN.md — правила и примеры)
-   Тёплое светлое поле, графитовая типографика, насыщенный оранжевый акцент,
-   пиксельная графика как подпись бренда. Поверхности плоские, тени мягкие.
+   Белая тема: холодное бело-лавандовое поле, белые карточки, тонкая крупная типографика,
+   один акцент — синий электрик. Кнопки-пилюли, крупные скругления, тени только у поднятых элементов.
    ========================================================================== */
 
 :root {
-  /* Цвет: семантические токены. */
-  --bg: #f6f5f1;
-  --surface: #ecebe6;
-  --surface-2: #e6e5e1;
-  --surface-3: #dad9d3;
+  /* Цвет: семантические токены. Холодное бело-лавандовое поле, почти чёрные чернила, один акцент —
+     синий электрик. */
+  --bg: #f1f2fa;
+  --surface: #e7e9f5;
+  --surface-2: #dfe2f1;
+  --surface-3: #d2d6ea;
   --surface-solid: #ffffff;
-  --ink: #151515;
-  --muted: #5c5b55;
-  /* Вторичный текст на серых сценах (первый экран, кейс): темнее --muted ради контраста. */
-  --ink-2: #3b3a36;
-  --ink-hover: #333230;
-  --accent: #ff6700;
-  --accent-ink: #151515;
-  --accent-deep: #d95500;
-  --accent-hover: #ff7d24;
-  --accent-soft: #ffe3cf;
-  /* Оранжевый текст на светлом (5:1 и выше) и значимая оранжевая графика (3:1 и выше). */
-  --accent-text: #a84400;
-  --accent-graphic: #e25b00;
-  /* Приглушённый текст на оранжевом и тонкие разделители. */
-  --on-accent-muted: #3d1d06;
+  --ink: #0a0b14;
+  --muted: #5a5d70;
+  /* Вторичный текст на сценах (первый экран, кейс): темнее --muted ради контраста. */
+  --ink-2: #33364a;
+  --ink-hover: #23263a;
+  --accent: #1a2ffb;
+  /* Текст и иконки на синем — белые (7,5:1). */
+  --accent-ink: #ffffff;
+  --accent-deep: #1020c8;
+  --accent-hover: #3d4fff;
+  --accent-soft: #dfe3ff;
+  /* Синий текст на светлом и значимая синяя графика. */
+  --accent-text: #1426d9;
+  --accent-graphic: #1a2ffb;
+  /* Синий на тёмных плашках: основной там не читается. */
+  --accent-on-dark: #8d99ff;
+  /* Приглушённый текст на синем и тонкие разделители. */
+  --on-accent-muted: #d6daff;
   /* Полупрозрачная — одинаково читается на фоне, поверхностях и сценах. */
-  --line: rgba(21, 21, 21, 0.12);
-  /* Серая «сцена» под объектами и скриншотами. */
-  --stage-1: #e3e2dd;
-  --stage-2: #d7d6d0;
-  --stage-glow: #f3f2ee;
+  --line: rgba(10, 11, 20, 0.12);
+  /* «Сцена» под объектами и скриншотами. */
+  --stage-1: #eceefa;
+  --stage-2: #dde1f3;
+  --stage-glow: #ffffff;
   --paper: #ffffff;
-  --paper-2: #f1f0eb;
-  --paper-ink: #151515;
-  --paper-muted: #55544f;
-  --night: #202020;
-  --night-ink: #f6f5f1;
-  --night-muted: #b7b5ad;
+  --paper-2: #f1f2fa;
+  --paper-ink: #0a0b14;
+  --paper-muted: #55586b;
+  --night: #0a0b14;
+  --night-ink: #f1f2fa;
+  --night-muted: #a9adc4;
   --danger: #c62f22;
   --success: #1f7a3a;
 
-  /* Шкала этапов: графит → оранжевый. */
-  --tone-1: #202020;
-  --tone-2: #2f2c29;
-  --tone-3: #4a3a2f;
-  --tone-4: #a9481a;
-  --tone-5: #ff6700;
-  --tone-6: #ff9a57;
-  --tone-7: #ffd0ad;
+  /* Шкала этапов: чернила → синий. */
+  --tone-1: #0a0b14;
+  --tone-2: #14173a;
+  --tone-3: #1a2070;
+  --tone-4: #1626b8;
+  --tone-5: #1a2ffb;
+  --tone-6: #7482ff;
+  --tone-7: #cfd4ff;
 
   /* Глубина: плоские поверхности, мягкие тени только у поднятых элементов. */
   --glass-blur: none;
-  --glass-edge: rgba(21, 21, 21, 0.06);
+  --glass-edge: rgba(10, 11, 20, 0.06);
   --glass-top: rgba(255, 255, 255, 0.7);
-  --glass-shadow: 0 1px 2px rgba(21, 21, 21, 0.06), 0 18px 36px -24px rgba(21, 21, 21, 0.28);
-  --shadow-lift: 0 2px 4px rgba(21, 21, 21, 0.08), 0 28px 50px -26px rgba(21, 21, 21, 0.4);
+  --glass-shadow: 0 1px 2px rgba(10, 11, 20, 0.06), 0 18px 36px -24px rgba(10, 11, 20, 0.28);
+  --shadow-lift: 0 2px 4px rgba(10, 11, 20, 0.08), 0 28px 50px -26px rgba(10, 11, 20, 0.4);
 
   /* Типографика. */
   --font-head: 'Onest Variable', 'Segoe UI', system-ui, sans-serif;
@@ -85,12 +89,14 @@
   /* Контейнер страницы: ширина и боковые поля. */
   --page-max: 1560px;
   --page-pad: clamp(20px, 5vw, 88px);
-  --radius: 16px;
-  --radius-sm: 10px;
-  --radius-lg: 28px;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --radius-lg: 32px;
   --pad: clamp(18px, 1.6vw, 26px);
   --section-gap: clamp(80px, 8vw, 140px);
   --header-h: 60px;
+  /* На главной (широкий экран) шапка лежит внутри сцены первого экрана — отступ от её верхнего края. */
+  --hdr-inset: clamp(14px, 1.4vw, 24px);
 
   /* Движение. */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -181,10 +187,17 @@ h2,
 h3,
 h4 {
   font-family: var(--font-head);
-  font-weight: 600;
+  font-weight: 560;
   line-height: 1.04;
   letter-spacing: -0.03em;
   text-wrap: balance;
+}
+
+/* Крупные заголовки — тонкие, строчными: тихо и крупно, как в референсе. */
+h1,
+h2 {
+  font-weight: 360;
+  letter-spacing: -0.045em;
 }
 
 p,
@@ -320,19 +333,17 @@ dd {
 
 .display {
   font-family: var(--font-head);
-  font-weight: 650;
+  font-weight: 340;
   font-size: var(--step-display);
-  line-height: 0.9;
-  letter-spacing: -0.04em;
-  text-transform: uppercase;
+  line-height: 0.96;
+  letter-spacing: -0.05em;
 }
 
 .head {
   font-family: var(--font-head);
   font-size: var(--step-head);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
-  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: -0.045em;
 }
 
 .head-sm {
@@ -413,10 +424,10 @@ dd {
   justify-content: space-between;
   gap: 14px;
   min-height: 52px;
-  padding: 14px 20px;
-  border-radius: var(--radius-sm);
+  padding: 14px 24px;
+  border-radius: 999px;
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 550;
   font-size: var(--fs-0);
   line-height: 1.1;
   letter-spacing: -0.01em;
@@ -451,12 +462,14 @@ dd {
 }
 
 .btn--ghost {
-  background: var(--surface-3);
+  background: transparent;
   color: var(--ink);
+  box-shadow: inset 0 0 0 1px rgba(10, 11, 20, 0.22);
 }
 
 .btn--ghost:hover {
-  background: #cfcec7;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--ink);
 }
 
 .btn--dark {
@@ -465,7 +478,7 @@ dd {
 }
 
 .btn--dark:hover {
-  background: #333230;
+  background: var(--ink-hover);
 }
 
 .btn[disabled],
@@ -570,7 +583,7 @@ a:hover > .arrow {
 /* --- Поверхности браузера ------------------------------------------- */
 
 html {
-  scrollbar-color: rgba(21, 21, 21, 0.35) transparent;
+  scrollbar-color: rgba(10, 11, 20, 0.35) transparent;
   scrollbar-width: thin;
 }
 
@@ -581,7 +594,7 @@ html {
 ::-webkit-scrollbar-thumb {
   border: 3px solid transparent;
   border-radius: 999px;
-  background: rgba(21, 21, 21, 0.3) padding-box;
+  background: rgba(10, 11, 20, 0.3) padding-box;
 }
 
 ::-webkit-scrollbar-track {
@@ -594,8 +607,42 @@ html {
   margin-bottom: -0.08em;
 }
 
-/* Временная перекраска синих объектов прошлой версии в оранжевый — пока нет финальных ассетов
-   (IMAGE_GENERATION_PROMPTS.md). Как только файл с новым именем появится, класс не ставится. */
-.is-tinted {
-  filter: hue-rotate(178deg) saturate(1.45) brightness(1.04) drop-shadow(0 30px 30px rgba(21, 21, 21, 0.2));
+/* Объекты ретро-набора (оранжевый пластик) до замены на новые: оранжевый уводится в синий акцент,
+   светлый пластик остаётся почти белым. */
+.is-cooled {
+  filter: hue-rotate(208deg) saturate(1.25) drop-shadow(0 14px 16px rgba(10, 11, 20, 0.14));
+}
+
+/* Двухтонный заголовок: приглушённая часть фразы рядом с основной. */
+.tone-mute {
+  color: #7a7e92;
+}
+
+/* Чип-пилюля: короткая подпись или счётчик. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-display);
+  font-weight: 550;
+  font-size: var(--fs-xs);
+  line-height: 1.2;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.chip--line {
+  background: transparent;
+  color: var(--ink-2);
+  box-shadow: inset 0 0 0 1px rgba(10, 11, 20, 0.2);
+}
+
+.chip--accent {
+  background: var(--accent);
+  color: var(--accent-ink);
 }
