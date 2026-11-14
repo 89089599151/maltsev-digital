@@ -56,7 +56,7 @@ const tools = [
     />
   </PageHero>
 
-  <section class="section ab-split" aria-labelledby="ab-why">
+  <section class="section split" aria-labelledby="ab-why">
     <h2 id="ab-why" class="head" data-split>Почему один</h2>
     <div class="ab-prose" data-stagger>
       <p class="ab-prose__lead">Один человек помнит всю историю проекта.</p>
@@ -73,14 +73,14 @@ const tools = [
 
   <ManifestSplit />
 
-  <section class="section ab-split" aria-labelledby="ab-principles">
+  <section class="section split" aria-labelledby="ab-principles">
     <h2 id="ab-principles" class="head" data-split>Принципы</h2>
-    <ul class="ab-rows" data-stagger>
+    <ul class="rows" data-stagger>
       {
         principles.map((p) => (
           <li>
-            <h3>{p.t}</h3>
-            <p>{p.d}</p>
+            <h3 class="rows__k">{p.t}</h3>
+            <p class="rows__v">{p.d}</p>
           </li>
         ))
       }
@@ -142,14 +142,6 @@ const tools = [
     object-position: 50% 30%;
   }
 
-  /* Заголовок слева, содержание справа — как в заголовках секций. */
-  .ab-split {
-    display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: 24px clamp(24px, 4vw, 64px);
-    align-items: start;
-  }
-
   .ab-prose {
     display: grid;
     gap: 1em;
@@ -162,33 +154,6 @@ const tools = [
     line-height: 1.25;
     letter-spacing: -0.025em;
     color: var(--ink);
-  }
-
-  /* Принципы — строки под линиями: название слева, пояснение справа. */
-  .ab-rows {
-    list-style: none;
-    padding: 0;
-    border-top: 1px solid var(--line);
-  }
-
-  .ab-rows li {
-    display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: 8px 24px;
-    align-items: baseline;
-    padding-block: clamp(18px, 1.8vw, 24px);
-    border-bottom: 1px solid var(--line);
-  }
-
-  .ab-rows h3 {
-    font-weight: 500;
-    font-size: var(--fs-1);
-    line-height: 1.2;
-    letter-spacing: -0.03em;
-  }
-
-  .ab-rows p {
-    color: var(--muted);
   }
 
   .ab-pair {
@@ -259,7 +224,6 @@ const tools = [
   }
 
   @media (max-width: 1023px) {
-    .ab-split,
     .ab-pair {
       grid-template-columns: 1fr;
     }
@@ -272,10 +236,6 @@ const tools = [
   }
 
   @media (max-width: 767px) {
-    .ab-rows li {
-      grid-template-columns: 1fr;
-    }
-
     .ab-card {
       border-radius: 24px;
     }

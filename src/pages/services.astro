@@ -19,7 +19,7 @@ const schema = {
   name: 'Разработка сайтов',
   itemListElement: plans.map((p) => ({
     '@type': 'Offer',
-    name: `Тариф ${p.name}`,
+    name: `Пакет ${p.name}`,
     description: p.forWhom,
     price: p.price,
     priceCurrency: 'RUB',
@@ -55,7 +55,7 @@ const schema = {
   <section class="section extras" aria-labelledby="extras-title">
     <div class="extras__head">
       <h2 id="extras-title" class="head">Дополнительно</h2>
-      <p>Можно добавить к любому тарифу. Нажмите «+», и работа попадёт в расчёт выше. Каждая страница сверх лимита — {formatPrice(extraPagePrice)}.</p>
+      <p>Можно добавить к любому пакету. Нажмите «+», и работа попадёт в расчёт выше. Каждая страница сверх лимита — {formatPrice(extraPagePrice)}.</p>
       <p class="extras__mirror" data-out-mirror hidden aria-live="polite">
         В расчёте: <strong data-out-mirror-sum></strong>
       </p>

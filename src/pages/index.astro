@@ -6,7 +6,6 @@ import ManifestSplit from '@/components/ManifestSplit.astro';
 import WorkFeature from '@/components/WorkFeature.astro';
 import ProcessSteps from '@/components/ProcessSteps.astro';
 import Packages from '@/components/Packages.astro';
-import OwnerSplit from '@/components/OwnerSplit.astro';
 import FaqList from '@/components/FaqList.astro';
 import ContactSplit from '@/components/ContactSplit.astro';
 import { faq } from '@/data/content';
@@ -19,11 +18,10 @@ const homeFaq = faq.filter((f) => f.home);
 
 <Base>
   <HeroNova />
-  <ManifestSplit />
   {featured && <WorkFeature project={featured} />}
   <Packages />
   <ProcessSteps compact />
-  <OwnerSplit />
+  <ManifestSplit owner />
 
   <div class="section" id="faq">
     <FaqList items={homeFaq} headingId="home-faq-title">

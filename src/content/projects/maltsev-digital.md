@@ -22,7 +22,7 @@ designNotes:
 gallery:
   - src: ../../assets/case/services-desktop.png
     alt: Страница «Услуги и цены»
-    caption: Тарифы, сравнение и калькулятор стоимости
+    caption: Пакеты и калькулятор стоимости
   - src: ../../assets/case/portfolio-desktop.png
     alt: Страница «Работы» с витриной этого кейса
     caption: Единственный кейс — крупной витриной, без пустых мест под будущие работы

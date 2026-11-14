@@ -1,8 +1,7 @@
 ---
 /**
  * Первый экран внутренних страниц — та же белая сцена, что на главной: крупный тонкий заголовок,
- * пояснение и действия. Справа — необязательный слот (фото, объект, факты).
- * Слово-метка в углу осталось только для страницы 404.
+ * пояснение и действия. Справа — необязательный слот (фото, объект, факты, контакты).
  */
 import { url } from '@/lib/url';
 
@@ -10,19 +9,16 @@ interface Props {
   id: string;
   title: string;
   lead?: string;
-  /** Крупное слово в углу сцены — только там, где оно само сообщение («404»). */
-  word?: string;
   crumbs?: { href: string; label: string }[];
   /** Для длинных заголовков: меньший кегль и ниже сцена. */
   compact?: boolean;
 }
-const { id, title, lead, word, crumbs, compact = false } = Astro.props;
+const { id, title, lead, crumbs, compact = false } = Astro.props;
 const hasAside = Astro.slots.has('default');
 ---
 
 <section class:list={['ph', { 'ph--aside': hasAside, 'ph--compact': compact }]} aria-labelledby={id}>
   <div class="ph__stage">
-    {word && <p class="ph__word" aria-hidden="true">{word}</p>}
     <div class="ph__main">
       {
         crumbs && (
@@ -76,19 +72,6 @@ const hasAside = Astro.slots.has('default');
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     align-items: center;
     min-height: clamp(340px, 36vw, 520px);
-  }
-
-  .ph__word {
-    position: absolute;
-    z-index: -1;
-    top: clamp(10px, 1.6vw, 28px);
-    right: clamp(24px, 3.4vw, 56px);
-    font-family: var(--font-head);
-    font-weight: 250;
-    font-size: clamp(4.5rem, 2rem + 9vw, 11rem);
-    line-height: 1;
-    letter-spacing: -0.07em;
-    color: var(--accent);
   }
 
   .ph__main {
@@ -183,11 +166,6 @@ const hasAside = Astro.slots.has('default');
       border-radius: 24px;
     }
 
-    .ph__word {
-      top: 10px;
-      right: 18px;
-      font-size: 3.5rem;
-    }
 
   }
 </style>

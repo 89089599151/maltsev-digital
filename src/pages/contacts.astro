@@ -9,40 +9,36 @@ import Icon from '@/components/Icon.astro';
 
 const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.formspreeId}` : '';
 const projectTypes = ['Лендинг', 'Сайт компании', 'Каталог или магазин', 'Сайт специалиста', 'Редизайн существующего сайта', 'Другое'];
-const deadlines = ['Как можно скорее', 'В течение месяца', '1–3 месяца', 'Срок не важен'];
 ---
 
 <Base
   title="Контакты и заявка на разработку сайта"
-  description="Оставьте заявку на разработку сайта: тип проекта, тариф и описание задачи. Или напишите напрямую в Telegram или на почту."
+  description="Оставьте заявку на разработку сайта: тип проекта, пакет и описание задачи. Или напишите напрямую в Telegram или на почту."
 >
   <PageHero
     id="ct-title"
     title="Обсудим ваш сайт"
-    lead={`Расскажите о задаче — отвечу ${site.contacts.responseTime.value}, задам уточняющие вопросы и пришлю предложение со сроками и стоимостью.`}
-  />
+    lead={`Напишите напрямую или заполните короткий бриф. Отвечу ${site.contacts.responseTime.value} и пришлю предложение со сроками и ценой.`}
+  >
+    <ContactLink kind="telegram" variant="tile" />
+    <ContactLink kind="email" variant="tile" />
+  </PageHero>
 
   <div class="ct section section--tight">
-    <section class="ct__intro" aria-labelledby="next-title" data-stagger>
-      <div class="ct__direct">
-        <ContactLink kind="telegram" variant="tile" />
-        <ContactLink kind="email" variant="tile" />
-      </div>
-      <div class="ct__next tile tile--raised">
-        <h2 id="next-title" class="head-sm">Что будет после заявки</h2>
-        <ol class="ct__steps">
-          <li><strong>Отвечу</strong> {site.contacts.responseTime.value} и уточню детали.</li>
-          <li><strong>Пришлю предложение</strong>: состав работ, сроки, стоимость, правки.</li>
-          <li><strong>Начнём</strong>, когда вы всё одобрите. До этого ни к чему не обязывает.</li>
-        </ol>
-      </div>
+    <section class="ct__intro" aria-labelledby="next-title">
+      <h2 id="next-title" class="ct__next-title">Что будет после заявки</h2>
+      <ol class="ct__steps">
+        <li><span class="num" aria-hidden="true">01</span><p><strong>Отвечу</strong> {site.contacts.responseTime.value} и уточню детали.</p></li>
+        <li><span class="num" aria-hidden="true">02</span><p><strong>Пришлю предложение</strong>: состав работ, сроки, цена, число правок.</p></li>
+        <li><span class="num" aria-hidden="true">03</span><p><strong>Начнём</strong>, когда вы всё одобрите. До этого заявка ни к чему не обязывает.</p></li>
+      </ol>
     </section>
 
     <section class="ct__form-wrap tile" aria-labelledby="brief-title">
-      <h2 id="brief-title" class="head-sm">Бриф на разработку</h2>
-      <p class="ct__form-sub muted">Поля со звёздочкой обязательны. Остальное поможет точнее оценить проект.{!endpoint && ' Заявка уйдёт письмом из вашей почты или сообщением в Telegram.'}</p>
+      <h2 id="brief-title" class="ct__form-title">Бриф</h2>
+      <p class="ct__form-sub muted">Три обязательных поля — со звёздочкой.{!endpoint && ' Заявка уйдёт письмом из вашей почты или сообщением в Telegram.'}</p>
 
-      <form data-reveal class="brief" data-lead-form data-endpoint={endpoint} data-mailto={endpoint ? undefined : site.contacts.email.value} data-telegram={endpoint ? undefined : (telegramUrl() ?? undefined)} method="post" action={endpoint || undefined} novalidate>
+      <form class="brief" data-lead-form data-endpoint={endpoint} data-mailto={endpoint ? undefined : site.contacts.email.value} data-telegram={endpoint ? undefined : (telegramUrl() ?? undefined)} method="post" action={endpoint || undefined} novalidate>
         <fieldset class="brief__set">
           <legend class="sr-only">Заявка на разработку сайта</legend>
           <input type="hidden" name="_subject" value="Заявка на разработку сайта" />
@@ -78,7 +74,7 @@ const deadlines = ['Как можно скорее', 'В течение меся
           </fieldset>
 
           <fieldset class="field group">
-            <legend>Тариф</legend>
+            <legend>Пакет</legend>
             <div class="plans-pick">
               {
                 plans.map((p) => (
@@ -103,23 +99,11 @@ const deadlines = ['Как можно скорее', 'В течение меся
 
           <div class="field">
             <label for="f-task">Опишите задачу *</label>
-            <textarea id="f-task" name="message" rows="6" required minlength="20" data-error-id="f-task-err" aria-describedby="f-task-hint f-task-err" placeholder="Чем занимается бизнес, для кого сайт, что он должен делать, какие сайты нравятся"></textarea>
+            <textarea id="f-task" name="message" rows="6" required minlength="20" data-error-id="f-task-err" aria-describedby="f-task-hint f-task-err" placeholder="Чем занимается бизнес, для кого сайт и что он должен делать. Если есть сайты, которые нравятся, — оставьте ссылки"></textarea>
             <span class="field__hint" id="f-task-hint">Хотя бы пара предложений — от 20 символов.</span>
             <span class="field__err" id="f-task-err"></span>
           </div>
 
-          <div class="row row--2">
-            <div class="field">
-              <label for="f-site">Текущий сайт или пример, если есть</label>
-              <input id="f-site" name="site" type="text" inputmode="url" placeholder="example.ru" />
-            </div>
-            <div class="field">
-              <label for="f-deadline">Желаемый срок</label>
-              <select id="f-deadline" name="deadline">
-                {deadlines.map((d) => <option>{d}</option>)}
-              </select>
-            </div>
-          </div>
 
           <div class="field">
             <label class="consent">
@@ -171,29 +155,45 @@ const deadlines = ['Как можно скорее', 'В течение меся
     align-items: start;
   }
 
+  /* Слева — три шага после заявки (прилипают при прокрутке длинной формы), справа — сама форма. */
   .ct__intro {
-    grid-column: 1 / 6;
+    grid-column: 1 / 5;
     display: grid;
-    gap: var(--gap);
+    gap: clamp(20px, 2vw, 28px);
     position: sticky;
     top: calc(var(--header-h) + var(--margin) + var(--gap));
+    padding-top: clamp(8px, 1.4vw, 20px);
+    padding-right: clamp(0px, 2vw, 32px);
   }
 
-  .ct__direct {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--gap);
-  }
-
-  .ct__next {
-    display: grid;
-    gap: 16px;
+  .ct__next-title,
+  .ct__form-title {
+    font-weight: 360;
+    font-size: var(--fs-4);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
   }
 
   .ct__steps {
-    padding-left: 1.3em;
+    list-style: none;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .ct__steps li {
     display: grid;
-    gap: 10px;
+    grid-template-columns: 2.4em minmax(0, 1fr);
+    gap: 12px;
+    align-items: baseline;
+    padding-block: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ct__steps .num {
+    font-family: var(--font-head);
+    font-size: var(--fs-1);
+    letter-spacing: -0.04em;
+    color: var(--accent-text);
   }
 
   .ct__steps strong {
@@ -202,8 +202,9 @@ const deadlines = ['Как можно скорее', 'В течение меся
   }
 
   .ct__form-wrap {
-    grid-column: 6 / 13;
-    padding: clamp(22px, 2.6vw, 40px);
+    grid-column: 5 / 13;
+    padding: clamp(22px, 2.8vw, 44px);
+    border-radius: var(--radius-lg);
   }
 
   .ct__form-sub {
@@ -261,9 +262,9 @@ const deadlines = ['Как можно скорее', 'В течение меся
     width: 100%;
     min-height: 54px;
     padding: 14px 16px;
-    border: 2px solid var(--line);
+    border: 1.5px solid transparent;
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--bg);
     color: var(--ink);
     font-family: var(--font-display);
     font-size: var(--fs-0);
@@ -285,7 +286,7 @@ const deadlines = ['Как можно скорее', 'В течение меся
   input[type='text']:hover,
   textarea:hover,
   select:hover {
-    background: var(--surface-solid);
+    border-color: rgba(10, 11, 20, 0.2);
   }
 
   input[type='text']:focus,
@@ -346,8 +347,7 @@ const deadlines = ['Как можно скорее', 'В течение меся
     min-height: 44px;
     padding: 11px 16px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: inset 0 0 0 1px var(--glass-edge);
+    background: var(--bg);
     font-family: var(--font-display);
     font-size: var(--step-small);
     font-weight: 500;
@@ -355,7 +355,7 @@ const deadlines = ['Как можно скорее', 'В течение меся
   }
 
   .pick:hover span {
-    background: var(--surface-3);
+    background: var(--surface-2);
   }
 
   .pick input:checked + span {
@@ -447,7 +447,6 @@ const deadlines = ['Как можно скорее', 'В течение меся
       grid-template-columns: 1fr;
     }
 
-    .ct__direct,
     .row--2 {
       grid-template-columns: 1fr;
     }

@@ -1,8 +1,15 @@
 ---
+/**
+ * Страница кейса. Сверху вниз: заголовок и факты, главный экран в окне браузера, задача,
+ * результаты, решения, остальные экраны, рассказ о ходе работы и призыв.
+ * Раскладки те же, что на остальных страницах: «заголовок слева — содержание справа» и строки под линиями.
+ */
 import { Image } from 'astro:assets';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Base from '@/layouts/Base.astro';
 import PageHero from '@/components/PageHero.astro';
+import BrowserShot from '@/components/BrowserShot.astro';
+import CtaBand from '@/components/CtaBand.astro';
 import { categoryLabel } from '@/config/portfolio';
 import { url } from '@/lib/url';
 import Icon from '@/components/Icon.astro';
@@ -24,10 +31,10 @@ const { project, next } = Astro.props;
 const d = project.data;
 const { Content } = await render(project);
 const hasNext = next.id !== project.id;
-/** Кейс этого сайта: живая версия — то, что открыто сейчас. */
+/** Кейс этого сайта: живая версия — то, что открыто сейчас. */
 const isSelf = project.id === 'maltsev-digital';
+// Десктопная версия уже показана обложкой — в ряду устройств остаются планшет и телефон.
 const devices = [
-  { key: 'desktop', label: 'Десктоп', img: d.responsive.desktop },
   { key: 'tablet', label: 'Планшет', img: d.responsive.tablet },
   { key: 'mobile', label: 'Телефон', img: d.responsive.mobile },
 ].filter((x) => x.img);
@@ -42,7 +49,7 @@ const schema = {
 };
 ---
 
-<Base title={isSelf ? 'Кейс: этот сайт, сделанный с ИИ' : `${d.title} — ${d.isConcept ? 'концепт' : 'проект'}`} description={d.summary} schema={schema}>
+<Base title={isSelf ? 'Кейс: этот сайт, сделанный с ИИ' : `${d.title} — ${d.isConcept ? 'концепт' : 'проект'}`} description={d.summary} schema={schema}>
   <article>
     <PageHero
       id="pj-title"
@@ -52,18 +59,18 @@ const schema = {
       compact
     >
       <dl class="pj-facts">
-        <div><dt>Тип</dt><dd>{d.isConcept ? 'Концепт — демонстрационный проект' : categoryLabel(d.category)}</dd></div>
+        <div><dt>Тип</dt><dd>{d.isConcept ? 'Концепт' : categoryLabel(d.category)}</dd></div>
         <div><dt>Год</dt><dd>{d.year}</dd></div>
-        <div class="pj-facts__wide"><dt>Технологии</dt><dd>{d.stack.join(', ')}</dd></div>
+        <div><dt>Технологии</dt><dd>{d.stack.join(', ')}</dd></div>
       </dl>
       {
         d.liveUrl ? (
-          <a class="pj-live" href={d.liveUrl} target="_blank" rel="noopener">
-            Открыть сайт <span aria-hidden="true"><Icon name="arrow-ne" /></span>
+          <a class="btn btn--accent pj-live" href={d.liveUrl} target="_blank" rel="noopener">
+            Открыть сайт <span class="arrow" aria-hidden="true"><Icon name="arrow-ne" /></span>
           </a>
         ) : isSelf ? (
-          <a class="pj-live" href={url('/')}>
-            Вы сейчас на этом сайте <span aria-hidden="true"><Icon name="arrow" /></span>
+          <a class="btn btn--accent pj-live" href={url('/')}>
+            Вы сейчас на этом сайте <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
           </a>
         ) : (
           <p class="pj-live pj-live--off">Живая версия недоступна</p>
@@ -72,127 +79,111 @@ const schema = {
     </PageHero>
 
     <figure class="pj-cover section section--tight">
-      <Image src={d.cover} alt={d.coverAlt} widths={[640, 1000, 1600, 2000]} sizes="100vw" loading="eager" fetchpriority="high" />
+      <BrowserShot src={d.cover} alt={d.coverAlt} widths={[640, 1000, 1600, 2000]} sizes="(max-width: 1023px) 92vw, 78vw" loading="eager" />
     </figure>
 
-    <section class="section pj-task" aria-labelledby="task-title">
-      <h2 id="task-title" class="head">Задача</h2>
-      <p class="lead">{d.task}</p>
+    <section class="section split" aria-labelledby="task-title">
+      <h2 id="task-title" class="head" data-split>Задача</h2>
+      <p class="pj-lead" data-reveal>{d.task}</p>
     </section>
 
     {
       d.results.length > 0 && (
-        <section class="section pj-results" aria-labelledby="res-title">
-          <h2 id="res-title" class="sr-only">Результаты</h2>
-          {d.results.map((r, i) => (
-            <div class={`tile ${i === 0 ? 'tile--accent' : 'tile--raised'}`} data-reveal style={`--i:${i}`}>
-              <p class="pj-results__v">{r.value}</p>
-              <p>{r.label}</p>
-            </div>
-          ))}
+        <section class="section split" aria-labelledby="res-title">
+          <h2 id="res-title" class="head" data-split>Результат</h2>
+          <dl class="rows" data-stagger>
+            {d.results.map((r) => (
+              <div>
+                <dd class="rows__k pj-res">{r.value}</dd>
+                <dt class="rows__v">{r.label}</dt>
+              </div>
+            ))}
+          </dl>
         </section>
       )
     }
 
     {
       d.designNotes.length > 0 && (
-        <section class="section pj-design" aria-labelledby="design-title">
-          <div class="pj-design__head tile tile--raised">
-            <h2 id="design-title" class="head">Решения в дизайне</h2>
-          </div>
-          <ul class="pj-design__list" data-stagger>
-            {d.designNotes.map((n) => (
-              <li class="tile">{n}</li>
-            ))}
+        <section class="section split" aria-labelledby="design-title">
+          <h2 id="design-title" class="head" data-split>Решения</h2>
+          <ul class="pj-notes" data-stagger>
+            {d.designNotes.map((n) => <li>{n}</li>)}
           </ul>
         </section>
       )
     }
 
     {
-      d.gallery.length > 0 && (
-        <section class="section pj-gallery" aria-labelledby="gal-title">
-          <h2 id="gal-title" class="head">Экраны</h2>
-          <div class="pj-gallery__grid">
-            {d.gallery.map((g, i) => (
-              <figure
-                class={`pj-gallery__item ${i % 3 === 0 || (i % 3 === 1 && i === d.gallery.length - 1) ? 'is-wide' : ''}`}
-                data-reveal
-              >
-                <Image src={g.src} alt={g.alt} widths={[600, 1000, 1600]} sizes="(max-width: 767px) 100vw, 66vw" loading="lazy" />
-                {g.caption && <figcaption>{g.caption}</figcaption>}
-              </figure>
-            ))}
-          </div>
+      (d.gallery.length > 0 || devices.length > 0) && (
+        <section class="section" aria-labelledby="gal-title">
+          <h2 id="gal-title" class="head pj-screens-title" data-split>Экраны</h2>
+          {d.gallery.length > 0 && (
+            <div class="pj-gallery" data-stagger>
+              {d.gallery.map((g) => (
+                <figure class="pj-shot">
+                  <BrowserShot src={g.src} alt={g.alt} widths={[600, 1000, 1600]} sizes="(max-width: 767px) 86vw, 42vw" />
+                  {g.caption && <figcaption>{g.caption}</figcaption>}
+                </figure>
+              ))}
+            </div>
+          )}
+          {devices.length > 0 && (
+            <div class="pj-devices" data-stagger>
+              {devices.map((dv) => (
+                <figure class={`pj-device pj-device--${dv.key}`}>
+                  <div class="pj-device__frame">
+                    <Image src={dv.img!} alt={`${d.title}: ${dv.label.toLowerCase()}`} widths={[300, 600, 900]} sizes="(max-width: 767px) 60vw, 28vw" loading="lazy" />
+                  </div>
+                  <figcaption>{dv.label}</figcaption>
+                </figure>
+              ))}
+            </div>
+          )}
         </section>
       )
     }
 
-    {
-      devices.length > 0 && (
-        <section class="section pj-devices" aria-labelledby="dev-title">
-          <h2 id="dev-title" class="head">На разных экранах</h2>
-          <div class="pj-devices__row">
-            {devices.map((dv) => (
-              <figure class={`device device--${dv.key}`} data-reveal>
-                <div class="device__frame">
-                  <Image src={dv.img!} alt={`${d.title}: версия — ${dv.label.toLowerCase()}`} widths={[400, 800, 1200]} sizes="(max-width: 767px) 100vw, 40vw" loading="lazy" />
-                </div>
-                <figcaption>{dv.label}</figcaption>
-              </figure>
-            ))}
-          </div>
-        </section>
-      )
-    }
-
-    <section class="section pj-story">
-      <div class="prose">
+    <section class="section split pj-story" aria-labelledby="story-title">
+      <h2 id="story-title" class="head" data-split>Как это сделано</h2>
+      <div class="prose" data-reveal>
         <Content />
       </div>
     </section>
 
-    <nav class="section pj-next" aria-label="Другие проекты">
-      {
-        hasNext ? (
-          <a class="pj-next__link tile tile--paper" href={url(`/portfolio/${next.id}/`)}>
-            <span class="pj-next__k">Следующий проект</span>
-            <span class="pj-next__t">{next.data.title}</span>
-            <span class="pj-next__arrow" aria-hidden="true"><Icon name="arrow" /></span>
-          </a>
-        ) : (
-          <a class="pj-next__link tile tile--paper" href={url('/portfolio/')}>
-            <span class="pj-next__k">Все работы</span>
-            <span class="pj-next__t">Вернуться в портфолио</span>
-            <span class="pj-next__arrow" aria-hidden="true"><Icon name="arrow" /></span>
-          </a>
-        )
-      }
-      <a class="pj-next__cta tile tile--accent" href={url('/contacts/')}>
-        <span class="pj-next__k">Хотите похожий сайт?</span>
-        <span class="pj-next__t">Обсудить проект</span>
-      </a>
-    </nav>
+    {
+      hasNext && (
+        <a class="section pj-next lift" href={url(`/portfolio/${next.id}/`)}>
+          <span class="pj-next__k">Следующий проект</span>
+          <span class="pj-next__t">{next.data.title}</span>
+          <span class="pj-next__arrow" aria-hidden="true"><Icon name="arrow" /></span>
+        </a>
+      )
+    }
+
+    <CtaBand
+      id="pj-cta-title"
+      title="Хотите похожий сайт?"
+      text="Расскажите о задаче — предложу формат, срок и цену до начала работы."
+      action={{ href: url('/contacts/'), label: 'Обсудить проект' }}
+      more={{ href: url('/portfolio/'), label: 'Все работы' }}
+    />
   </article>
 </Base>
 
 <style>
+  /* Факты в первом экране: строки под линиями, как на других страницах. */
   .pj-facts {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    border-top: 1px solid var(--line);
   }
 
   .pj-facts div {
     display: grid;
-    gap: 4px;
-    padding: 14px 16px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.7);
-  }
-
-  .pj-facts__wide {
-    grid-column: 1 / -1;
+    grid-template-columns: 7.5em minmax(0, 1fr);
+    gap: 12px;
+    align-items: baseline;
+    padding-block: 12px;
+    border-bottom: 1px solid var(--line);
   }
 
   .pj-facts dt {
@@ -202,277 +193,214 @@ const schema = {
 
   .pj-facts dd {
     font-family: var(--font-display);
-    font-weight: 560;
+    font-weight: 500;
+    line-height: 1.35;
   }
 
   .pj-live {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    min-height: 56px;
-    padding: 14px 18px;
-    border-radius: 999px;
-    background: var(--accent);
-    color: var(--accent-ink);
-    font-family: var(--font-display);
-    font-weight: 600;
-    text-decoration: none;
+    justify-self: start;
+    margin-top: 12px;
   }
 
   .pj-live--off {
-    background: rgba(255, 255, 255, 0.5);
+    font-size: var(--step-small);
     color: var(--muted);
   }
 
+  /* Обложка: окно браузера на светлой подложке во всю ширину. */
   .pj-cover {
+    padding: clamp(20px, 5vw, 72px) clamp(16px, 9vw, 150px);
     border-radius: var(--radius-lg);
-    overflow: hidden;
-    background: var(--surface-2);
+    background:
+      radial-gradient(60% 70% at 70% 40%, var(--stage-glow) 0%, rgba(255, 255, 255, 0) 70%),
+      linear-gradient(180deg, var(--stage-1), var(--stage-2));
   }
 
-  .pj-cover img {
-    width: 100%;
-    height: auto;
-    display: block;
+  .pj-lead {
+    max-width: 56ch;
+    font-size: var(--fs-2);
+    line-height: 1.35;
+    letter-spacing: -0.02em;
   }
 
-  .pj-task {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--gap);
-  }
-
-  .pj-task h2 {
-    grid-column: 1 / 5;
-  }
-
-  .pj-task .lead {
-    grid-column: 5 / 12;
-  }
-
-  .pj-results {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: var(--gap);
-  }
-
-  .pj-results .tile {
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 16px;
-  }
-
-  .pj-results__v {
-    font-family: var(--font-head);
+  .pj-res {
     font-weight: 400;
-    font-size: clamp(3rem, 1.6rem + 3vw, 5rem);
-    line-height: 0.9;
+    font-size: var(--fs-3);
     letter-spacing: -0.04em;
+    color: var(--accent-text);
   }
 
-  .pj-design {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--gap);
-  }
-
-  .pj-design__head {
-    grid-column: 1 / 5;
-    display: flex;
-    align-items: flex-end;
-    min-height: 260px;
-  }
-
-  .pj-design__list {
-    grid-column: 5 / 13;
+  .pj-notes {
     list-style: none;
     padding: 0;
-    display: grid;
-    gap: var(--gap);
+    border-top: 1px solid var(--line);
   }
 
-  .pj-design__list li {
-    font-family: var(--font-display);
-    font-weight: 560;
-    font-size: var(--fs-2);
-    line-height: 1.25;
-    letter-spacing: -0.015em;
+  .pj-notes li {
+    padding-block: clamp(16px, 1.6vw, 22px);
+    border-bottom: 1px solid var(--line);
+    font-size: var(--step-body);
+    line-height: 1.45;
   }
 
-  .pj-gallery h2,
-  .pj-devices h2 {
-    margin-bottom: 32px;
+  .pj-screens-title {
+    margin-bottom: clamp(24px, 3vw, 40px);
   }
 
-  .pj-gallery__grid {
+  .pj-gallery {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--gap);
   }
 
-  .pj-gallery__item {
-    border-radius: var(--radius);
-    overflow: hidden;
-    background: var(--surface);
+  .pj-shot {
+    display: grid;
+    gap: 16px;
+    align-content: start;
+    padding: clamp(16px, 3vw, 44px);
+    padding-bottom: clamp(14px, 1.6vw, 22px);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, var(--stage-1), var(--stage-2));
   }
 
-  .pj-gallery__item.is-wide {
-    grid-column: 1 / -1;
+  .pj-shot figcaption,
+  .pj-device figcaption {
+    font-size: var(--step-small);
+    color: var(--ink-2);
   }
 
-  .pj-gallery__item img {
+  /* Планшет и телефон — рядом, на белой карточке. */
+  .pj-devices {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: clamp(20px, 5vw, 72px);
+    margin-top: var(--gap);
+    padding: clamp(24px, 4vw, 56px);
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+  }
+
+  .pj-device {
+    display: grid;
+    gap: 12px;
+    justify-items: center;
+  }
+
+  .pj-device--tablet {
+    width: min(46%, 420px);
+  }
+
+  .pj-device--mobile {
+    width: min(24%, 210px);
+  }
+
+  .pj-device__frame {
+    width: 100%;
+    padding: 5px;
+    border-radius: 22px;
+    background: var(--ink);
+    box-shadow: 0 30px 50px -28px rgba(10, 11, 20, 0.5);
+  }
+
+  .pj-device__frame img {
     width: 100%;
     height: auto;
+    border-radius: 17px;
+    object-fit: cover;
+    object-position: top;
   }
 
-  .pj-gallery__item figcaption,
-  .device figcaption {
-    padding: 14px 18px;
-    font-family: var(--font-display);
+  .pj-device--tablet img {
+    aspect-ratio: 3 / 4;
+  }
+
+  .pj-device--mobile img {
+    aspect-ratio: 376 / 814;
+  }
+
+  .pj-story .prose {
+    color: var(--ink-2);
+  }
+
+  .pj-story .prose :global(h2) {
+    margin-top: 1.6em;
+    font-weight: 500;
+    font-size: var(--fs-1);
+    letter-spacing: -0.03em;
+    color: var(--ink);
+  }
+
+  .pj-story .prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  /* Следующий проект: белая строка-ссылка во всю ширину. */
+  .pj-next {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 24px;
+    align-items: center;
+    padding: clamp(22px, 2.6vw, 36px) clamp(24px, 4vw, 64px);
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+    text-decoration: none;
+  }
+
+  .pj-next__k {
     font-size: var(--step-small);
     color: var(--muted);
   }
 
-  .pj-devices__row {
-    display: grid;
-    grid-template-columns: 6fr 3.4fr 1.8fr;
-    gap: var(--gap);
-    align-items: end;
-  }
-
-  .device__frame {
-    border-radius: var(--radius);
-    overflow: hidden;
-    background: var(--night);
-    padding: 4px;
-  }
-
-  .device--mobile .device__frame {
-    border-radius: 20px;
-    padding: 4px;
-  }
-
-  .device__frame img {
-    width: 100%;
-    border-radius: 4px;
-  }
-
-  .device--desktop img { aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
-  .device--tablet img { aspect-ratio: 3 / 4; object-fit: cover; object-position: top; }
-  .device--mobile img { aspect-ratio: 9 / 19; object-fit: cover; object-position: top; border-radius: 16px; }
-
-  .pj-story {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-  }
-
-  .pj-story .prose {
-    grid-column: 5 / 12;
-  }
-
-  .pj-next {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--gap);
-  }
-
-  .pj-next__link,
-  .pj-next__cta {
-    display: grid;
-    gap: 12px;
-    min-height: 260px;
-    align-content: space-between;
-    text-decoration: none;
-    transition: background-color var(--dur-fast) var(--ease-out);
-  }
-
-  .pj-next__link {
-    grid-column: 1 / 9;
-    position: relative;
-  }
-
-  .pj-next__link:hover {
-    background: var(--paper-2);
-  }
-
-  .pj-next__cta {
-    grid-column: 9 / 13;
-  }
-
-  .pj-next__cta:hover {
-    background: var(--accent-hover);
-  }
-
-  .pj-next__k {
-    font-family: var(--font-display);
-    font-weight: 500;
-  }
-
   .pj-next__t {
+    grid-column: 1;
     font-family: var(--font-head);
-    font-weight: 400;
-    font-size: clamp(2rem, 1rem + 3vw, 4rem);
-    line-height: 0.95;
-    letter-spacing: -0.04em;
+    font-weight: 360;
+    font-size: var(--fs-4);
+    line-height: 1.05;
+    letter-spacing: -0.045em;
   }
 
   .pj-next__arrow {
-    position: absolute;
-    right: var(--pad);
-    top: var(--pad);
-    font-family: var(--font-display);
-    font-size: 2.5rem;
-    transition: transform var(--dur) var(--ease-out);
-  }
-
-  .pj-next__link:hover .pj-next__arrow {
-    transform: translateX(8px);
-  }
-
-  @media (max-width: 1023px) {
-    .pj-task h2,
-    .pj-task .lead,
-    .pj-design__head,
-    .pj-design__list,
-    .pj-story .prose,
-    .pj-next__link,
-    .pj-next__cta {
-      grid-column: 1 / -1;
-    }
-
-    .pj-design__head {
-      min-height: 0;
-    }
-
-    .pj-task {
-      gap: 20px;
-    }
-
-    .pj-devices__row {
-      grid-template-columns: 2fr 1fr;
-    }
-
-    .device--desktop {
-      grid-column: 1 / -1;
-    }
+    grid-column: 2;
+    grid-row: 1 / 3;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: var(--fs-1);
   }
 
   @media (max-width: 767px) {
-    .pj-task,
-    .pj-design,
-    .pj-story,
+    .pj-gallery {
+      grid-template-columns: 1fr;
+    }
+
+    .pj-cover,
+    .pj-shot,
+    .pj-devices,
     .pj-next {
-      grid-template-columns: 1fr;
+      border-radius: 22px;
     }
 
-    .pj-gallery__grid {
-      grid-template-columns: 1fr;
+    .pj-device--tablet {
+      width: 58%;
     }
 
-    .pj-devices__row {
-      grid-template-columns: 1.4fr 1fr;
+    .pj-device--mobile {
+      width: 30%;
+    }
+
+    .pj-device__frame {
+      padding: 3px;
+      border-radius: 14px;
+    }
+
+    .pj-device__frame img {
+      border-radius: 11px;
     }
   }
 </style>

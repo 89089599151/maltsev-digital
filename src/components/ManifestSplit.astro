@@ -1,20 +1,32 @@
 ---
 /**
- * Манифест: кто что делает в проекте. Слева — рутина, которую берёт ИИ,
- * справа — решения, которые остаются за человеком. Без цифр и обещаний.
+ * Кто делает сайт и как: слева — рутина, которую берёт ИИ, справа — решения, которые остаются
+ * за человеком. На главной первым в ряду стоит портрет автора со ссылкой на страницу «Обо мне»
+ * (owner) — один блок вместо отдельных «манифеста» и «кто делает сайт».
  */
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { site } from '@/config/site';
+import { url } from '@/lib/url';
+import photo from '@/assets/photos/owner.webp';
+
+interface Props {
+  /** Показать карточку с портретом автора (на главной). */
+  owner?: boolean;
+}
+const { owner = false } = Astro.props;
 
 const ai = [
   'Черновики структуры и текстов',
   'Варианты композиции и цвета',
-  'Рутинный код и проверку ошибок',
-  'Тесты на разных экранах',
+  'Рутинный код и поиск ошибок',
+  'Проверку на разных экранах',
 ];
 const me = [
   'Разбираюсь в вашем бизнесе и клиентах',
   'Выбираю структуру и путь к заявке',
   'Утверждаю дизайн и каждую деталь',
-  'Отвечаю за скорость, доступность и запуск',
+  'Отвечаю за скорость и запуск',
 ];
 ---
 
@@ -22,21 +34,40 @@ const me = [
   <div class="mf__head">
     <h2 id="mf-title" class="mf__title" data-split><span class="tone-mute">ИИ ускоряет.</span><br />Решаю&nbsp;я.</h2>
     <p class="mf__lead" data-reveal>
-      Нейросети забирают у разработки рутину. Освободившееся время уходит на то, что определяет результат.
+      Рутину отдаю нейросетям. Время, которое это освобождает, уходит на структуру, дизайн и проверку.
     </p>
   </div>
 
-  <div class="mf__grid" data-stagger>
-    <article class="mf__card mf__card--ai" aria-labelledby="mf-ai" data-reveal>
+  <div class:list={['mf__grid', { 'mf__grid--owner': owner }]} data-stagger>
+    {
+      owner && (
+        <a class="mf__who lift" href={url('/about/')}>
+          <Image
+            src={photo}
+            alt={`${site.brand.owner.value} на ночной площади под снегом смотрит вверх, на свет фонаря`}
+            widths={[360, 560, 800]}
+            sizes="(max-width: 767px) 92vw, (max-width: 1023px) 46vw, 30vw"
+            loading="lazy"
+          />
+          <span class="mf__who-body">
+            <span class="mf__who-name">{site.brand.owner.value}</span>
+            <span class="mf__who-role">Дизайнер и разработчик. Веду проект сам — от разговора до запуска.</span>
+            <span class="mf__who-go">Обо мне <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></span>
+          </span>
+        </a>
+      )
+    }
+
+    <article class="mf__card mf__card--ai" aria-labelledby="mf-ai">
       <h3 id="mf-ai" class="mf__card-title">Делает ИИ</h3>
       <ul class="mf__list">{ai.map((t) => <li>{t}</li>)}</ul>
       <p class="mf__foot">Быстрее и дешевле для вас</p>
     </article>
 
-    <article class="mf__card mf__card--me" aria-labelledby="mf-me" data-reveal>
+    <article class="mf__card mf__card--me" aria-labelledby="mf-me">
       <h3 id="mf-me" class="mf__card-title">Решаю я</h3>
       <ul class="mf__list">{me.map((t) => <li>{t}</li>)}</ul>
-      <p class="mf__foot">Вы говорите напрямую с тем, кто делает сайт</p>
+      <p class="mf__foot">Вы говорите с тем, кто делает сайт</p>
     </article>
   </div>
 </section>
@@ -53,14 +84,12 @@ const me = [
   .mf__title {
     font-size: var(--step-display);
     line-height: 1;
-    letter-spacing: -0.045em;
+    letter-spacing: -0.05em;
   }
 
   .mf__lead {
     max-width: 40ch;
     padding-bottom: 0.4em;
-    font-family: var(--font-display);
-    font-weight: 400;
     font-size: var(--fs-2);
     line-height: 1.35;
     letter-spacing: -0.02em;
@@ -72,15 +101,88 @@ const me = [
     gap: var(--gap);
   }
 
+  .mf__grid--owner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr) minmax(0, 6fr);
+  }
+
+  /* Портрет: фото во всю карточку, подпись — на затемнении снизу. */
+  .mf__who {
+    position: relative;
+    display: grid;
+    align-items: end;
+    min-height: 420px;
+    border-radius: var(--radius-lg);
+    background: var(--night);
+    color: var(--night-ink);
+    text-decoration: none;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .mf__who img {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 28%;
+    transition: scale 900ms var(--ease-out);
+  }
+
+  .mf__who:hover img {
+    scale: 1.04;
+  }
+
+  .mf__who-body {
+    display: grid;
+    gap: 6px;
+    padding: clamp(20px, 2.4vw, 32px);
+    padding-top: 96px;
+    background: linear-gradient(180deg, rgba(10, 11, 20, 0) 0%, rgba(10, 11, 20, 0.86) 62%);
+  }
+
+  .mf__who-name {
+    font-family: var(--font-head);
+    font-weight: 400;
+    font-size: var(--fs-3);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+  }
+
+  .mf__who-role {
+    max-width: 30ch;
+    font-size: var(--step-small);
+    line-height: 1.4;
+    color: var(--night-muted);
+  }
+
+  .mf__who-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-family: var(--font-display);
+    font-weight: 550;
+    font-size: var(--step-small);
+  }
+
+  .mf__who-go .arrow {
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .mf__who:hover .mf__who-go .arrow {
+    transform: translateX(4px);
+  }
+
   .mf__card {
     display: flex;
     flex-direction: column;
     gap: clamp(20px, 2vw, 28px);
-    padding: clamp(24px, 3vw, 44px);
+    padding: clamp(24px, 2.6vw, 40px);
     border-radius: var(--radius-lg);
   }
 
-  /* Светлая основа; ответственность автора выделяется отдельной тёмной карточкой. */
   .mf__card--ai {
     background: var(--paper);
   }
@@ -105,8 +207,8 @@ const me = [
 
   .mf__list li {
     display: grid;
-    grid-template-columns: 18px 1fr;
-    gap: 12px;
+    grid-template-columns: 8px 1fr;
+    gap: 14px;
     align-items: baseline;
     padding-block: 14px;
     border-top: 1px solid var(--line);
@@ -122,6 +224,7 @@ const me = [
     height: 8px;
     border-radius: 50%;
     background: var(--ink);
+    translate: 0 -1px;
   }
 
   .mf__card--me .mf__list li {
@@ -134,7 +237,6 @@ const me = [
 
   .mf__foot {
     margin-top: auto;
-    justify-self: start;
     align-self: flex-start;
     padding: 8px 14px;
     border-radius: 999px;
@@ -150,6 +252,17 @@ const me = [
     color: var(--accent-ink);
   }
 
+  @media (max-width: 1199px) {
+    .mf__grid--owner {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .mf__grid--owner .mf__who {
+      grid-column: 1 / -1;
+      min-height: 360px;
+    }
+  }
+
   @media (max-width: 1023px) {
     .mf__head {
       grid-template-columns: 1fr;
@@ -157,12 +270,20 @@ const me = [
   }
 
   @media (max-width: 767px) {
-    .mf__grid {
+    .mf__grid,
+    .mf__grid--owner {
       grid-template-columns: 1fr;
     }
 
-    .mf__card {
+    .mf__card,
+    .mf__who {
       border-radius: 22px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mf__who:hover img {
+      scale: none;
     }
   }
 </style>

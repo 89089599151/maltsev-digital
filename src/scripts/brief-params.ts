@@ -27,7 +27,7 @@ export function applyBriefParams(): void {
       .join(', ');
     const fmt = (n: string) => new Intl.NumberFormat('ru-RU').format(Number(n)) + ' ₽';
     const parts = [
-      plan ? `тариф ${plan.toUpperCase()}` : '',
+      plan ? `пакет ${plan.toUpperCase()}` : '',
       pages ? `страниц: ${Number(pages)}` : '',
       addons ? `дополнительно: ${addons}` : '',
       sum ? `ориентир ${fmt(sum)}` : '',

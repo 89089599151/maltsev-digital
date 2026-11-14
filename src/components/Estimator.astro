@@ -7,6 +7,7 @@
 import { plans, addons, extraPagePrice, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
 import Icon from './Icon.astro';
+import SectionHead from './SectionHead.astro';
 
 const types = [
   { id: 'start', label: 'Лендинг', note: 'Одна страница', pages: 1 },
@@ -27,13 +28,11 @@ const start = plans[1];
 ---
 
 <section class="est section" id="calculator" aria-labelledby="est-title">
-  <div class="est__head">
-    <h2 id="est-title" class="head" data-split>Посчитайте свой сайт</h2>
-    <p>
-      Выберите тип сайта, количество страниц и нужные работы — калькулятор подберёт тариф и покажет
-      ориентир. Точную сумму я подтвержу после короткого обсуждения.
-    </p>
-  </div>
+  <SectionHead
+    id="est-title"
+    title="Посчитайте свой сайт"
+    text="Выберите тип сайта и число страниц — калькулятор подберёт пакет и покажет ориентир. Точную сумму подтвержу после короткого разговора."
+  />
 
   <form class="est__board" data-estimator data-config={JSON.stringify(data)}>
     <fieldset class="est__types tile">
@@ -61,7 +60,7 @@ const start = plans[1];
     </div>
 
     <div class="est__result tile tile--accent" aria-live="polite">
-      <p class="est__res-label">Подходит тариф</p>
+      <p class="est__res-label">Подходит пакет</p>
       <p class="est__res-plan" data-out-plan>{start.name}</p>
       <p class="est__res-sum" data-out-sum>{formatPrice(start.price)}</p>
       <p class="est__res-time">Срок: <span data-out-time>{start.timeline}</span></p>
@@ -80,22 +79,6 @@ const start = plans[1];
 </script>
 
 <style>
-  .est__head {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--gap);
-    align-items: end;
-    margin-bottom: 40px;
-  }
-
-  .est__head h2 {
-    grid-column: 1 / 7;
-  }
-
-  .est__head p {
-    grid-column: 7 / 12;
-  }
-
   .est__board {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -165,7 +148,7 @@ const start = plans[1];
     gap: 2px;
     padding: 14px 16px;
     border-radius: 14px;
-    background: var(--paper);
+    background: var(--bg);
     transition:
       background-color var(--dur-fast) var(--ease-out),
       color var(--dur-fast) var(--ease-out);

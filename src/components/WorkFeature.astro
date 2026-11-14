@@ -8,6 +8,7 @@
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import SectionHead from './SectionHead.astro';
+import BrowserShot from './BrowserShot.astro';
 import { url } from '@/lib/url';
 import Icon from './Icon.astro';
 
@@ -56,16 +57,13 @@ const caseUrl = url(`/portfolio/${project.id}/`);
     </div>
 
     <a class="wf__visual" href={caseUrl} aria-label={`Открыть кейс ${d.title}`} tabindex="-1">
-      <div class="wf__desktop">
-        <span class="wf__bar" aria-hidden="true"><i></i><i></i><i></i></span>
-        <Image
-          src={desktop}
-          alt={d.coverAlt}
-          widths={[640, 960, 1280, 1600]}
-          sizes="(max-width: 1023px) 86vw, 50vw"
-          loading={head ? 'lazy' : 'eager'}
-        />
-      </div>
+      <BrowserShot
+        class="wf__desktop"
+        src={desktop}
+        alt={d.coverAlt}
+        sizes="(max-width: 1023px) 86vw, 50vw"
+        loading={head ? 'lazy' : 'eager'}
+      />
       {
         mobile && (
           <div class="wf__phone">
@@ -161,40 +159,12 @@ const caseUrl = url(`/portfolio/${project.id}/`);
     overflow: hidden;
   }
 
-  .wf__desktop {
-    border-radius: 14px;
-    background: var(--paper);
-    box-shadow:
-      0 0 0 1px rgba(10, 11, 20, 0.08),
-      0 40px 70px -40px rgba(16, 32, 200, 0.45);
-    overflow: hidden;
+  .wf__visual :global(.wf__desktop) {
     transition: scale 700ms var(--ease-out);
   }
 
-  .wf__visual:hover .wf__desktop {
+  .wf__visual:hover :global(.wf__desktop) {
     scale: 1.015;
-  }
-
-  .wf__bar {
-    display: flex;
-    gap: 6px;
-    padding: 10px 12px;
-    border-bottom: 1px solid rgba(10, 11, 20, 0.08);
-  }
-
-  .wf__bar i {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--surface-3);
-  }
-
-  .wf__desktop img {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1425 / 900;
-    object-fit: cover;
-    object-position: top;
   }
 
   .wf__phone {
@@ -254,7 +224,7 @@ const caseUrl = url(`/portfolio/${project.id}/`);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .wf__visual:hover .wf__desktop {
+    .wf__visual:hover :global(.wf__desktop) {
       scale: none;
     }
   }

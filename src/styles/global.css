@@ -270,7 +270,7 @@ dd {
 .tile {
   position: relative;
   border-radius: var(--radius);
-  background: var(--surface);
+  background: var(--paper);
   padding: var(--pad);
   overflow: hidden;
   min-width: 0;
@@ -281,7 +281,7 @@ dd {
 }
 
 .tile--dark {
-  background: var(--surface);
+  background: var(--paper);
 }
 
 /* Тёмно-синее «ночное» стекло — один-два акцентных блока на экран. */
@@ -295,7 +295,7 @@ dd {
 }
 
 .tile--raised {
-  background: var(--surface-2);
+  background: var(--bg);
 }
 
 .tile--paper {
@@ -633,6 +633,56 @@ html {
    светлый пластик остаётся почти белым. */
 .is-cooled {
   filter: hue-rotate(208deg) saturate(1.25) drop-shadow(0 14px 16px rgba(10, 11, 20, 0.14));
+}
+
+/* --- Общие раскладки -------------------------------------------------- */
+
+/* Заголовок слева, содержание справа — та же пропорция, что у заголовков секций. */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 24px clamp(24px, 4vw, 64px);
+  align-items: start;
+}
+
+/* Строки под линиями: короткое название слева, пояснение справа. */
+.rows {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.rows > * {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 8px 24px;
+  align-items: baseline;
+  padding-block: clamp(18px, 1.8vw, 24px);
+  border-bottom: 1px solid var(--line);
+}
+
+.rows__k {
+  font-family: var(--font-head);
+  font-weight: 500;
+  font-size: var(--fs-1);
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.rows__v {
+  color: var(--muted);
+}
+
+@media (max-width: 1023px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .rows > * {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Двухтонный заголовок: приглушённая часть фразы рядом с основной. */
