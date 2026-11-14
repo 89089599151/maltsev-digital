@@ -1,11 +1,14 @@
 ---
 import Base from '@/layouts/Base.astro';
+import { Image } from 'astro:assets';
 import PageHero from '@/components/PageHero.astro';
 import FaqList from '@/components/FaqList.astro';
 import { faq } from '@/data/content';
 import { url } from '@/lib/url';
 import Icon from '@/components/Icon.astro';
+import { genImage } from '@/lib/gen';
 
+const sculpture = genImage('faq-dialogue');
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -30,6 +33,19 @@ const schema = {
     <Fragment slot="actions">
       <a class="btn btn--ink" href={url('/contacts/')}>Задать свой вопрос <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
     </Fragment>
+    {sculpture && (
+      <Image
+        class="fq-object"
+        src={sculpture.src}
+        alt=""
+        widths={[320, 480, 640, 960]}
+        sizes="(max-width: 767px) 62vw, (max-width: 1023px) 320px, (min-width: 1440px) 480px, 34vw"
+        quality={80}
+        loading="eager"
+        fetchpriority="high"
+        draggable="false"
+      />
+    )}
   </PageHero>
 
   <div class="section">
@@ -43,3 +59,29 @@ const schema = {
     </FaqList>
   </div>
 </Base>
+
+<style>
+  .fq-object {
+    width: min(100%, 480px);
+    height: auto;
+    justify-self: center;
+    filter: drop-shadow(0 24px 30px rgba(26, 47, 251, 0.13));
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .fq-object {
+      animation: fq-float 9s ease-in-out infinite;
+    }
+  }
+
+  @keyframes fq-float {
+    0%, 100% { transform: translateY(-5px) rotate(0.6deg); }
+    50% { transform: translateY(5px) rotate(-0.6deg); }
+  }
+
+  @media (max-width: 1023px) {
+    .fq-object {
+      width: min(62vw, 320px);
+    }
+  }
+</style>

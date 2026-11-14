@@ -1,5 +1,22 @@
 # Задания на генерацию изображений — v3, белая тема с синим акцентом (GPT Image)
 
+## 15 ноября — «Работы» и «Вопросы»
+
+Встроенным генератором созданы два изображения с прозрачным фоном в стиле страницы услуг.
+Используются в правой части первого экрана соответствующих страниц; реальные кейсы и ответы остаются вёрсткой.
+
+### `src/assets/gen/works-gallery.png` — стеклянная галерея
+
+```text
+Use case: stylized-concept. Asset type: transparent 3D hero sculpture for the portfolio / Works page of Maltsev Digital, an established white and electric-blue independent web designer website. Primary request: a sculptural curated gallery of digital work. Three floating thick glass picture frames in a compact elegant fanned composition, connected by one fluid cobalt glass ribbon sweeping under and behind them. The front frame is a wide frosted-white glass card containing a tiny abstract embossed landscape composition of one smooth blue sphere and a curved arch, strictly decorative sculptural shapes, not a real website screenshot; rear frames are clear deep electric-blue refractive glass at subtly different angles. One slender polished silver chrome elliptical ring wraps diagonally around the lower third, linking the whole arrangement into one coherent object. Premium polished CGI product render, bright clean studio lighting, crisp white specular edges, substantial rounded glass, beautiful physically plausible refraction, silver highlights. Palette exclusively electric blue #1A2FFB, icy clear azure, frosted white and small polished chrome accents. Three-quarter view slightly from above. Landscape 3:2 composition, object fills 78 percent, centered with every extremity entirely inside and generous clean margin. Genuinely transparent alpha background outside the objects, clean edges, no outer haze or glow, no floor, no ground shadow, no pedestal. No words, no letters, no numerals, no logos, no watermarks, no people, no pink, purple or orange. Sophisticated restrained family resemblance to high-end blue-glass browser-panel sculptures, with a distinct art-gallery silhouette.
+```
+
+### `src/assets/gen/faq-dialogue.png` — диалог
+
+```text
+Use case: stylized-concept. Asset type: transparent 3D hero sculpture for the Questions and Answers page of Maltsev Digital, an established white and electric-blue independent web designer website. Primary request: an elegant sculptural conversation made from two large overlapping rounded speech bubbles in thick glass. One main front speech bubble in frosted white translucent glass angled slightly clockwise, bearing a single beautiful raised electric-blue glass question mark (punctuation only). One larger rear speech bubble in deep cobalt transparent glass angled slightly counterclockwise, containing three small evenly spaced frosted-white glass dots, visible clearly above and left of the front bubble. The chat bubbles have short soft rounded tails at opposite lower corners. A single flowing cobalt glass ribbon curls loosely below and behind the pair, with a very small polished silver chrome bead at the end, forming one cohesive floating composition. Premium polished CGI product render, bright clean studio lighting, crisp white specular edges, substantial rounded glass, beautiful physically plausible refraction and soft internal caustics. Palette exclusively electric blue #1A2FFB, icy clear azure, frosted white, and small polished chrome accents. Three-quarter view slightly from above. Landscape 3:2 composition, object fills 78 percent, centered with every extremity entirely inside, generous clean margins. Genuinely transparent alpha background outside the objects, clean edges, no outer haze or glow, no floor, no ground shadow, no pedestal. No words, no letters, no numerals, no logos, no watermark, no people, no pink, purple or orange. Sophisticated restrained family resemblance to high-end blue-glass browser-panel sculptures, instantly legible conversation silhouette.
+```
+
 ## 14 ноября — объёмная сборка сайта для страницы услуг
 
 Готовый файл: `src/assets/gen/services-assembly.png`. Создан встроенным генератором с прозрачным фоном.
