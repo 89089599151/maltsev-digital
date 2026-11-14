@@ -7,9 +7,17 @@ import CtaBand from '@/components/CtaBand.astro';
 import { Image } from 'astro:assets';
 import { genImage } from '@/lib/gen';
 import PricingCards from '@/components/PricingCards.astro';
-import { plans, addons, extraPagePrice, formatPrice, pricingConfirmed } from '@/config/pricing';
+import { plans, addons, extraPagePrice, formatPrice, paymentTerms, pricingConfirmed } from '@/config/pricing';
+import { terms } from '@/data/content';
 
 const sculpture = genImage('services-assembly');
+
+// Условия работы: текст — в src/data/content.ts, суммы подставляются из цен.
+const fill = (v: string) =>
+  v
+    .replace('{payment}', paymentTerms)
+    .replace('{copy}', formatPrice(addons.find((a) => a.id === 'copy')!.price))
+    .replace('{premium}', formatPrice(plans.find((p) => p.id === 'premium')!.price));
 import { url } from '@/lib/url';
 import Icon from '@/components/Icon.astro';
 
@@ -49,6 +57,20 @@ const schema = {
   </PageHero>
   <PricingCards />
 
+  <section class="section split" id="terms" aria-labelledby="terms-title">
+    <h2 id="terms-title" class="head" data-split>Условия</h2>
+    <dl class="rows" data-stagger>
+      {
+        terms.map((t) => (
+          <div>
+            <dt class="rows__k">{t.k}</dt>
+            <dd class="rows__v">{fill(t.v)}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
   <Estimator />
 
   <!-- Дополнительные работы -->
@@ -84,7 +106,7 @@ const schema = {
     id="sv-cta-title"
     title="Не уверены, какой пакет нужен?"
     text="Опишите задачу в двух словах — предложу подходящий вариант и назову точную сумму."
-    action={{ href: url('/contacts/'), label: 'Описать задачу' }}
+    action={{ href: url('/contacts/'), label: 'Обсудить проект' }}
   />
 </Base>
 

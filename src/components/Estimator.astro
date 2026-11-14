@@ -1,6 +1,7 @@
 ---
 /**
- * Калькулятор: тип сайта и число страниц → подходящий тариф, ориентировочная сумма и срок.
+ * Калькулятор: тип сайта и число страниц → подходящий пакет, ориентировочная сумма и срок.
+ * Лендинг — всегда одна страница; страницы сверх пакета считаются доплатой за каждую.
  * Дополнительные работы добавляются кнопками «+» в списке «Дополнительно» ниже (data-addon).
  * Кнопка переносит расчёт в форму заявки.
  */
@@ -55,21 +56,25 @@ const start = plans[1];
     <div class="est__pages tile">
       <label class="est__legend" for="est-pages">Страниц</label>
       <output class="est__pages-val" for="est-pages" data-pages-out>6</output>
-      <input id="est-pages" type="range" name="pages" min="1" max="25" value="6" step="1" aria-describedby="est-pages-note" />
-      <p class="est__pages-note small" id="est-pages-note">Уникальных страниц: главная, услуги, о компании, контакты и так далее.</p>
+      <input id="est-pages" type="range" name="pages" min="1" max="15" value="6" step="1" aria-describedby="est-pages-note" />
+      <p class="est__pages-note small" id="est-pages-note" data-pages-note>Главная, услуги, о компании, контакты и так далее. Больше 15 страниц — посчитаю отдельно.</p>
     </div>
 
-    <div class="est__result tile tile--accent" aria-live="polite">
+    <div class="est__result tile" aria-live="polite">
       <p class="est__res-label">Подходит пакет</p>
       <p class="est__res-plan" data-out-plan>{start.name}</p>
       <p class="est__res-sum" data-out-sum>{formatPrice(start.price)}</p>
       <p class="est__res-time">Срок: <span data-out-time>{start.timeline}</span></p>
       <p class="est__res-extra small" data-out-extra></p>
       {!pricingConfirmed && <p class="est__res-note small">Цены предварительные и требуют подтверждения.</p>}
-      <a class="btn btn--dark est__go" href={url(`/contacts/?plan=${start.id}`)} data-out-link>
+      <a class="btn btn--accent est__go" href={url(`/contacts/?plan=${start.id}`)} data-out-link>
         Отправить заявку с расчётом <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
       </a>
     </div>
+
+    <p class="est__shop">
+      Интернет-магазин с корзиной и онлайн-оплатой в калькулятор не входит — <a href={url('/contacts/')}>считаю отдельно</a>.
+    </p>
   </form>
 </section>
 
@@ -232,8 +237,9 @@ const start = plans[1];
   .est__res-sum {
     transform-origin: left center;
     margin-top: auto;
+    color: var(--accent-text);
     font-family: var(--font-head);
-    font-weight: 600;
+    font-weight: 400;
     font-size: clamp(2.25rem, 1.5rem + 2vw, 3.25rem);
     letter-spacing: -0.04em;
     line-height: 1;
@@ -244,8 +250,20 @@ const start = plans[1];
     font-weight: 600;
   }
 
+  .est__res-extra,
   .est__res-note {
-    color: var(--on-accent-muted);
+    color: var(--muted);
+  }
+
+  .est__shop {
+    grid-column: 1 / -1;
+    font-size: var(--step-small);
+    color: var(--muted);
+  }
+
+  input[type='range']:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
   }
 
   .est__go {

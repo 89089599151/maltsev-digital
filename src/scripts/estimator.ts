@@ -28,6 +28,8 @@ export function initEstimator(): void {
 
   const range = form.querySelector<HTMLInputElement>('input[name="pages"]')!;
   const pagesOut = form.querySelector<HTMLOutputElement>('[data-pages-out]')!;
+  const pagesNote = form.querySelector<HTMLElement>('[data-pages-note]');
+  const defaultNote = pagesNote?.textContent ?? '';
   const outPlan = form.querySelector<HTMLElement>('[data-out-plan]')!;
   const outSum = form.querySelector<HTMLElement>('[data-out-sum]')!;
   const outTime = form.querySelector<HTMLElement>('[data-out-time]')!;
@@ -42,13 +44,20 @@ export function initEstimator(): void {
 
   const calc = () => {
     const type = form.querySelector<HTMLInputElement>('input[name="type"]:checked')?.value ?? 'business';
+    // Лендинг — всегда одна страница: ползунок закрыт, чтобы цена не менялась без объяснения.
+    const isLanding = type === 'start';
+    if (isLanding) range.value = '1';
+    range.disabled = isLanding;
+    if (pagesNote) {
+      pagesNote.textContent = isLanding
+        ? 'Лендинг — одна страница. Нужно больше — выберите «Сайт компании».'
+        : defaultNote;
+    }
     const pages = Number(range.value);
     pagesOut.value = String(pages);
 
-    // Тариф определяется типом сайта. Лендинг больше чем на одну страницу — уже сайт компании.
-    // Страницы сверх лимита тарифа считаются доплатой, а не переводом в более дорогой пакет.
-    const planId = type === 'start' && pages > 1 ? 'business' : type;
-    const plan = cfg.plans.find((p) => p.id === planId) ?? cfg.plans[1];
+    // Пакет определяется типом сайта. Страницы сверх пакета — доплата за каждую, без смены пакета.
+    const plan = cfg.plans.find((p) => p.id === type) ?? cfg.plans[1];
     const included = cfg.includedIn[plan.id] ?? [];
     const extraPages = Math.max(0, pages - plan.maxPages);
 
@@ -67,7 +76,7 @@ export function initEstimator(): void {
       btn.disabled = isIncluded;
       btn.setAttribute('aria-pressed', String(isOn));
       btn.setAttribute('aria-label', isIncluded ? `${addon.name}: уже входит в ${plan.name}` : `${isOn ? 'Убрать из расчёта' : 'Добавить в расчёт'}: ${addon.name}`);
-      // «+» — можно добавить, «−» — добавлено, галочка — уже входит в тариф.
+      // «+» — можно добавить, «−» — добавлено, галочка — уже входит в пакет.
       btn.querySelector('[data-icon-plus]')?.toggleAttribute('hidden', isOn || isIncluded);
       btn.querySelector('[data-icon-minus]')?.toggleAttribute('hidden', !isOn);
       btn.querySelector('[data-icon-check]')?.toggleAttribute('hidden', !isIncluded);
@@ -84,11 +93,12 @@ export function initEstimator(): void {
 
     outPlan.textContent = plan.name;
     outSum.textContent = fmt(sum);
-    outTime.textContent = plan.timeline;
+    // Доп. страницы удлиняют работу — точный срок называется в предложении.
+    outTime.textContent = extraPages ? `${plan.timeline} и больше — уточню в предложении` : plan.timeline;
     const notes: string[] = [];
-    if (extraPages) notes.push(`${extraPages} доп. стр. × ${fmt(cfg.extraPagePrice)}`);
-    if (names.length) notes.push(names.join(', '));
-    outExtra.textContent = notes.length ? `Включено: ${notes.join('; ')}` : '';
+    if (extraPages) notes.push(`Сверх пакета: ${extraPages} стр. × ${fmt(cfg.extraPagePrice)}`);
+    if (names.length) notes.push(`Добавлено: ${names.join(', ')}`);
+    outExtra.textContent = notes.join('. ');
     if (mirrorSum) mirrorSum.textContent = `${fmt(sum)} · ${plan.name}`;
 
     const params = new URLSearchParams({ plan: plan.id, pages: String(pages), sum: String(sum) });

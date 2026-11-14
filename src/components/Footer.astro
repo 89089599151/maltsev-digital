@@ -35,7 +35,7 @@ const year = new Date().getFullYear();
       </ul>
     </nav>
     <div class="ftr__contacts">
-      <p class="ftr__lead">Напишите о задаче — отвечу {site.contacts.responseTime.value} и предложу план.</p>
+      <p class="ftr__lead">Напишите о задаче — предложу план, срок и цену.</p>
       <ContactLink kind="telegram" />
       <ContactLink kind="email" />
     </div>
@@ -151,7 +151,18 @@ const year = new Date().getFullYear();
 
     .ftr__cols {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      row-gap: 24px;
+      row-gap: 8px;
+    }
+
+    /* Ссылки высотой с палец: по 44px, а не по строке текста. */
+    .ftr__cols ul {
+      gap: 0;
+    }
+
+    .ftr__cols a {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
     }
 
     .ftr__bottom {

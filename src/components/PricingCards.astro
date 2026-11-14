@@ -6,7 +6,7 @@
  */
 import SectionHead from './SectionHead.astro';
 import Icon from './Icon.astro';
-import { plans, formatPrice, paymentTerms, pricingConfirmed } from '@/config/pricing';
+import { plans, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
 
 const scopes: Record<string, string> = { start: 'Одна страница', business: 'До 8 страниц', premium: 'До 15 страниц' };
@@ -16,7 +16,7 @@ const scopes: Record<string, string> = { start: 'Одна страница', bus
   <SectionHead
     id="detail-title"
     title="Три пакета"
-    text={`Цена фиксируется в предложении и меняется, только если меняется задача. ${paymentTerms}${pricingConfirmed ? '' : ' Цены предварительные.'}`}
+    text={`Цена записывается в договоре и меняется, только если меняется задача. Оплата, сроки и возврат — в условиях ниже.${pricingConfirmed ? '' : ' Цены предварительные.'}`}
   />
 
   <div class="pl__grid" data-stagger>
@@ -39,10 +39,11 @@ const scopes: Record<string, string> = { start: 'Одна страница', bus
             {p.highlights.map((item) => (
               <li><Icon name="check" /><span>{item}</span></li>
             ))}
+            <li class="pl__need"><Icon name="minus" /><span>Тексты и фото — от вас</span></li>
           </ul>
 
           <a class="btn pl__btn" href={url(`/contacts/?plan=${p.id}`)}>
-            Выбрать {p.name} <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+            Заказать {p.name} <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
           </a>
 
           <details class="pl__more">
@@ -179,6 +180,12 @@ const scopes: Record<string, string> = { start: 'Одна страница', bus
 
   .pl__card--business .pl__list :global(.icon) {
     color: inherit;
+  }
+
+  /* То, чего в пакете нет, — тем же списком, но приглушённо. */
+  .pl__list .pl__need,
+  .pl__list .pl__need :global(.icon) {
+    color: var(--pl-muted);
   }
 
   .pl__card--premium .pl__list :global(.icon) {

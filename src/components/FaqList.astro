@@ -8,14 +8,16 @@ interface Props {
   /** Имя группы: открыт только один вопрос. */
   group?: string;
   headingLevel?: 'h2' | 'h3';
+  /** Заголовок списка остаётся только для скринридеров — когда над списком уже есть заголовок страницы. */
+  headingHidden?: boolean;
 }
-const { items, heading = 'Частые вопросы', headingId = 'faq-title', group = 'faq', headingLevel = 'h2' } = Astro.props;
+const { items, heading = 'Частые вопросы', headingId = 'faq-title', group = 'faq', headingLevel = 'h2', headingHidden = false } = Astro.props;
 const H = headingLevel;
 ---
 
 <section class="faq" aria-labelledby={headingId}>
   <div class="faq__side">
-    <H id={headingId} class="head" data-split>{heading}</H>
+    {headingHidden ? <H id={headingId} class="sr-only">{heading}</H> : <H id={headingId} class="head" data-split>{heading}</H>}
     <slot name="side" />
   </div>
   <div class="faq__list" data-stagger>

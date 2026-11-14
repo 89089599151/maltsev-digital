@@ -66,7 +66,7 @@ const href = isTg ? telegramUrl() : emailUrl('Заявка на разработ
     grid-column: 1;
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: var(--step-body);
+    font-size: clamp(0.8125rem, 3.4vw, 1.1875rem);
     letter-spacing: -0.01em;
     overflow-wrap: anywhere;
   }
@@ -103,7 +103,8 @@ const href = isTg ? telegramUrl() : emailUrl('Заявка на разработ
     align-self: start;
   }
 
+  /* На узком экране адрес почты должен помещаться в одну строку. */
   .cl--tile .cl__value {
-    font-size: var(--fs-2);
+    font-size: clamp(0.875rem, 3.7vw, 1.5625rem);
   }
 </style>

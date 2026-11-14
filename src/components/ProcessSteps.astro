@@ -22,8 +22,8 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
     title="Как идёт работа"
     text={compact
       ? 'Четыре шага от заявки до запуска. Каждый согласуем, прежде чем идти дальше.'
-      : 'Семь шагов от заявки до запуска. На каждом вы знаете, что происходит, сколько это займёт и что нужно от вас.'}
-    link={compact ? { href: url('/services/#process'), label: 'Все этапы подробно' } : { href: url('/contacts/'), label: 'Начать с заявки' }}
+      : 'Семь шагов от заявки до запуска. Срок пакета считается от предоплаты — это шаги с четвёртого по седьмой.'}
+    link={compact ? { href: url('/services/#process'), label: 'Все этапы подробно' } : { href: url('/contacts/'), label: 'Обсудить проект' }}
   />
 
   <ol class="ps__list" data-stagger>
@@ -33,7 +33,7 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
           <span class="ps__num num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
           <div class="ps__head">
             <h3 class="ps__name">{s.name}</h3>
-            <p class="ps__dur"><span class="chip chip--line">{s.duration}</span></p>
+            {s.duration && <p class="ps__dur"><span class="chip chip--line">{s.duration}</span></p>}
           </div>
           <p class="ps__text">{s.text}</p>
           {s.fromYou && (
@@ -101,7 +101,7 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
     color: var(--muted);
   }
 
-  /* Главная: четыре белые карточки в ряд, последняя — акцентная (запуск). */
+  /* Главная: четыре белые карточки в ряд. */
   .ps--compact .ps__list {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -124,24 +124,6 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
 
   .ps--compact .ps__head {
     gap: 12px;
-  }
-
-  .ps--compact .ps__step:last-child {
-    background: var(--accent);
-    color: var(--accent-ink);
-  }
-
-  .ps--compact .ps__step:last-child .ps__num {
-    color: var(--accent-ink);
-  }
-
-  .ps--compact .ps__step:last-child .ps__text {
-    color: var(--on-accent-muted);
-  }
-
-  .ps--compact .ps__step:last-child :global(.chip) {
-    color: var(--accent-ink);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
   }
 
   /* Услуги: строка на этап — номер, название и срок, описание, что нужно от вас. */

@@ -18,7 +18,7 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
   <PageHero
     id="ct-title"
     title="Обсудим ваш сайт"
-    lead={`Напишите напрямую или заполните короткий бриф. Отвечу ${site.contacts.responseTime.value} и пришлю предложение со сроками и ценой.`}
+    lead={`Напишите напрямую или заполните короткий бриф. Отвечу ${site.contacts.responseTime.value} — ${site.contacts.hours}.`}
   >
     <ContactLink kind="telegram" variant="tile" />
     <ContactLink kind="email" variant="tile" />
@@ -28,9 +28,9 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
     <section class="ct__intro" aria-labelledby="next-title">
       <h2 id="next-title" class="ct__next-title">Что будет после заявки</h2>
       <ol class="ct__steps">
-        <li><span class="num" aria-hidden="true">01</span><p><strong>Отвечу</strong> {site.contacts.responseTime.value} и уточню детали.</p></li>
-        <li><span class="num" aria-hidden="true">02</span><p><strong>Пришлю предложение</strong>: состав работ, сроки, цена, число правок.</p></li>
-        <li><span class="num" aria-hidden="true">03</span><p><strong>Начнём</strong>, когда вы всё одобрите. До этого заявка ни к чему не обязывает.</p></li>
+        <li><span class="num" aria-hidden="true">01</span><p><strong>Отвечу</strong> и уточню детали.</p></li>
+        <li><span class="num" aria-hidden="true">02</span><p><strong>Пришлю предложение и договор</strong>: состав работ, срок, цена, число правок.</p></li>
+        <li><span class="num" aria-hidden="true">03</span><p><strong>Начнём</strong> после подписания и предоплаты. До этого заявка ни к чему не обязывает.</p></li>
       </ol>
     </section>
 

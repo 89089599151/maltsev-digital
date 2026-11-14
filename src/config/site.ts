@@ -36,6 +36,8 @@ export const site = {
     email: { value: 'sergey_maltsev_00@vk.com', confirmed: true } as Confirmable<string>,
     /** Через какое время вы обычно отвечаете. Обещание клиенту. */
     responseTime: { value: 'в течение 15 минут в рабочее время', confirmed: true } as Confirmable<string>,
+    /** Часы, в которые действует обещание о времени ответа. Подтверждено владельцем 15.11.2026. */
+    hours: 'ежедневно с 10:00 до 20:00 по Москве',
     workFormat: 'Удалённо, по всей России',
   },
 
