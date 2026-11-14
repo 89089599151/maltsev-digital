@@ -20,20 +20,20 @@ const me = [
 
 <section class="mf section" id="manifest" aria-labelledby="mf-title">
   <div class="mf__head">
-    <h2 id="mf-title" class="mf__title"><span class="tone-mute">ИИ ускоряет.</span><br />Решаю&nbsp;я.</h2>
+    <h2 id="mf-title" class="mf__title" data-split><span class="tone-mute">ИИ ускоряет.</span><br />Решаю&nbsp;я.</h2>
     <p class="mf__lead" data-reveal>
       Нейросети забирают у разработки рутину. Освободившееся время уходит на то, что определяет результат.
     </p>
   </div>
 
-  <div class="mf__grid">
-    <article class="mf__card mf__card--ai" aria-labelledby="mf-ai" data-reveal="rise">
+  <div class="mf__grid" data-stagger>
+    <article class="mf__card mf__card--ai" aria-labelledby="mf-ai" data-reveal>
       <h3 id="mf-ai" class="mf__card-title">Делает ИИ</h3>
       <ul class="mf__list">{ai.map((t) => <li>{t}</li>)}</ul>
       <p class="mf__foot">Быстрее и дешевле для вас</p>
     </article>
 
-    <article class="mf__card mf__card--me" aria-labelledby="mf-me" data-reveal="rise">
+    <article class="mf__card mf__card--me" aria-labelledby="mf-me" data-reveal>
       <h3 id="mf-me" class="mf__card-title">Решаю я</h3>
       <ul class="mf__list">{me.map((t) => <li>{t}</li>)}</ul>
       <p class="mf__foot">Вы говорите напрямую с тем, кто делает сайт</p>

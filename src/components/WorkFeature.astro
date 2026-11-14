@@ -1,18 +1,24 @@
 ---
+/**
+ * Витрина кейса: слева — название, суть, три факта и вход в кейс; справа — настоящие скриншоты
+ * в ровных рамках (десктоп и телефон) на светлой подложке. Без наклонов и декоративной графики:
+ * показываем сам сайт.
+ * На главной блок идёт с заголовком секции «Работы», на странице портфолио — без него.
+ */
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import SectionHead from './SectionHead.astro';
-import { categoryLabel } from '@/config/portfolio';
 import { url } from '@/lib/url';
 import Icon from './Icon.astro';
 
 interface Props {
   project: CollectionEntry<'projects'>;
-  /** На странице портфолио используется компактное вступление самой страницы. */
+  /** false — без заголовка секции (на странице портфолио заголовок уже в первом экране). */
   head?: boolean;
 }
 
 const { project, head = true } = Astro.props;
+// Без заголовка секции название кейса становится заголовком второго уровня.
 const Name = head ? 'h3' : 'h2';
 const d = project.data;
 const desktop = d.responsive.desktop ?? d.cover;
@@ -20,64 +26,21 @@ const mobile = d.responsive.mobile;
 const caseUrl = url(`/portfolio/${project.id}/`);
 ---
 
-<section class:list={['wf', 'section', { 'wf--portfolio': !head }]} id="work" aria-labelledby={head ? 'wf-title' : 'wf-name'}>
+<section class="wf section" id="work" aria-labelledby={head ? 'wf-title' : 'wf-name'}>
   {head && <SectionHead
     id="wf-title"
     title="Работы"
-    text="Первый кейс — сайт, который вы сейчас смотрите. От идеи и дизайна до работающего кода."
+    text="Первый кейс — сайт, который вы сейчас смотрите. Ваш будет сделан так же."
     link={{ href: url('/portfolio/'), label: 'Все работы' }}
   />}
 
-  <article class="wf__stage" aria-labelledby="wf-name" data-tilt-area>
-    <div class="wf__rail">
-      <p><span class="wf__status" aria-hidden="true"></span>{d.isConcept ? 'Концепт' : 'Избранный проект'}</p>
-      <p>{categoryLabel(d.category)} <span class="wf__rail-slash" aria-hidden="true">/</span> {d.year}</p>
-    </div>
-
-    <div class="wf__info" data-reveal>
-      <span class="wf__index" aria-hidden="true">01<span>↗</span></span>
-      <div class="wf__heading">
-        <p class="wf__eyebrow">Дизайн + разработка</p>
-        <Name id="wf-name" class="wf__name">{d.title}</Name>
-      </div>
+  <article class="wf__stage" aria-labelledby="wf-name" data-reveal>
+    <div class="wf__info">
+      <Name id="wf-name" class="wf__name">{d.title}</Name>
       <p class="wf__sum">{d.summary}</p>
-      <a class="btn wf__cta" href={caseUrl}>
-        Смотреть кейс <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
-      </a>
-    </div>
-
-    <a class="wf__visual" href={caseUrl} aria-label={`Открыть кейс ${d.title}`} tabindex="-1">
-      <span class="wf__orbit wf__orbit--one" aria-hidden="true"></span>
-      <span class="wf__orbit wf__orbit--two" aria-hidden="true"></span>
-      <span class="wf__cross wf__cross--one" aria-hidden="true">+</span>
-      <span class="wf__cross wf__cross--two" aria-hidden="true">+</span>
-      <div class="wf__desktop-track" data-tilt="4">
-        <div class="wf__desktop">
-          <div class="wf__browser" aria-hidden="true">
-            <span class="wf__dots"><i></i><i></i><i></i></span>
-            <span>{d.title}</span>
-            <span class="wf__browser-arrow">↗</span>
-          </div>
-          <div class="wf__screen">
-            <Image src={desktop} alt={d.coverAlt} widths={[640, 960, 1280, 1600]} sizes="(max-width: 767px) 84vw, (max-width: 1023px) 76vw, 56vw" loading={head ? 'lazy' : 'eager'} />
-          </div>
-        </div>
-      </div>
-      {mobile && (
-        <div class="wf__phone-track" data-float="10">
-          <div class="wf__phone">
-            <span class="wf__phone-camera" aria-hidden="true"></span>
-            <Image src={mobile} alt="" widths={[240, 376, 560]} sizes="(max-width: 767px) 22vw, (max-width: 1023px) 19vw, 13vw" loading={head ? 'lazy' : 'eager'} />
-          </div>
-        </div>
-      )}
-      <span class="wf__visual-note" aria-hidden="true">Детали имеют значение <span>↗</span></span>
-    </a>
-
-    {(d.results.length > 0 || d.stack.length > 0) && (
-      <div class="wf__bottom">
-        {d.results.length > 0 && (
-          <dl class="wf__facts" data-stagger>
+      {
+        d.results.length > 0 && (
+          <dl class="wf__facts">
             {d.results.slice(0, 3).map((r) => (
               <div>
                 <dt>{r.short ?? r.label}</dt>
@@ -85,568 +48,214 @@ const caseUrl = url(`/portfolio/${project.id}/`);
               </div>
             ))}
           </dl>
-        )}
-        {d.stack.length > 0 && <p class="wf__stack">{d.stack.slice(0, 3).join(' / ')}</p>}
+        )
+      }
+      <a class="btn btn--ink wf__cta" href={caseUrl}>
+        Смотреть кейс <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+      </a>
+    </div>
+
+    <a class="wf__visual" href={caseUrl} aria-label={`Открыть кейс ${d.title}`} tabindex="-1">
+      <div class="wf__desktop">
+        <span class="wf__bar" aria-hidden="true"><i></i><i></i><i></i></span>
+        <Image
+          src={desktop}
+          alt={d.coverAlt}
+          widths={[640, 960, 1280, 1600]}
+          sizes="(max-width: 1023px) 86vw, 50vw"
+          loading={head ? 'lazy' : 'eager'}
+        />
       </div>
-    )}
+      {
+        mobile && (
+          <div class="wf__phone">
+            <Image src={mobile} alt="" widths={[240, 376, 560]} sizes="(max-width: 1023px) 24vw, 13vw" loading={head ? 'lazy' : 'eager'} />
+          </div>
+        )
+      }
+    </a>
   </article>
 </section>
 
 <style>
-  .wf--portfolio {
-    margin-top: clamp(24px, 3vw, 40px);
-  }
-
   .wf__stage {
-    position: relative;
-    isolation: isolate;
     display: grid;
-    grid-template-columns: minmax(0, 3.8fr) minmax(0, 8.2fr);
-    gap: 0 clamp(20px, 3vw, 48px);
-    padding: clamp(24px, 3vw, 44px);
-    overflow: hidden;
-    border: 1px solid rgba(26, 47, 251, 0.1);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(24px, 3vw, 48px);
+    align-items: stretch;
+    padding: clamp(12px, 1.2vw, 18px);
+    padding-left: clamp(24px, 4vw, 64px);
     border-radius: var(--radius-lg);
-    background:
-      radial-gradient(ellipse at 83% 64%, rgba(26, 47, 251, 0.11), transparent 54%),
-      linear-gradient(135deg, var(--paper) 12%, #e9ecfa 100%);
-    color: var(--ink);
-  }
-
-  .wf__stage::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    inset: 0;
-    background: linear-gradient(128deg, transparent 58%, rgba(26, 47, 251, 0.12) 58.05%, transparent 58.15%);
-    pointer-events: none;
-  }
-
-  .wf__rail {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px 24px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(26, 47, 251, 0.14);
-    color: var(--muted);
-    font-size: var(--fs-xs);
-    line-height: 1.4;
-  }
-
-  .wf__rail p:first-child {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    color: var(--ink);
-  }
-
-  .wf__status {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 0 4px rgba(26, 47, 251, 0.08);
-  }
-
-  .wf__rail-slash {
-    padding-inline: 12px;
-    color: var(--accent-text);
+    background: var(--paper);
   }
 
   .wf__info {
-    position: relative;
-    z-index: 2;
     display: grid;
-    align-content: center;
+    gap: clamp(16px, 1.6vw, 22px);
     justify-items: start;
-    gap: 22px;
-    padding-block: clamp(32px, 3.5vw, 52px);
-  }
-
-  .wf__index {
-    display: flex;
-    align-items: start;
-    gap: 12px;
-    margin-left: -0.04em;
-    font-size: clamp(4.5rem, 6.5vw, 6.8rem);
-    font-weight: 300;
-    line-height: 0.85;
-    letter-spacing: -0.08em;
-    color: var(--accent);
-  }
-
-  .wf__index > span {
-    margin-top: 0.1em;
-    font-size: 0.35em;
-    line-height: 1;
-    letter-spacing: 0;
-  }
-
-  .wf__heading {
-    display: grid;
-    gap: 12px;
-  }
-
-  .wf__eyebrow {
-    color: var(--muted);
-    font-size: var(--fs-xs);
+    align-content: center;
+    padding-block: clamp(16px, 3vw, 48px);
   }
 
   .wf__name {
-    max-width: 10ch;
-    font-size: var(--fs-4);
     font-weight: 360;
+    font-size: var(--fs-5);
     line-height: 1.02;
-    letter-spacing: -0.045em;
+    letter-spacing: -0.05em;
   }
 
   .wf__sum {
-    max-width: 32ch;
+    max-width: 36ch;
+    font-size: var(--step-body);
     color: var(--ink-2);
-    font-size: var(--fs-0);
-    line-height: 1.55;
+  }
+
+  /* Три факта списком под линиями: значение слева, пояснение справа. */
+  .wf__facts {
+    width: 100%;
+    max-width: 440px;
+    border-top: 1px solid var(--line);
+  }
+
+  .wf__facts div {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 16px;
+    align-items: baseline;
+    padding-block: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .wf__facts dd {
+    grid-column: 1;
+    grid-row: 1;
+    font-family: var(--font-head);
+    font-weight: 450;
+    font-size: var(--fs-1);
+    line-height: 1.1;
+    letter-spacing: -0.035em;
+  }
+
+  .wf__facts dt {
+    grid-column: 2;
+    font-size: var(--fs-xs);
+    line-height: 1.35;
+    color: var(--muted);
   }
 
   .wf__cta {
-    margin-top: 2px;
-    background: var(--accent);
-    color: var(--accent-ink);
+    min-height: 56px;
+    margin-top: 6px;
   }
 
-  .wf__cta:hover {
-    background: var(--accent-hover);
-  }
-
-  .wf__cta:focus-visible {
-    outline-color: var(--accent);
-  }
-
+  /* Скриншоты: светлая подложка, окно браузера и телефон поверх его правого нижнего угла. */
   .wf__visual {
     position: relative;
-    align-self: center;
-    display: block;
-    min-width: 0;
-    width: calc(100% + clamp(4px, 1vw, 18px));
-    padding: 9% 7% 12% 2%;
-    text-decoration: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .wf__desktop-track {
-    position: relative;
-    z-index: 1;
+    display: grid;
+    align-items: center;
+    padding: clamp(20px, 4vw, 56px) clamp(28px, 6vw, 88px) clamp(28px, 5vw, 72px) clamp(20px, 3.4vw, 48px);
+    border-radius: calc(var(--radius-lg) - 8px);
+    background:
+      radial-gradient(60% 70% at 70% 40%, var(--stage-glow) 0%, rgba(255, 255, 255, 0) 70%),
+      linear-gradient(180deg, var(--stage-1), var(--stage-2));
+    overflow: hidden;
   }
 
   .wf__desktop {
+    border-radius: 14px;
+    background: var(--paper);
+    box-shadow:
+      0 0 0 1px rgba(10, 11, 20, 0.08),
+      0 40px 70px -40px rgba(16, 32, 200, 0.45);
     overflow: hidden;
-    border: 1px solid rgba(52, 63, 109, 0.2);
-    border-radius: 10px;
-    background: #eef0f8;
-    box-shadow: 0 32px 56px -20px rgba(35, 48, 101, 0.32);
-    transform: rotate(-5deg);
-    transition: transform var(--dur-slow) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+    transition: scale 700ms var(--ease-out);
   }
 
-  .wf__browser {
+  .wf__visual:hover .wf__desktop {
+    scale: 1.015;
+  }
+
+  .wf__bar {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: clamp(22px, 2.3vw, 30px);
-    padding-inline: 10px;
-    color: var(--muted);
-    font-size: 9px;
-    line-height: 1;
+    gap: 6px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(10, 11, 20, 0.08);
   }
 
-  .wf__dots {
-    display: flex;
-    gap: 4px;
-  }
-
-  .wf__dots i {
-    width: 4px;
-    height: 4px;
+  .wf__bar i {
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: #a4abc1;
+    background: var(--surface-3);
   }
 
-  .wf__browser-arrow {
-    font-size: 14px;
-  }
-
-  .wf__screen {
-    aspect-ratio: 1425 / 900;
-    overflow: hidden;
-    background: var(--bg);
-  }
-
-  .wf__screen img {
+  .wf__desktop img {
     width: 100%;
-    height: 100%;
+    height: auto;
+    aspect-ratio: 1425 / 900;
     object-fit: cover;
     object-position: top;
-    transition: transform var(--dur-slow) var(--ease-out);
-  }
-
-  .wf__phone-track {
-    position: absolute;
-    z-index: 2;
-    right: 1%;
-    bottom: 2%;
-    width: 24%;
   }
 
   .wf__phone {
-    position: relative;
-    aspect-ratio: 376 / 814;
-    padding: clamp(3px, 0.4vw, 5px);
-    overflow: hidden;
-    border: 1px solid #b3bcd6;
-    border-radius: clamp(14px, 2vw, 26px);
-    background: #edf0fa;
-    box-shadow: 0 24px 44px -14px rgba(35, 48, 101, 0.35);
-    transform: rotate(6deg);
-    transition: transform var(--dur-slow) var(--ease-out);
-  }
-
-  .wf__phone-camera {
     position: absolute;
-    z-index: 1;
-    top: 8px;
-    left: 38%;
-    width: 24%;
-    height: 4px;
-    border-radius: 999px;
-    background: #68708c;
+    right: clamp(12px, 2.4vw, 36px);
+    bottom: clamp(14px, 2.4vw, 36px);
+    width: 21%;
+    padding: 5px;
+    border-radius: 20px;
+    background: var(--ink);
+    box-shadow: 0 30px 50px -24px rgba(10, 11, 20, 0.55);
+    overflow: hidden;
   }
 
   .wf__phone img {
     width: 100%;
-    height: 100%;
-    border-radius: clamp(10px, 1.6vw, 21px);
+    height: auto;
+    aspect-ratio: 376 / 814;
     object-fit: cover;
     object-position: top;
-  }
-
-  .wf__orbit {
-    position: absolute;
-    z-index: 0;
-    inset: 15% -7%;
-    border: 1px solid rgba(26, 47, 251, 0.23);
-    border-radius: 50%;
-    transform: rotate(-26deg);
-    pointer-events: none;
-  }
-
-  .wf__orbit--two {
-    inset: 12% 12%;
-    border-color: rgba(26, 47, 251, 0.13);
-    transform: rotate(32deg);
-  }
-
-  .wf__cross {
-    position: absolute;
-    color: var(--accent);
-    font-size: var(--fs-2);
-    font-weight: 300;
-    line-height: 1;
-    pointer-events: none;
-  }
-
-  .wf__cross--one {
-    top: 3%;
-    right: 10%;
-  }
-
-  .wf__cross--two {
-    bottom: 9%;
-    left: 5%;
-  }
-
-  .wf__visual-note {
-    position: absolute;
-    bottom: 0;
-    left: 13%;
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    color: var(--muted);
-    font-size: var(--fs-xs);
-    line-height: 1.3;
-  }
-
-  .wf__visual-note > span {
-    color: var(--accent);
-    font-size: var(--fs-1);
-  }
-
-  .wf__bottom {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    justify-content: space-between;
-    gap: 28px;
-    padding-top: clamp(24px, 2.5vw, 36px);
-    border-top: 1px solid rgba(26, 47, 251, 0.14);
-  }
-
-  .wf__facts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 22px clamp(24px, 4vw, 56px);
-  }
-
-  .wf__facts > div {
-    display: flex;
-    flex-direction: column-reverse;
-    gap: 8px;
-  }
-
-  .wf__facts dd {
-    font-size: var(--fs-2);
-    font-weight: 450;
-    line-height: 1.1;
-    letter-spacing: -0.03em;
-  }
-
-  .wf__facts dt,
-  .wf__stack {
-    color: var(--muted);
-    font-size: var(--fs-xs);
-    line-height: 1.5;
-  }
-
-  .wf__facts dt {
-    max-width: 23ch;
-  }
-
-  .wf__stack {
-    padding-bottom: 1px;
-  }
-
-  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-    .wf__stage:has(.wf__cta:hover) .wf__desktop,
-    .wf__visual:hover .wf__desktop {
-      transform: translateY(-8px) rotate(-2deg);
-      box-shadow: 0 42px 64px -20px rgba(35, 48, 101, 0.35);
-    }
-
-    .wf__stage:has(.wf__cta:hover) .wf__screen img,
-    .wf__visual:hover .wf__screen img {
-      transform: scale(1.025);
-    }
-
-    .wf__stage:has(.wf__cta:hover) .wf__phone,
-    .wf__visual:hover .wf__phone {
-      transform: translate(4px, -10px) rotate(3deg);
-    }
-  }
-
-  .wf__stage:has(.wf__cta:focus-visible) .wf__desktop {
-    transform: translateY(-6px) rotate(-2deg);
+    border-radius: 15px;
   }
 
   @media (max-width: 1023px) {
     .wf__stage {
-      grid-template-columns: minmax(0, 1fr);
+      grid-template-columns: 1fr;
+      padding: clamp(10px, 1.6vw, 16px);
     }
 
     .wf__visual {
-      grid-row: 2;
-      width: min(100%, 760px);
-      margin: 24px auto 0;
-      padding-top: 7%;
+      order: -1;
     }
 
     .wf__info {
-      grid-row: 3;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 16px 32px;
-      align-content: start;
-      padding-block: 32px;
-    }
-
-    .wf__index {
-      position: absolute;
-      right: 0;
-      bottom: 32px;
-      font-size: 4.5rem;
-      opacity: 0.5;
-    }
-
-    .wf__heading {
-      grid-row: 1 / 3;
-    }
-
-    .wf__name {
-      max-width: 12ch;
-    }
-
-    .wf__sum,
-    .wf__cta {
-      grid-column: 2;
-    }
-
-    .wf__cta {
-      margin-right: 70px;
-    }
-
-    .wf__bottom {
-      grid-row: 4;
-    }
-
-    .wf__stack {
-      display: none;
+      padding: 8px clamp(8px, 2vw, 24px) 16px;
     }
   }
 
   @media (max-width: 767px) {
     .wf__stage {
-      padding: 22px 20px 26px;
       border-radius: 24px;
     }
 
-    .wf__rail {
-      gap: 8px 16px;
-      padding-bottom: 16px;
-    }
-
-    .wf__rail > p:last-child {
-      font-size: 11px;
-    }
-
-    .wf__rail-slash {
-      padding-inline: 6px;
-    }
-
     .wf__visual {
-      width: calc(100% + 10px);
-      margin-top: 22px;
-      margin-left: -5px;
-      padding: 8% 9% 15% 1%;
+      border-radius: 16px;
     }
 
-    .wf__desktop {
-      border-radius: 7px;
+    .wf__phone {
+      width: 24%;
+      padding: 3px;
+      border-radius: 12px;
     }
 
-    .wf__browser {
-      height: 18px;
-      padding-inline: 7px;
-      font-size: 6px;
-    }
-
-    .wf__dots {
-      gap: 3px;
-    }
-
-    .wf__dots i {
-      width: 3px;
-      height: 3px;
-    }
-
-    .wf__browser-arrow {
-      font-size: 10px;
-    }
-
-    .wf__phone-track {
-      width: 25%;
-      right: 0;
-      bottom: 4%;
-    }
-
-    .wf__phone-camera {
-      top: 6px;
-      height: 3px;
-    }
-
-    .wf__visual-note {
-      left: 4%;
-      gap: 16px;
-      font-size: 10px;
-    }
-
-    .wf__visual-note > span {
-      font-size: var(--fs-0);
-    }
-
-    .wf__info {
-      grid-template-columns: 1fr;
-      gap: 20px;
-      padding-block: 30px;
-    }
-
-    .wf__heading {
-      grid-row: auto;
-      gap: 10px;
-      padding-right: 64px;
-    }
-
-    .wf__index {
-      top: 34px;
-      bottom: auto;
-      font-size: 3.5rem;
-      opacity: 0.75;
-    }
-
-    .wf__index > span {
-      display: none;
-    }
-
-    .wf__name {
-      font-size: var(--fs-3);
-    }
-
-    .wf__sum,
-    .wf__cta {
-      grid-column: 1;
-    }
-
-    .wf__sum {
-      max-width: 38ch;
-    }
-
-    .wf__cta {
-      margin-right: 0;
-    }
-
-    .wf__bottom {
-      padding-top: 24px;
-    }
-
-    .wf__facts {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    .wf__facts > div {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-      align-items: baseline;
-      gap: 12px;
-    }
-
-    .wf__facts dd {
-      grid-column: 1;
-      grid-row: 1;
-      font-size: var(--fs-1);
-    }
-
-    .wf__facts dt {
-      grid-column: 2;
-      max-width: none;
+    .wf__phone img {
+      border-radius: 9px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .wf__stage:has(.wf__cta:focus-visible) .wf__desktop {
-      transform: rotate(-5deg);
+    .wf__visual:hover .wf__desktop {
+      scale: none;
     }
   }
 </style>

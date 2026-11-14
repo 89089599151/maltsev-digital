@@ -79,7 +79,7 @@
   --step-small: 0.9375rem; /* 15 — подписи полей, мелкий текст */
   --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
   --step-lead: var(--fs-1);
-  --step-head: var(--fs-4);
+  --step-head: var(--fs-5);
   --step-display: var(--fs-6);
 
   /* Сетка. */
@@ -434,9 +434,8 @@ dd {
   text-decoration: none;
   transition:
     transform var(--dur-fast) var(--ease-out),
-    translate var(--dur) var(--ease-out),
-    box-shadow var(--dur) var(--ease-out),
     background-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
     color var(--dur-fast) var(--ease-out);
   -webkit-tap-highlight-color: transparent;
 }
@@ -471,7 +470,6 @@ dd {
 
 .btn--ghost:is(:hover, :focus-visible) {
   background: var(--paper);
-  --btn-hover-ring: inset 0 0 0 1px var(--ink);
   box-shadow: inset 0 0 0 1px var(--ink);
 }
 
@@ -500,70 +498,59 @@ a:is(:hover, :focus-visible) > .arrow {
   transform: translateX(4px);
 }
 
-/* --- Карточки и ссылки ------------------------------------------------ */
+/* --- Движение ---------------------------------------------------------- */
 
-/* Отдельное translate складывается с transform появления и GSAP-наклоном.
-   Новые карточки подключаются атрибутом; знакомые блоки получают тот же отклик без JS. */
-:is([data-hover-card], .mf__card, .hn__stat, .ps--compact .ps__step, .pk__row, .pk__calc, .pc) {
-  transition:
-    translate 420ms var(--ease-out),
-    box-shadow 420ms var(--ease-out),
-    border-color var(--dur) var(--ease-out),
-    background-color var(--dur) var(--ease-out);
-}
-
-/* Фокус дочерней ссылки поднимает всю карточку, сохраняя её собственную обводку. */
+/* Одна система на весь сайт (src/scripts/motion.ts только ставит классы):
+   блок появляется один раз, когда заходит в окно, — 22px вверх и из прозрачности, 800мс;
+   дети [data-stagger] идут по очереди с шагом 70мс; заголовок [data-split] поднимается из-под маски.
+   Анимация, а не переход: она не перебивает собственные переходы элемента (наведение, фокус).
+   Без скрипта и при reduced-motion всё видно сразу. */
 @media (prefers-reduced-motion: no-preference) {
-  :is([data-hover-card], .mf__card, .hn__stat, .ps--compact .ps__step, .pk__row, .pk__calc, .pc):focus-within {
-    translate: 0 var(--card-hover-lift, -7px);
-    box-shadow: var(--card-hover-shadow, var(--shadow-lift));
+  .motion-ready :is([data-reveal], [data-split]):not(.is-in) {
+    opacity: 0;
   }
 
-  .btn:focus-visible:not([disabled], [aria-disabled='true']) {
-    translate: 0 -3px;
-    box-shadow: var(--btn-hover-ring, 0 0 0 transparent), var(--shadow-lift);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
-  :is([data-hover-card], .mf__card, .hn__stat, .ps--compact .ps__step, .pk__row, .pk__calc, .pc):hover {
-    translate: 0 var(--card-hover-lift, -7px);
-    box-shadow: var(--card-hover-shadow, var(--shadow-lift));
+  .motion-ready [data-reveal].is-in:not(.is-static) {
+    animation: reveal-up 800ms var(--ease-out) calc(var(--i, 0) * 70ms) backwards;
   }
 
-  .btn:hover:not([disabled], [aria-disabled='true']) {
-    translate: 0 -3px;
-    box-shadow: var(--btn-hover-ring, 0 0 0 transparent), var(--shadow-lift);
+  .motion-ready [data-split].is-in:not(.is-static) {
+    animation: head-rise 900ms var(--ease-out) backwards;
   }
 }
 
-/* JS добавляет самостоятельный декоративный слой: фон карточки и её псевдоэлементы свободны.
-   Изолированный отрицательный z-index держит свет над фоном, но под текстом и ссылками. */
-.has-spotlight {
-  position: relative;
-  isolation: isolate;
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 22px;
+  }
 }
 
-.motion-spotlight {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(
-    310px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
-    var(--spotlight-color, rgba(91, 113, 255, 0.18)),
-    transparent 72%
-  );
-  transition: opacity 350ms var(--ease-out);
+/* Маска шире блока сверху и по бокам: не срезает бревис Й и выносные элементы. */
+@keyframes head-rise {
+  from {
+    translate: 0 60%;
+    clip-path: inset(-0.2em -0.1em 60% -0.1em);
+  }
+
+  to {
+    translate: 0 0;
+    clip-path: inset(-0.2em -0.1em -0.2em -0.1em);
+  }
 }
 
-.is-spotlit > .motion-spotlight {
-  opacity: 1;
+/* Кликабельная карточка отвечает на наведение лёгким подъёмом; некликабельные стоят на месте. */
+.lift {
+  transition:
+    translate var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
 }
 
-/* --- Появление -------------------------------------------------------- */
+@media (hover: hover) and (pointer: fine) {
+  .lift:hover {
+    translate: 0 -4px;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -575,64 +562,8 @@ a:is(:hover, :focus-visible) > .arrow {
     scroll-behavior: auto !important;
   }
 
-  :is([data-hover-card], .mf__card, .hn__stat, .ps--compact .ps__step, .pk__row, .pk__calc, .pc, .btn) {
-    translate: none !important;
-  }
-
-  .btn:active,
-  .btn .arrow,
-  a > .arrow {
-    transform: none !important;
-  }
-
-  .motion-spotlight {
-    display: none;
-  }
-}
-
-/* Появление при прокрутке. Скрипт (src/scripts/motion.ts) только ставит классы: .motion-ready на <html>
-   при запуске и .is-in на элемент, когда тот заходит в окно. Без скрипта и при reduced-motion всё видно сразу. */
-@media (prefers-reduced-motion: no-preference) {
-  .motion-ready [data-reveal]:not(.is-in) {
-    opacity: 0;
-    transform: translateY(var(--reveal-distance, 44px));
-  }
-
-  .motion-ready [data-reveal='rise']:not(.is-in) {
-    opacity: 1;
-    transform: translateY(24px);
-    clip-path: inset(100% 0% 0% 0% round 22px);
-  }
-
-  .motion-ready [data-reveal='wipe']:not(.is-in) {
-    opacity: 1;
-    transform: none;
-    clip-path: inset(0% 100% 0% 0% round 22px);
-  }
-
-  /* Задержка касается появления; наведение и фокус отвечают без ожидания своей очереди. */
-  .motion-ready [data-reveal].is-revealing {
-    transition:
-      opacity 850ms var(--ease-out) var(--reveal-delay, 0ms),
-      transform 1000ms var(--ease-out) var(--reveal-delay, 0ms),
-      clip-path 1050ms cubic-bezier(0.76, 0, 0.24, 1) var(--reveal-delay, 0ms),
-      translate 420ms var(--ease-out),
-      box-shadow 420ms var(--ease-out),
-      border-color var(--dur) var(--ease-out),
-      background-color var(--dur) var(--ease-out) !important;
-  }
-}
-
-/* Срабатывает сразу при смене настройки, ещё до обработчика JS. */
-@media (prefers-reduced-motion: reduce) {
-  .motion-ready [data-reveal] {
-    opacity: 1 !important;
-    transform: none !important;
-    clip-path: none !important;
-  }
-
-  .split-line {
-    transform: none !important;
+  .lift:hover {
+    translate: none;
   }
 }
 
@@ -696,12 +627,6 @@ html {
 
 ::-webkit-scrollbar-track {
   background: transparent;
-}
-
-/* Строки, которые режет SplitText: маска не должна обрезать нижние выносные. */
-.split-line {
-  padding-bottom: 0.08em;
-  margin-bottom: -0.08em;
 }
 
 /* Объекты ретро-набора (оранжевый пластик) до замены на новые: оранжевый уводится в синий акцент,

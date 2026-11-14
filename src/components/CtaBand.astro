@@ -1,0 +1,104 @@
+---
+/**
+ * Синяя полоса-призыв в конце внутренних страниц: вопрос, одна фраза и кнопка.
+ * Один компонент для «Услуг», «Работ» и «Обо мне» — одинаковый финал на каждой странице.
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  text: string;
+  action: { href: string; label: string };
+  /** Вторая, тихая ссылка рядом с кнопкой. */
+  more?: { href: string; label: string };
+}
+const { id, title, text, action, more } = Astro.props;
+---
+
+<section class="cb section" aria-labelledby={id} data-reveal>
+  <h2 id={id} class="cb__title">{title}</h2>
+  <div class="cb__side">
+    <p class="cb__text">{text}</p>
+    <div class="cb__actions">
+      <a class="btn cb__btn" href={action.href}>
+        {action.label} <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+      </a>
+      {more && <a class="cb__more" href={more.href}>{more.label}</a>}
+    </div>
+  </div>
+</section>
+
+<style>
+  .cb {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 24px clamp(24px, 4vw, 64px);
+    align-items: end;
+    padding: clamp(28px, 4vw, 64px);
+    border-radius: var(--radius-lg);
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .cb__title {
+    max-width: 14ch;
+    font-size: var(--fs-5);
+    line-height: 1.02;
+    letter-spacing: -0.05em;
+  }
+
+  .cb__side {
+    display: grid;
+    gap: 22px;
+    justify-items: start;
+  }
+
+  .cb__text {
+    max-width: 40ch;
+    font-size: var(--step-body);
+    color: var(--on-accent-muted);
+  }
+
+  .cb__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+  }
+
+  .cb__btn {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  .cb__btn:is(:hover, :focus-visible) {
+    background: var(--bg);
+  }
+
+  .cb__more {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-weight: 550;
+    color: inherit;
+    text-underline-offset: 0.3em;
+  }
+
+  .cb :global(:focus-visible) {
+    outline-color: var(--paper);
+  }
+
+  @media (max-width: 1023px) {
+    .cb {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .cb {
+      border-radius: 24px;
+    }
+  }
+</style>

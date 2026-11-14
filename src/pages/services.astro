@@ -2,9 +2,14 @@
 import Base from '@/layouts/Base.astro';
 import Estimator from '@/components/Estimator.astro';
 import ProcessSteps from '@/components/ProcessSteps.astro';
-import ServicesHero from '@/components/ServicesHero.astro';
+import PageHero from '@/components/PageHero.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { Image } from 'astro:assets';
+import { genImage } from '@/lib/gen';
 import PricingCards from '@/components/PricingCards.astro';
 import { plans, addons, extraPagePrice, formatPrice, pricingConfirmed } from '@/config/pricing';
+
+const sculpture = genImage('services-assembly');
 import { url } from '@/lib/url';
 import Icon from '@/components/Icon.astro';
 
@@ -27,7 +32,21 @@ const schema = {
   description="Три пакета с фиксированной ценой: START, BUSINESS и PREMIUM. Что входит и не входит, сроки, правки, калькулятор стоимости и этапы работы."
   schema={pricingConfirmed ? schema : undefined}
 >
-  <ServicesHero />
+  <PageHero
+    id="sv-title"
+    title="Услуги и цены"
+    lead="Делаю сайты под ключ: от структуры и дизайна до запуска на вашем домене. Три пакета с понятным составом и фиксированной ценой."
+  >
+    <Fragment slot="actions">
+      <div class="sv-actions">
+        <a class="btn btn--ink" href="#plans">Выбрать пакет <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
+        <a class="btn btn--ghost" href="#calculator">Рассчитать стоимость</a>
+      </div>
+    </Fragment>
+    {sculpture && (
+      <Image class="sv-object" src={sculpture.src} alt="" widths={[420, 640, 900]} sizes="(max-width: 1023px) 70vw, 36vw" quality={80} loading="eager" fetchpriority="high" />
+    )}
+  </PageHero>
   <PricingCards />
 
   <Estimator />
@@ -61,11 +80,12 @@ const schema = {
 
   <ProcessSteps />
 
-  <section class="section sv-cta tile tile--accent" aria-labelledby="sv-cta-title">
-    <h2 id="sv-cta-title" class="head">Не уверены, какой тариф нужен?</h2>
-    <p class="lead">Опишите задачу в двух словах — предложу подходящий вариант и назову точную сумму.</p>
-    <a class="btn btn--ink" href={url('/contacts/')}>Описать задачу <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
-  </section>
+  <CtaBand
+    id="sv-cta-title"
+    title="Не уверены, какой пакет нужен?"
+    text="Опишите задачу в двух словах — предложу подходящий вариант и назову точную сумму."
+    action={{ href: url('/contacts/'), label: 'Описать задачу' }}
+  />
 </Base>
 
 <style>
@@ -91,7 +111,6 @@ const schema = {
 
   .extras__head .head {
     font-size: var(--fs-4);
-    overflow-wrap: anywhere;
   }
 
   .extras__list {
@@ -100,7 +119,7 @@ const schema = {
     display: grid;
     padding: 8px clamp(22px, 2.6vw, 36px);
     border-radius: var(--radius-lg);
-    background: var(--surface);
+    background: var(--paper);
   }
 
   /* Один лист со строками вместо стопки плиток. */
@@ -130,7 +149,7 @@ const schema = {
     place-items: center;
     width: 44px;
     height: 44px;
-    border-radius: 12px;
+    border-radius: 50%;
     background: var(--ink);
     color: var(--bg);
     font-size: var(--fs-1);
@@ -173,8 +192,8 @@ const schema = {
   .extras__mirror {
     justify-self: start;
     padding: 10px 14px;
-    border-radius: var(--radius-sm);
-    background: var(--surface);
+    border-radius: 999px;
+    background: var(--paper);
     font-size: var(--step-small);
   }
 
@@ -206,18 +225,18 @@ const schema = {
     white-space: nowrap;
   }
 
-  .sv-cta {
-    display: grid;
-    gap: 24px;
-    padding: clamp(28px, 4vw, 56px);
+  .sv-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
   }
 
-  .sv-cta .lead {
-    max-width: 46ch;
-  }
-
-  .sv-cta .btn {
-    justify-self: start;
+  /* Объект справа в первом экране: стеклянные окна, собранные в сайт. */
+  .sv-object {
+    width: min(100%, 520px);
+    height: auto;
+    justify-self: center;
+    filter: drop-shadow(0 36px 36px rgba(26, 47, 251, 0.2));
   }
 
   @media (max-width: 1023px) {

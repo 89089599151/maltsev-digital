@@ -1,11 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
 import ProjectCard from '@/components/ProjectCard.astro';
 import WorkFeature from '@/components/WorkFeature.astro';
+import CtaBand from '@/components/CtaBand.astro';
 import { categories } from '@/config/portfolio';
 import { url } from '@/lib/url';
-import Icon from '@/components/Icon.astro';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const [featured, ...rest] = projects;
@@ -17,22 +18,20 @@ const pattern = ['wide', 'normal', 'tall', 'normal', 'normal', 'wide', 'normal']
   title="Работы — портфолио веб-разработчика"
   description="Портфолио Maltsev Digital: реальные сайты с разбором задачи, дизайна и разработки. Первый кейс — этот сайт, от идеи до запуска."
 >
-  <header class="pf-intro" aria-labelledby="pf-title">
-    <div class="pf-intro__heading">
-      <p class="pf-intro__eyebrow">Портфолио <span aria-hidden="true">/</span> Дизайн и код</p>
-      <h1 id="pf-title">Работы<span class="pf-intro__dot" aria-hidden="true">.</span></h1>
-    </div>
-    <p class="pf-intro__lead">От идеи до сайта, который можно открыть. С задачей, решениями и вниманием к деталям.</p>
-  </header>
+  <PageHero
+    id="pf-title"
+    title="Работы"
+    lead={featured
+      ? 'Каждый проект — с задачей, решениями и ссылкой на живой сайт. Первый кейс — этот сайт: он сделан так же, как будет сделан ваш.'
+      : 'Готовлю проекты к публикации. Каждый появится с разбором задачи, дизайна и разработки.'}
+    compact
+  />
 
   {featured && <WorkFeature project={featured} head={false} />}
 
   {rest.length > 0 && (
     <section class="section pf-list" aria-labelledby="pf-list-title">
-      <div class="pf-list__head" data-reveal>
-        <h2 id="pf-list-title" class="head">Ещё проекты</h2>
-        <span class="pf-list__count">{String(rest.length).padStart(2, '0')}</span>
-      </div>
+      <h2 id="pf-list-title" class="head pf-list__title" data-split>Ещё проекты</h2>
       {used.length > 1 && (
         <div class="filters" role="group" aria-label="Фильтр по категориям" data-filters>
           <button type="button" class="filter" aria-pressed="true" data-filter="all">Все</button>
@@ -48,29 +47,13 @@ const pattern = ['wide', 'normal', 'tall', 'normal', 'normal', 'wide', 'normal']
     </section>
   )}
 
-  {!featured && (
-    <section class="pf-empty" aria-labelledby="pf-empty-title" data-reveal>
-      <span class="pf-empty__index" aria-hidden="true">01</span>
-      <div>
-        <h2 id="pf-empty-title" class="head">Первый кейс скоро здесь</h2>
-        <p>Готовлю проекты к публикации. Каждый появится с подробным разбором задачи, дизайна и разработки.</p>
-      </div>
-    </section>
-  )}
-
-  <section class="pf-next section" aria-labelledby="pf-next-title" data-reveal>
-    <a class="pf-next__card" href={url('/contacts/')} data-hover-card>
-      <div class="pf-next__main">
-        <p class="pf-next__eyebrow">Есть задача для сайта?</p>
-        <h2 id="pf-next-title">Следующий<br /><span>проект — ваш.</span></h2>
-      </div>
-      <div class="pf-next__side">
-        <p>Расскажите об идее. Я предложу формат, стоимость и план работы.</p>
-        <span class="pf-next__action">Обсудить проект <span class="pf-next__arrow" aria-hidden="true"><Icon name="arrow" /></span></span>
-      </div>
-      <span class="pf-next__orbit" aria-hidden="true"></span>
-    </a>
-  </section>
+  <CtaBand
+    id="pf-next-title"
+    title="Следующий кейс — ваш"
+    text="Расскажите об идее — предложу формат, стоимость и план работы."
+    action={{ href: url('/contacts/'), label: 'Обсудить проект' }}
+    more={{ href: url('/services/'), label: 'Пакеты и цены' }}
+  />
 </Base>
 
 <script>
@@ -96,165 +79,8 @@ const pattern = ['wide', 'normal', 'tall', 'normal', 'normal', 'wide', 'normal']
 </script>
 
 <style>
-  .pf-intro {
-    display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    align-items: end;
-    gap: 24px clamp(32px, 5vw, 80px);
-    padding: clamp(32px, 4.5vw, 68px) 0 0;
-  }
-
-  .pf-intro__heading {
-    display: grid;
-    gap: 22px;
-  }
-
-  .pf-intro__eyebrow {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-    color: var(--muted);
-    font-size: var(--fs-xs);
-  }
-
-  .pf-intro__eyebrow > span {
-    color: var(--accent);
-  }
-
-  .pf-intro h1 {
-    font-size: var(--step-display);
-    font-weight: 360;
-    line-height: 0.96;
-    letter-spacing: -0.06em;
-  }
-
-  .pf-intro__dot {
-    color: var(--accent);
-  }
-
-  .pf-intro__lead {
-    max-width: 36ch;
-    padding-bottom: 4px;
-    color: var(--ink-2);
-    font-size: var(--step-body);
-    line-height: 1.5;
-  }
-
-  .pf-list__head {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    margin-bottom: 32px;
-  }
-
-  .pf-list__count {
-    align-self: start;
-    color: var(--accent-text);
-    font-size: var(--fs-xs);
-  }
-
-  .pf-next {
-    margin-top: clamp(48px, 6vw, 88px);
-  }
-
-  .pf-next__card {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: 32px clamp(32px, 5vw, 80px);
-    align-items: end;
-    padding: clamp(28px, 4vw, 56px);
-    border-radius: var(--radius-lg);
-    border: 1px solid rgba(26, 47, 251, 0.14);
-    background: linear-gradient(120deg, var(--paper), #e6eafb);
-    color: var(--ink);
-    text-decoration: none;
-  }
-
-  .pf-next__main,
-  .pf-next__side {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    justify-items: start;
-  }
-
-  .pf-next__main {
-    gap: 24px;
-  }
-
-  .pf-next__eyebrow {
-    font-size: var(--fs-xs);
-    color: var(--muted);
-  }
-
-  .pf-next h2 {
-    font-size: var(--fs-5);
-    font-weight: 360;
-    line-height: 1.04;
-    letter-spacing: -0.05em;
-  }
-
-  .pf-next h2 > span {
-    color: var(--accent-text);
-  }
-
-  .pf-next__side {
-    gap: 28px;
-    padding-bottom: 3px;
-  }
-
-  .pf-next__side > p {
-    max-width: 28ch;
-    color: var(--ink-2);
-    font-size: var(--fs-0);
-    line-height: 1.5;
-  }
-
-  .pf-next__action {
-    display: inline-flex;
-    align-items: center;
-    gap: 24px;
-    font-size: var(--fs-0);
-    font-weight: 550;
-    color: var(--accent-text);
-  }
-
-  .pf-next__arrow {
-    display: grid;
-    place-items: center;
-    width: 48px;
-    height: 48px;
-    border: 1px solid rgba(26, 47, 251, 0.3);
-    border-radius: 50%;
-    transition: color var(--dur) var(--ease-out), background-color var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
-  }
-
-  .pf-next__orbit {
-    position: absolute;
-    z-index: 0;
-    top: -70%;
-    right: -8%;
-    width: 54%;
-    aspect-ratio: 0.75;
-    border: 1px solid rgba(26, 47, 251, 0.15);
-    border-radius: 50%;
-    transform: rotate(-35deg);
-    pointer-events: none;
-  }
-
-  .pf-next__card:is(:hover, :focus-visible) .pf-next__arrow {
-    transform: rotate(-40deg);
-    background: var(--accent);
-    color: var(--accent-ink);
-  }
-
-  .pf-next__card:focus-visible {
-    outline-color: var(--accent);
-    outline-offset: 5px;
+  .pf-list__title {
+    margin-bottom: clamp(24px, 3vw, 40px);
   }
 
   .filters {
@@ -268,20 +94,21 @@ const pattern = ['wide', 'normal', 'tall', 'normal', 'normal', 'wide', 'normal']
     min-height: 48px;
     padding: 12px 18px;
     border-radius: 999px;
-    background: var(--surface-2);
-    box-shadow: inset 0 0 0 1px var(--glass-edge);
+    background: var(--paper);
     font-size: var(--fs-0);
     font-weight: 550;
-    transition: background-color var(--dur-fast) var(--ease-out);
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
   }
 
   .filter:hover {
-    background: var(--surface-3);
+    background: var(--surface-2);
   }
 
   .filter[aria-pressed='true'] {
-    background: var(--accent);
-    color: var(--accent-ink);
+    background: var(--ink);
+    color: var(--bg);
   }
 
   .grid {
@@ -298,79 +125,5 @@ const pattern = ['wide', 'normal', 'tall', 'normal', 'normal', 'wide', 'normal']
   .filters__empty {
     padding: 40px 0;
     color: var(--muted);
-  }
-
-  .pf-empty {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 5fr);
-    align-items: center;
-    gap: 32px;
-    margin-top: 32px;
-    padding: clamp(28px, 5vw, 72px);
-    border-radius: var(--radius-lg);
-    border: 1px solid rgba(26, 47, 251, 0.12);
-    background: linear-gradient(135deg, var(--paper), #e9ecfa);
-    color: var(--ink);
-  }
-
-  .pf-empty__index {
-    font-size: var(--step-display);
-    font-weight: 300;
-    line-height: 1;
-    letter-spacing: -0.08em;
-    color: var(--accent);
-  }
-
-  .pf-empty p {
-    max-width: 48ch;
-    margin-top: 20px;
-    color: var(--muted);
-    font-size: var(--fs-0);
-  }
-
-  @media (max-width: 767px) {
-    .pf-intro {
-      grid-template-columns: 1fr;
-      gap: 22px;
-      padding-top: 28px;
-    }
-
-    .pf-intro__heading {
-      gap: 20px;
-    }
-
-    .pf-intro__lead {
-      max-width: 32ch;
-    }
-
-    .pf-next__card {
-      grid-template-columns: 1fr;
-      gap: 28px;
-      padding: 28px 24px;
-      border-radius: 24px;
-    }
-
-    .pf-next__main {
-      gap: 22px;
-    }
-
-    .pf-next h2 {
-      font-size: var(--fs-4);
-    }
-
-    .pf-next__side {
-      gap: 24px;
-    }
-
-    .pf-next__orbit {
-      top: -40%;
-      right: -35%;
-      width: 100%;
-    }
-
-    .grid,
-    .pf-empty {
-      grid-template-columns: 1fr;
-    }
   }
 </style>

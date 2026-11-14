@@ -1,7 +1,8 @@
 ---
 /**
- * Первый экран внутренних страниц: светлая сцена, крупный тонкий заголовок, пояснение
- * и короткое слово-метка в углу. Справа — необязательный слот (факты, фото, кнопки).
+ * Первый экран внутренних страниц — та же белая сцена, что на главной: крупный тонкий заголовок,
+ * пояснение и действия. Справа — необязательный слот (фото, объект, факты).
+ * Слово-метка в углу осталось только для страницы 404.
  */
 import { url } from '@/lib/url';
 
@@ -9,7 +10,7 @@ interface Props {
   id: string;
   title: string;
   lead?: string;
-  /** Короткое слово-метка в углу сцены: «Цена», «404», «01». */
+  /** Крупное слово в углу сцены — только там, где оно само сообщение («404»). */
   word?: string;
   crumbs?: { href: string; label: string }[];
   /** Для длинных заголовков: меньший кегль и ниже сцена. */
@@ -61,18 +62,20 @@ const hasAside = Astro.slots.has('default');
     grid-template-columns: minmax(0, 1fr);
     gap: clamp(24px, 3vw, 48px);
     align-items: end;
-    min-height: clamp(360px, 42vw, 560px);
+    min-height: clamp(280px, 28vw, 420px);
     padding: clamp(28px, 4vw, 64px);
     border-radius: var(--radius-lg);
     background:
-      radial-gradient(55% 70% at 80% 30%, var(--stage-glow) 0%, rgba(255, 255, 255, 0) 70%),
-      linear-gradient(180deg, var(--stage-1), var(--stage-2));
+      radial-gradient(50% 70% at 82% 40%, rgba(26, 47, 251, 0.1) 0%, rgba(26, 47, 251, 0) 70%),
+      var(--paper);
     overflow: hidden;
     isolation: isolate;
   }
 
   .ph--aside .ph__stage {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: center;
+    min-height: clamp(340px, 36vw, 520px);
   }
 
   .ph__word {
@@ -119,9 +122,10 @@ const hasAside = Astro.slots.has('default');
   }
 
   .ph__title {
+    font-weight: 300;
     font-size: var(--step-display);
     line-height: 1;
-    letter-spacing: -0.045em;
+    letter-spacing: -0.055em;
     max-width: 12ch;
     overflow-wrap: anywhere;
     hyphens: auto;
@@ -137,35 +141,32 @@ const hasAside = Astro.slots.has('default');
   }
 
   .ph__lead {
-    max-width: 52ch;
-    font-family: var(--font-display);
-    font-weight: 500;
+    max-width: 46ch;
     font-size: var(--fs-1);
     line-height: 1.4;
-    color: var(--ink);
+    letter-spacing: -0.015em;
+    color: var(--ink-2);
   }
 
   .ph__aside {
     display: grid;
     gap: 8px;
-    align-self: stretch;
-    align-content: end;
   }
 
   @media (prefers-reduced-motion: no-preference) {
     .ph__main {
-      animation: ph-up 0.9s var(--ease-out) 0.1s backwards;
+      animation: ph-up 0.9s var(--ease-out) 0.05s backwards;
     }
 
     .ph__aside {
-      animation: ph-up 0.9s var(--ease-out) 0.25s backwards;
+      animation: ph-up 0.9s var(--ease-out) 0.18s backwards;
     }
   }
 
   @keyframes ph-up {
     from {
       opacity: 0;
-      transform: translateY(24px);
+      transform: translateY(18px);
     }
   }
 
@@ -188,8 +189,5 @@ const hasAside = Astro.slots.has('default');
       font-size: 3.5rem;
     }
 
-    .ph__main {
-      padding-top: 56px;
-    }
   }
 </style>
