@@ -37,7 +37,7 @@ const { id, title, text, link, invert = false } = Astro.props;
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     gap: 24px clamp(24px, 4vw, 64px);
     align-items: end;
-    margin-bottom: clamp(32px, 4vw, 56px);
+    margin-bottom: clamp(24px, 3vw, 40px);
   }
 
   .sh__title {
@@ -94,6 +94,12 @@ const { id, title, text, link, invert = false } = Astro.props;
   @media (max-width: 1023px) {
     .sh {
       grid-template-columns: 1fr;
+      row-gap: 18px;
+    }
+
+    .sh__side {
+      gap: 12px;
+      padding-bottom: 0;
     }
   }
 </style>

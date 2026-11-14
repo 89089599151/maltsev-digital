@@ -297,16 +297,17 @@ const schema = {
 
   .pj-device__frame {
     width: 100%;
-    padding: 5px;
-    border-radius: 22px;
-    background: var(--ink);
-    box-shadow: 0 30px 50px -28px rgba(10, 11, 20, 0.5);
+    border-radius: 14px;
+    background: var(--paper);
+    box-shadow:
+      0 0 0 1px rgba(10, 11, 20, 0.08),
+      0 40px 70px -40px rgba(16, 32, 200, 0.45);
+    overflow: hidden;
   }
 
   .pj-device__frame img {
     width: 100%;
     height: auto;
-    border-radius: 17px;
     object-fit: cover;
     object-position: top;
   }
@@ -395,12 +396,7 @@ const schema = {
     }
 
     .pj-device__frame {
-      padding: 3px;
-      border-radius: 14px;
-    }
-
-    .pj-device__frame img {
-      border-radius: 11px;
+      border-radius: 10px;
     }
   }
 </style>

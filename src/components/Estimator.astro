@@ -198,7 +198,7 @@ const start = plans[1];
 
   input[type='range'] {
     width: 100%;
-    margin-top: auto;
+    margin-top: var(--space-6);
     accent-color: var(--accent);
     height: 44px;
     cursor: pointer;
@@ -255,6 +255,10 @@ const start = plans[1];
     color: var(--muted);
   }
 
+  .est__res-extra:empty {
+    display: none;
+  }
+
   .est__shop {
     grid-column: 1 / -1;
     font-size: var(--step-small);
@@ -291,7 +295,42 @@ const start = plans[1];
     .est__result {
       grid-column: 1 / -1;
       grid-row: auto;
-      min-height: 320px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px clamp(24px, 4vw, 40px);
+      align-items: start;
+    }
+
+    .est__res-label {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .est__res-plan {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .est__res-sum {
+      grid-column: 2;
+      grid-row: 1 / 3;
+      align-self: center;
+      margin-top: 0;
+    }
+
+    .est__res-time {
+      grid-column: 1;
+      grid-row: 3;
+    }
+
+    .est__res-extra,
+    .est__res-note,
+    .est__go {
+      grid-column: 1 / -1;
+    }
+
+    .est__go {
+      justify-self: start;
     }
   }
 
@@ -308,6 +347,16 @@ const start = plans[1];
 
     .est__pages-val {
       font-size: 4rem;
+    }
+
+    .est__result {
+      display: flex;
+      gap: 12px;
+    }
+
+    .est__res-sum {
+      align-self: auto;
+      margin-top: 8px;
     }
   }
 </style>

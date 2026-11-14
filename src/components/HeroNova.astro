@@ -41,7 +41,7 @@ const fastest = plans[0];
       </h1>
     </div>
 
-    <p class="hn__lead">Дизайн, код и запуск в одних руках. Цену и срок записываю в договоре до начала работы.</p>
+    <p class="hn__lead">Дизайн, разработка и запуск. Цену и срок фиксирую в договоре.</p>
 
     <div class="hn__cta">
       <a class="hn__btn" href={url('/contacts/')}>
@@ -120,7 +120,7 @@ const fastest = plans[0];
           <path d="M12 0c.7 6.9 4.9 11.3 12 12-7.1.7-11.3 5.1-12 12-.7-6.9-4.9-11.3-12-12C7.100 11.300 11.300 6.900 12 0Z" />
         </svg>
         <span class="hn__card-t">
-          Три пакета с понятным составом. Точная цена — в договоре до старта.{!pricingConfirmed && ' Цены предварительные.'}
+          Лендинг, сайт компании или индивидуальный проект.{!pricingConfirmed && ' Цены предварительные.'}
         </span>
         <span class="hn__card-who">
           <Image src={avatar} alt="" width={36} height={36} loading="eager" />
@@ -149,7 +149,7 @@ const fastest = plans[0];
     isolation: isolate;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    row-gap: 22px;
+    row-gap: 18px;
     padding: 28px 20px 20px;
     border-radius: 26px;
     /* Белая сцена: холодное свечение за объектом, чтобы стекло не висело в пустоте. */
@@ -214,6 +214,7 @@ const fastest = plans[0];
 
   .hn__btn {
     display: inline-flex;
+    flex-shrink: 0;
     align-items: center;
     gap: 18px;
     min-height: 60px;
@@ -226,6 +227,7 @@ const fastest = plans[0];
     font-size: var(--fs-0);
     letter-spacing: -0.01em;
     text-decoration: none;
+    white-space: nowrap;
     transition: background-color var(--dur-fast) var(--ease-out);
   }
 
@@ -635,6 +637,33 @@ const fastest = plans[0];
     }
   }
 
+  /* На телефоне цена остаётся заметной, а повтор условий не растягивает весь первый экран. */
+  @media (max-width: 639px) {
+    .hn__card-pic {
+      min-height: 120px;
+    }
+
+    .hn__card-body {
+      padding: 10px 8px 10px 12px;
+    }
+
+    .hn__card-t {
+      display: none;
+    }
+
+    .hn__card-who {
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .hn__card-who img {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
   /* --- Широкий экран: композиция референса, шапка внутри сцены ----------------- */
   @media (min-width: 1024px) {
     /* Сцена поднимается под шапку и почти до краёв окна; контент выровнен по полям шапки. */
@@ -653,7 +682,7 @@ const fastest = plans[0];
       grid-template-rows: auto auto auto 1fr auto;
       column-gap: var(--gap);
       row-gap: 0;
-      min-height: min(calc(100svh - var(--margin) - 48px), 1000px);
+      min-height: min(calc(100svh - var(--margin) - 48px), 820px);
       padding: calc(var(--hdr-inset) + 56px + clamp(28px, 6vh, 84px)) var(--pad-x) clamp(22px, 3.4vh, 40px);
       border-radius: var(--radius-lg);
     }
@@ -684,7 +713,6 @@ const fastest = plans[0];
     .hn__cta {
       grid-column: 1 / 6;
       grid-row: 3;
-      flex-wrap: nowrap;
       margin-top: clamp(20px, 3.4vh, 36px);
     }
 
@@ -692,7 +720,7 @@ const fastest = plans[0];
     .hn__object {
       position: absolute;
       left: 57%;
-      top: 58%;
+      top: 66%;
       width: clamp(480px, 54%, 900px);
       translate: -50% -50%;
     }
@@ -774,6 +802,7 @@ const fastest = plans[0];
     }
 
     .hn__object {
+      top: 58%;
       width: clamp(440px, 48%, 720px);
     }
 

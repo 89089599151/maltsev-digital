@@ -146,6 +146,10 @@ const H = headingLevel;
   }
 
   @media (max-width: 1023px) {
+    .faq {
+      row-gap: 28px;
+    }
+
     .faq__side,
     .faq__list {
       grid-column: 1 / -1;
@@ -153,7 +157,7 @@ const H = headingLevel;
 
     .faq__side {
       position: static;
-      margin-bottom: 24px;
+      gap: 18px;
       padding-right: 0;
     }
   }
@@ -173,12 +177,9 @@ const H = headingLevel;
     }
 
     .faq__a {
-      padding-right: 0;
-    }
-
-    .faq__a {
-      padding: 0 20px 20px;
+      padding: 0 0 24px;
       font-size: var(--fs-0);
+      line-height: 1.6;
     }
   }
 </style>

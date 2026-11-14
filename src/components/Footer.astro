@@ -74,7 +74,7 @@ const year = new Date().getFullYear();
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: var(--gap);
-    margin-top: 56px;
+    margin-top: clamp(28px, 3vw, 44px);
   }
 
   .ftr__cols {
@@ -121,7 +121,7 @@ const year = new Date().getFullYear();
     grid-template-columns: 1fr auto;
     gap: 24px;
     align-items: center;
-    margin-top: 56px;
+    margin-top: clamp(28px, 3vw, 44px);
   }
 
   .ftr__bottom p:nth-child(2) {
@@ -139,7 +139,7 @@ const year = new Date().getFullYear();
 
     .ftr__contacts {
       grid-column: 1 / -1;
-      margin-top: 32px;
+      margin-top: 16px;
     }
   }
 
@@ -151,7 +151,17 @@ const year = new Date().getFullYear();
 
     .ftr__cols {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      row-gap: 8px;
+      gap: 12px 20px;
+    }
+
+    .ftr__cols ul:last-child {
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 20px;
+    }
+
+    .ftr__cols ul:last-child li:last-child {
+      grid-column: 1 / -1;
     }
 
     /* Ссылки высотой с палец: по 44px, а не по строке текста. */

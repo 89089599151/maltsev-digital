@@ -58,8 +58,8 @@ const hasAside = Astro.slots.has('default');
     grid-template-columns: minmax(0, 1fr);
     gap: clamp(24px, 3vw, 48px);
     align-items: end;
-    min-height: clamp(280px, 28vw, 420px);
-    padding: clamp(28px, 4vw, 64px);
+    min-height: clamp(260px, 26vw, 380px);
+    padding: clamp(28px, 3.3vw, 52px);
     border-radius: var(--radius-lg);
     background:
       radial-gradient(50% 70% at 82% 40%, rgba(26, 47, 251, 0.1) 0%, rgba(26, 47, 251, 0) 70%),
@@ -71,7 +71,7 @@ const hasAside = Astro.slots.has('default');
   .ph--aside .ph__stage {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     align-items: center;
-    min-height: clamp(340px, 36vw, 520px);
+    min-height: clamp(320px, 32vw, 480px);
   }
 
   .ph__main {
@@ -115,18 +115,18 @@ const hasAside = Astro.slots.has('default');
   }
 
   .ph--compact .ph__stage {
-    min-height: clamp(280px, 28vw, 400px);
+    min-height: clamp(260px, 26vw, 380px);
   }
 
   .ph--compact .ph__title {
-    font-size: clamp(2rem, 1rem + 3.6vw, 4.5rem);
+    font-size: clamp(2.5rem, 1.25rem + 3.6vw, 4.5rem);
     max-width: 18ch;
   }
 
   .ph__lead {
     max-width: 46ch;
-    font-size: var(--fs-1);
-    line-height: 1.4;
+    font-size: var(--step-body);
+    line-height: 1.5;
     letter-spacing: -0.015em;
     color: var(--ink-2);
   }
@@ -162,10 +162,8 @@ const hasAside = Astro.slots.has('default');
   @media (max-width: 767px) {
     .ph__stage {
       min-height: 0;
-      padding: 24px 18px;
+      padding: 28px 22px;
       border-radius: 24px;
     }
-
-
   }
 </style>

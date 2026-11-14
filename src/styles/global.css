@@ -77,14 +77,25 @@
   --fs-5: clamp(2.5rem, 1rem + 4.6vw, 3.8125rem); /* 40→61 — крупный H2 */
   --fs-6: clamp(3rem, 1rem + 5.4vw, 6rem); /* 48→96 — дисплей */
   --step-small: 0.9375rem; /* 15 — подписи полей, мелкий текст */
-  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-body: clamp(1rem, 0.95rem + 0.35vw, 1.125rem);
   --step-lead: var(--fs-1);
   --step-head: var(--fs-5);
   --step-display: var(--fs-6);
 
-  /* Сетка. */
-  /* Между карточками: на телефоне 12px, на широком экране до 20px — иначе крупные плашки слипаются. */
-  --gap: clamp(12px, 1.25vw, 20px);
+  /* Базовая шкала: 4 px для деталей, 8 px для основных групп. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  /* Сетка: расстояние внутри группы меньше, чем между самостоятельными блоками. */
+  --gap: clamp(var(--space-4), 1.5vw, var(--space-6));
   --margin: clamp(16px, 1.4vw, 24px);
   /* Контейнер страницы: ширина и боковые поля. */
   --page-max: 1560px;
@@ -92,8 +103,8 @@
   --radius: 20px;
   --radius-sm: 12px;
   --radius-lg: 32px;
-  --pad: clamp(18px, 1.6vw, 26px);
-  --section-gap: clamp(80px, 8vw, 140px);
+  --pad: clamp(var(--space-4), 2vw, var(--space-8));
+  --section-gap: var(--space-16);
   --header-h: 60px;
   /* На главной (широкий экран) шапка лежит внутри сцены первого экрана — отступ от её верхнего края. */
   --hdr-inset: clamp(14px, 1.4vw, 24px);
@@ -106,6 +117,12 @@
   --dur-slow: 900ms;
 
   color-scheme: light;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --section-gap: clamp(var(--space-24), 7vw, var(--space-32));
+  }
 }
 
 /* --- Сброс ------------------------------------------------------------- */
@@ -326,7 +343,7 @@ dd {
 }
 
 .section--tight {
-  margin-top: var(--gap);
+  margin-top: clamp(var(--space-8), 4vw, var(--space-12));
 }
 
 /* --- Типографика ------------------------------------------------------ */
@@ -386,6 +403,19 @@ dd {
 
 .prose {
   max-width: 64ch;
+}
+
+/* Балансируем только заголовки; длинный текст получает отдельную меру и переносы. */
+:where(h1, h2, h3, .head, .head-sm) {
+  text-wrap: balance;
+}
+
+:where(.prose p, .ph__lead, .sh__text, .rows__v) {
+  text-wrap: pretty;
+}
+
+:where(.pk__price, .pl__price, .est__res-sum, .wf__facts dd) {
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 .prose > * + * {
@@ -588,10 +618,10 @@ a:is(:hover, :focus-visible) > .arrow {
 
 @media (max-width: 767px) {
   :root {
-    --gap: 6px;
+    --gap: var(--space-4);
     --margin: 16px;
     --page-pad: 16px;
-    --pad: 18px;
+    --pad: 1.25rem;
   }
 
   .board {
