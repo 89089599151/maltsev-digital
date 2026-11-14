@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '@/layouts/Base.astro';
+import { genImage } from '@/lib/gen';
 import ContactLink from '@/components/ContactLink.astro';
 import PageHero from '@/components/PageHero.astro';
 import { site, telegramUrl } from '@/config/site';
@@ -8,6 +10,8 @@ import { url } from '@/lib/url';
 import Icon from '@/components/Icon.astro';
 
 const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.formspreeId}` : '';
+// Стеклянная бутылка с посланием: «напишите мне».
+const bottle = genImage('contacts-bottle');
 const projectTypes = ['Лендинг', 'Сайт компании', 'Каталог или магазин', 'Сайт специалиста', 'Редизайн существующего сайта', 'Другое'];
 ---
 
@@ -20,8 +24,15 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
     title="Обсудим ваш сайт"
     lead={`Напишите напрямую или заполните короткий бриф. Отвечу ${site.contacts.responseTime.value} — ${site.contacts.hours}.`}
   >
-    <ContactLink kind="telegram" variant="tile" />
-    <ContactLink kind="email" variant="tile" />
+    <Fragment slot="actions">
+      <div class="ct-direct">
+        <ContactLink kind="telegram" variant="tile" />
+        <ContactLink kind="email" variant="tile" />
+      </div>
+    </Fragment>
+    {bottle && (
+      <Image class="ct-object" src={bottle.src} alt="" widths={[320, 480, 640, 900]} sizes="(max-width: 1023px) 60vw, 34vw" quality={80} loading="eager" fetchpriority="high" />
+    )}
   </PageHero>
 
   <div class="ct section section--tight">
@@ -153,6 +164,34 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
     gap: var(--gap);
     margin-top: var(--gap);
     align-items: start;
+  }
+
+  /* Прямые контакты — сразу под текстом первого экрана, две плашки в ряд. */
+  .ct-direct {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: min(100%, 680px);
+  }
+
+  /* В половинной плашке адрес почты набран мельче, чтобы не переносился. */
+  .ct-direct :global(.cl.cl--tile .cl__value) {
+    font-size: clamp(0.875rem, 3.7vw, 1.0625rem);
+  }
+
+  /* На узком десктопе и планшете плашки встают друг под другом. */
+  @media (max-width: 1279px) {
+    .ct-direct {
+      grid-template-columns: 1fr;
+      width: min(100%, 420px);
+    }
+  }
+
+  .ct-object {
+    width: min(100%, 480px);
+    height: auto;
+    justify-self: center;
+    filter: drop-shadow(0 30px 32px rgba(26, 47, 251, 0.18));
   }
 
   /* Слева — три шага после заявки (прилипают при прокрутке длинной формы), справа — сама форма. */
@@ -447,8 +486,13 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
       grid-template-columns: 1fr;
     }
 
+    .ct-direct,
     .row--2 {
       grid-template-columns: 1fr;
+    }
+
+    .ct-object {
+      width: min(70vw, 300px);
     }
 
     .plans-pick {

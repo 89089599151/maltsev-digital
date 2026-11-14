@@ -10,7 +10,8 @@ import PricingCards from '@/components/PricingCards.astro';
 import { plans, addons, extraPagePrice, formatPrice, paymentTerms, pricingConfirmed } from '@/config/pricing';
 import { terms } from '@/data/content';
 
-const sculpture = genImage('services-assembly');
+// Стеклянный осьминог: много дел в одних руках.
+const sculpture = genImage('services-octopus');
 
 // Условия работы: текст — в src/data/content.ts, суммы подставляются из цен.
 const fill = (v: string) =>
@@ -253,9 +254,9 @@ const schema = {
     gap: 12px;
   }
 
-  /* Объект справа в первом экране: стеклянные окна, собранные в сайт. */
+  /* Объект справа в первом экране — из той же серии, что медуза на главной. */
   .sv-object {
-    width: min(100%, 520px);
+    width: min(100%, 560px);
     height: auto;
     justify-self: center;
     filter: drop-shadow(0 36px 36px rgba(26, 47, 251, 0.2));

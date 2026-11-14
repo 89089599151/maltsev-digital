@@ -10,7 +10,8 @@ import { categories } from '@/config/portfolio';
 import { url } from '@/lib/url';
 import { genImage } from '@/lib/gen';
 
-const sculpture = genImage('works-gallery');
+// Стеклянная раковина наутилуса в разрезе: камеры — как проекты.
+const sculpture = genImage('works-nautilus');
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const [featured, ...rest] = projects;
 const used = categories.filter((c) => rest.some((p) => p.data.category === c.id));

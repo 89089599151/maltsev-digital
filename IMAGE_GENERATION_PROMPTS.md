@@ -1,111 +1,146 @@
-# Задания на генерацию изображений — v3, белая тема с синим акцентом (GPT Image)
+# Задания на генерацию изображений — v4, серия «стеклянное море»
 
-## 15 ноября — «Работы» и «Вопросы»
+Прошлые промпты (медуза, сборка окон для услуг, галерея и диалог) остались в истории git.
 
-Встроенным генератором созданы два изображения с прозрачным фоном в стиле страницы услуг.
-Используются в правой части первого экрана соответствующих страниц; реальные кейсы и ответы остаются вёрсткой.
+## Почему переделываем
 
-### `src/assets/gen/works-gallery.png` — стеклянная галерея
+Картинки для «Работ» и «Вопросов» повторяют формулу страницы услуг: три стеклянные панели, лента
+и хромовое кольцо. На трёх страницах подряд это читается как одна и та же картинка, а облачка
+с вопросительным знаком и точками выглядят как иконка из мессенджера.
 
-```text
-Use case: stylized-concept. Asset type: transparent 3D hero sculpture for the portfolio / Works page of Maltsev Digital, an established white and electric-blue independent web designer website. Primary request: a sculptural curated gallery of digital work. Three floating thick glass picture frames in a compact elegant fanned composition, connected by one fluid cobalt glass ribbon sweeping under and behind them. The front frame is a wide frosted-white glass card containing a tiny abstract embossed landscape composition of one smooth blue sphere and a curved arch, strictly decorative sculptural shapes, not a real website screenshot; rear frames are clear deep electric-blue refractive glass at subtly different angles. One slender polished silver chrome elliptical ring wraps diagonally around the lower third, linking the whole arrangement into one coherent object. Premium polished CGI product render, bright clean studio lighting, crisp white specular edges, substantial rounded glass, beautiful physically plausible refraction, silver highlights. Palette exclusively electric blue #1A2FFB, icy clear azure, frosted white and small polished chrome accents. Three-quarter view slightly from above. Landscape 3:2 composition, object fills 78 percent, centered with every extremity entirely inside and generous clean margin. Genuinely transparent alpha background outside the objects, clean edges, no outer haze or glow, no floor, no ground shadow, no pedestal. No words, no letters, no numerals, no logos, no watermarks, no people, no pink, purple or orange. Sophisticated restrained family resemblance to high-end blue-glass browser-panel sculptures, with a distinct art-gallery silhouette.
+Главный образ сайта — стеклянная медуза на первом экране. Новая серия продолжает его: на каждой
+странице один морской объект из того же стекла, со своим силуэтом и смыслом. Никаких панелей,
+символов и значков.
+
+| Страница | Объект | Смысл | Файл |
+|---|---|---|---|
+| Главная | медуза (уже есть) | — | `hero-object-v2.png` |
+| Работы | раковина наутилуса в разрезе — **стоит на сайте** | камеры — проекты, спираль — рост | `works-nautilus.png` |
+| Вопросы | морской конёк — **стоит на сайте** | силуэт сам похож на знак вопроса | `faq-seahorse.png` |
+| Контакты | бутылка с посланием — **стоит на сайте** | «напишите мне» | `contacts-bottle.png` |
+| 404 | спасательный круг — **стоит на сайте** | «вы заблудились — вот выход» | `notfound-buoy.png` |
+| Главная, карточка цены | раковина с жемчужиной — **стоит на сайте** | ценность, цена | `price-pearl.png` |
+| Услуги | осьминог — **стоит на сайте** | много дел в одних руках | `services-octopus.png` |
+
+## Как генерировать
+
+1. ChatGPT → создать изображение. **Приложите к запросу `src/assets/gen/hero-object-v2.png`**
+   и напишите первой строкой: `Use the attached glass jellyfish as the exact material, colour and
+   lighting reference.` Без образца стекло каждый раз получается разным.
+2. Вставьте промпт задания, сразу за ним — блок «Общий стиль».
+3. Просите PNG с прозрачным фоном. Если прозрачность не получилась — ровный белый фон `#FFFFFF`
+   без градиента и теней, вырежу сам.
+4. Делайте 3–4 варианта каждого объекта и выбирайте по силуэту: он должен узнаваться в размере
+   со спичечный коробок.
+
+Вся серия сгенерирована и подключена 15.11.2026. Исходники лежат в `src/assets/gen/`: мусор по углам убран,
+пустые поля обрезаны (скрипт не хранится, шаги простые: обнулить альфу ниже 12, обрезать по объекту с запасом 4%).
+
+## Общий стиль — добавлять в конец каждого промпта
+
+```
+Material and look: thick, heavy, polished blown art glass. Deep electric blue (#1A2FFB) where the glass is thick, almost clear icy azure where it is thin. Strong refraction, soft caustics inside the glass, crisp white specular highlights. A few thin polished silver-chrome edges or threads are the only accent. The form is organic, flowing and sculptural — a museum glass piece, not an icon, not a toy, not a cartoon character. Premium CGI product render, bright clean studio light from the top left. The object floats in empty space on a fully transparent background (alpha): no floor, no pedestal, no ground shadow, no outer glow or haze around the object. Three-quarter view. Landscape 3:2 canvas, 1536x1024. The object fills about 70% of the frame, its main mass slightly right of centre, nothing cropped, clean margins on all sides. No text, letters, numbers, punctuation marks, logos, interface panels, browser windows, cursors, speech bubbles, people or hands. No purple, pink, orange or green. It must look like one more piece from the same collection as the attached jellyfish.
 ```
 
-### `src/assets/gen/faq-dialogue.png` — диалог
+**Нельзя:** панели и окна браузера, ленты с хромовым кольцом вокруг объекта, знаки и буквы,
+мультяшные глаза и улыбки, тёмный фон, свечение вокруг объекта, пол и тень на полу.
 
-```text
-Use case: stylized-concept. Asset type: transparent 3D hero sculpture for the Questions and Answers page of Maltsev Digital, an established white and electric-blue independent web designer website. Primary request: an elegant sculptural conversation made from two large overlapping rounded speech bubbles in thick glass. One main front speech bubble in frosted white translucent glass angled slightly clockwise, bearing a single beautiful raised electric-blue glass question mark (punctuation only). One larger rear speech bubble in deep cobalt transparent glass angled slightly counterclockwise, containing three small evenly spaced frosted-white glass dots, visible clearly above and left of the front bubble. The chat bubbles have short soft rounded tails at opposite lower corners. A single flowing cobalt glass ribbon curls loosely below and behind the pair, with a very small polished silver chrome bead at the end, forming one cohesive floating composition. Premium polished CGI product render, bright clean studio lighting, crisp white specular edges, substantial rounded glass, beautiful physically plausible refraction and soft internal caustics. Palette exclusively electric blue #1A2FFB, icy clear azure, frosted white, and small polished chrome accents. Three-quarter view slightly from above. Landscape 3:2 composition, object fills 78 percent, centered with every extremity entirely inside, generous clean margins. Genuinely transparent alpha background outside the objects, clean edges, no outer haze or glow, no floor, no ground shadow, no pedestal. No words, no letters, no numerals, no logos, no watermark, no people, no pink, purple or orange. Sophisticated restrained family resemblance to high-end blue-glass browser-panel sculptures, instantly legible conversation silhouette.
+---
+
+## IMG-01 · `works-nautilus.png` — «Работы» (готово)
+
+**Где стоит.** Справа в первом экране страницы «Работы», ширина до 480 px.
+
+**Основной вариант — наутилус:**
+
+```
+A single hero object: a nautilus shell made of blown glass, cut open along its length so the perfect logarithmic spiral of its inner chambers is visible. The outer shell is deep electric-blue glass. The thin walls between the chambers are clear azure glass; each chamber is slightly lighter than the previous one towards the centre, and the innermost chamber is almost white and softly lit from inside. One thin silver-chrome line traces the outer edge of the spiral. The opening of the shell faces left and slightly towards the viewer. Calm, precise, jewellery-like.
 ```
 
-## 14 ноября — объёмная сборка сайта для страницы услуг
+**Вариант B — витрина** (если морская серия не понравится):
 
-Готовый файл: `src/assets/gen/services-assembly.png`. Создан встроенным генератором с прозрачным фоном.
-Используется в `ServicesHero.astro`; отрисовка интерфейса и тарифов остаётся настоящей вёрсткой.
-
-```text
-Use case: stylized-concept. Asset type: transparent 3D sculpture for the services page of a premium independent web designer, on a white/electric-blue website. Primary request: a beautiful sculptural website being assembled in space: three large rounded rectangular browser-like glass panels floating in an elegant fanned, slightly exploded arrangement, held together by a fluid looping electric-blue glass ribbon. One main front panel is frosted white glass with tasteful embossed abstract interface blocks (one large image rectangle and two clean lines, no actual letters), two rear panels are clear cobalt-blue refractive glass. A single polished chrome arrow cursor rests at the lower-right edge of the front panel. Three-quarter view from slightly above, sophisticated product photography, tactile polished glass, soft silver edges, bright studio lighting, white specular highlights, saturated electric blue #1A2FFB and clear icy blue, no purple/pink/orange. Composition: coherent single connected object centered within a landscape 3:2 canvas, occupies 80 percent, all corners and the cursor fully inside with clear margins. Transparent alpha background, no outer haze, no floor, no ground shadow, no pedestal, no text, no logos, no watermark. Crisp high-end CGI, elegant restrained arrangement, visually striking and readable at medium size.
 ```
-
-Вторая версия (ретро-оранжевый набор) больше не подходит: сайт перешёл на белую тему с холодным
-лавандовым полем и одним акцентом — синим электриком `#1A2FFB`. Старые промпты остались в истории git.
-
-**Как генерировать.** ChatGPT → создать изображение (GPT Image). В запрос вставьте промпт задания
-и в конце — блок «Общий стиль». Просите PNG с прозрачным фоном. Если прозрачность не получилась —
-фон ровный белый `#FFFFFF` без градиента и теней, я вырежу сам.
-
-**Как отдать.** Пришлите PNG с именем из задания. Я положу его в `src/assets/gen/`, сайт подхватит
-файл сам: сейчас в центре первого экрана временно стоит стеклянная лента из первого набора
-(`hero-sculpture.png`), она отключится автоматически.
-
-Нужна одна картинка — IMG-01. Сделайте 3–4 варианта и выберите лучший.
-
-## Выполнено 14 ноября 2026
-
-Встроенным генератором изображений подготовлена уточнённая версия медузы с прозрачностью:
-`src/assets/gen/hero-object-v2.png`. Первый экран использует её и сохраняет исходник как запасной.
-Изображения для кейса — реальные снимки сайта, а не сгенерированные макеты.
-
-Финальный запрос редактирования (исходник — `hero-object.png`, прозрачный фон включён):
-
-```text
-Use case: background-extraction. Asset type: premium 3D glass jellyfish hero for the white-and-electric-blue Maltsev Digital website. Edit target: the supplied blue glass jellyfish image. Preserve its elegant jellyfish silhouette, bell in upper right, ribbon tentacles sweeping lower left, electric-blue #1A2FFB glass, white specular highlights, subtle silver edges, and three-quarter view. Remove the entire black/blue backdrop AND every diffuse outer glow or halo around the object. Produce genuinely transparent alpha outside the jellyfish with clean edges so it composites naturally on white or near-black. Preserve luminous glass details only INSIDE the object, no opaque rectangular background, no added objects, no text, no watermarks. Keep the entire jellyfish inside a horizontal 3:2 canvas with 10% clear margin around all extremities. High-end polished studio render, crisp glass refraction, no floor, no ground shadow.
+A single hero object: a tall blown-glass display dome (a bell jar) of clear azure glass, standing on a thin silver-chrome ring instead of a base. Inside the dome floats one smooth sphere of deep electric-blue glass with slow swirling lighter layers inside it, like a small planet on exhibition. Reflections of the sphere bend along the inner wall of the dome. Calm, precise, museum-like.
 ```
 
 ---
 
-## Превью для соцсетей — выполнено
+## IMG-02 · `faq-seahorse.png` — «Вопросы» (готово)
 
-Файл `public/og-white-blue.jpg`, 1200×630. Встроенный генератор заменил прежнюю скульптуру
-на новую медузу, сохранив заголовок, бренд и подписи. Результат сжат в JPEG для быстрой загрузки.
-Исходное `public/og.jpg` сохранено. Запрос:
+**Где стоит.** Справа в первом экране страницы «Вопросы и ответы»: вертикальный объект шириной
+до 240 px на десктопе и до 150 px на небольшом экране.
 
-```text
-Use case: precise-object-edit. Asset type: 1200x630 social sharing preview for Maltsev Digital. Image 1 is the edit target: keep its whole layout, typography, every word and every character, blue m brand mark, white rounded card, pale lavender outer margin, left title and the three bottom pills completely unchanged. Image 2 is the supporting insert: the new blue glass jellyfish. Change ONLY the blue-and-chrome infinity-loop object on the right of Image 1: remove it and replace it with the jellyfish from Image 2, attractively fitted entirely in the right half, clear glass with electric-blue #1A2FFB accents. Bell at upper right, tentacles sweeping toward lower left. Give it clean natural edges on the white card, no black field and no dark halo, no clipping outside the card. Do not overlap or obscure any existing text or pills. Keep text exactly: MALTSEV DIGITAL; Сайты для бизнеса и экспертов под ключ; от 29 000 ₽; от 7 рабочих дней; один исполнитель. No new text, no added decorations, no watermark. Preserve the wide 1200:630 composition.
-```
+**Основной вариант — морской конёк:**
 
-## Общий стиль — добавлять в конец промпта
+Подключена финальная версия с естественным стеклянным гребнем, без декоративной короны
+и хромовых шариков на голове. Прозрачные поля обрезаны с запасом 4%, чтобы сохранить вертикальную подачу.
 
 ```
-Style: premium 3D product render, the look of a modern creative studio website. Materials: clear and deep-blue glass with strong refraction and soft caustics, electric blue (#1A2FFB) as the main color, lighter azure and white highlights, a small amount of polished silver chrome as an accent. Smooth flowing organic forms, no hard edges. Bright, clean studio lighting from the top left, crisp white speculars, gentle inner glow inside the glass, no outer glow or halo around the object. The object floats in empty space. No floor, no shadow on the ground, no background scene. No text, no letters, no numbers, no logos. Transparent background.
+A single hero object: a seahorse made of blown glass, seen in profile, facing left. Its body bends in one elegant S-curve and ends in a tightly curled tail, so the whole silhouette quietly resembles a question mark — but it is clearly an animal, with no punctuation anywhere. Ridged, segmented body in deep electric-blue glass; a translucent azure dorsal fin with fine ribs; a small delicate crown on the head; a single tiny silver-chrome bead for the eye. Realistic proportions of a real seahorse, elegant and slightly mysterious, not cute.
 ```
 
-**Палитра:** синий `#1A2FFB` (основной), голубой и белые блики, немного серебряного хрома.
-**Нельзя:** оранжевый, фиолетовый и розовый; пиксели, кубики и ретро-техника; текст и логотипы; люди
-и руки; тёмный фон и внешнее свечение вокруг объекта (на белой странице оно даёт грязный ореол);
-пол, подставка, пейзаж; шум и зерно.
+**Вариант B — компас:**
+
+```
+A single hero object: a navigator's compass made of glass. A thick round lens-like disc of clear azure glass with a thin silver-chrome rim, tilted towards the viewer. Inside the glass floats a slender needle of deep electric-blue glass, pointing up and to the right. No markings, no letters, no scale on the dial — only the disc, the rim and the needle. Strong refraction through the thick edge of the disc.
+```
 
 ---
 
-## IMG-01 · `hero-object.png` — главный объект первого экрана
+## IMG-03 · `contacts-bottle.png` — «Контакты» (готово)
 
-**Назначение.** Единственный крупный объект на белой сцене первого экрана: стоит в центре, чуть
-правее и ниже заголовка, справа его частично перекрывает белая карточка с ценой. Тот же файл
-в уменьшенном виде стоит на тёмной вставке этой карточки, поэтому он должен хорошо смотреться
-и на белом, и на почти чёрном.
-
-**Формат.** 1536×1024 (горизонтально, 3:2), прозрачный PNG.
-
-**Промпт — основной вариант (медуза, как на референсе):**
+**Где стоит.** Справа в первом экране страницы «Контакты». Прямые ссылки на Telegram и почту
+перенесены под текст первого экрана; на телефоне плашки стоят друг под другом.
 
 ```
-A single hero object: a stylized jellyfish made of deep electric-blue glass. A large smooth translucent bell (dome) with a glossy surface and soft inner glow, visible delicate ribs inside the dome, a ruffled edge, and long flowing translucent tentacles and ribbon-like arms trailing down and slightly to the left, as if drifting in slow water. The glass is saturated blue in the thick parts and almost clear azure in the thin parts, with white specular highlights along the top of the bell and thin silver-chrome edges on a few ribbons. Three-quarter view, slightly from below, the bell in the upper right, tentacles sweeping to the lower left. The object occupies about 70% of the frame width, nothing is cropped, generous empty space on all sides.
+A single hero object: a message in a bottle, made entirely of glass. A rounded bottle lying at a slight upward angle, as if drifting on a slow current: deep electric blue at the base, fading to clear azure at the neck, closed with a small silver-chrome stopper. Inside it, a rolled sheet of frosted white glass tied with one thin chrome thread — completely blank, no writing. A few tiny glass bubbles trail away from the neck to the upper right.
 ```
 
-**Вариант B (абстрактная лента — ближе к тому, что стоит сейчас):**
+---
+
+## IMG-04 · `notfound-buoy.png` — страница 404 (готово)
+
+**Где стоит.** Справа в первом экране вместо крупных цифр. Код ошибки 404 остаётся в пояснении;
+слева доступны ссылки на основные разделы сайта.
 
 ```
-A single hero object: an abstract continuous ribbon of thick deep-blue glass twisted into a soft infinity-like loop, one side of the ribbon polished silver chrome, the other clear electric-blue glass with caustics inside. Smooth, heavy, liquid form. Three-quarter view from slightly above, object centered and occupying about 70% of the frame width, nothing cropped, generous empty space.
+A single hero object: a ring-shaped life buoy made of thick deep electric-blue glass, with four evenly spaced bands of frosted white glass around it. A thin silver-chrome rope is loosely looped along its outer edge and trails off to the lower left. The ring is tilted about 30 degrees towards the viewer and floats calmly. Seen through the hole of the ring, the glass edge bends the light.
 ```
 
-**Вариант C (капля-сфера):**
+---
+
+## IMG-05 · `price-pearl.png` — карточка цены на главной (готово)
+
+**Где стоит.** Маленькая тёмная вставка в карточке «от 29 000 ₽» на первом экране. Раковина
+заменила вторую копию медузы и вписана целиком с полями. Светлая жемчужина остаётся центром
+композиции на почти чёрном фоне.
+
+**Формат другой:** квадрат 1024×1024, объект занимает около 80% кадра и стоит по центру.
+В блоке «Общий стиль» замените `Landscape 3:2 canvas, 1536x1024` на `Square canvas, 1024x1024`
+и уберите слова про смещение вправо.
 
 ```
-A single hero object: a large soft blob of deep electric-blue glass, like a drop of liquid frozen in weightlessness, with two smaller drops separating from it on the right side. Inside the glass — smooth swirling layers of lighter azure. One thin silver-chrome ring loosely orbits the main drop at an angle. Three-quarter view, object centered, about 60% of the frame width, nothing cropped, generous empty space.
+A single hero object: an open scallop shell made of blown glass, the two halves parted like a slightly open book and facing the viewer. Fine radial ribs on the shell, deep electric-blue glass on the outside, clear azure inside. Resting in the lower half is one perfect pearl of frosted white glass, softly lit from within — the brightest point of the image. Thin silver-chrome line along the rim of the shell. Must read clearly at a very small size and on a near-black background.
 ```
 
-**Композиция.** Основная масса объекта — в центре и справа, слева вверху пусто: там заголовок
-и кнопка. Ничего не обрезано, по краям запас 10–15%.
-**Камера.** Три четверти, без сильной перспективы.
-**Интеграция.** `src/components/HeroNova.astro`: `genImage('hero-object')`, запасной —
-`hero-sculpture`. Размер и положение на сцене — `.hn__object`, вставка в карточке — `.hn__card-pic`.
-**Анимация.** Медленное парение (±14 px, 8 с) и лёгкий сдвиг за курсором — уже есть в коде.
+---
+
+## IMG-06 · `services-octopus.png` — «Услуги» (готово)
+
+Осьминог заменил стеклянные окна браузера: теперь все объекты принадлежат одной морской серии.
+Используется уточнённая версия с восемью различимыми щупальцами.
+
+```
+A single hero object: an octopus made of blown glass, seen from slightly above. A smooth rounded mantle of deep electric-blue glass and eight long arms of clear azure glass spreading out in one graceful swirl, each arm ending in a small tight curl, with fine rows of tiny suckers as delicate glass beads. Two or three arms sweep to the lower left, the rest fan out to the right. A thin silver-chrome line runs along the top of two arms. Elegant and calm, realistic anatomy, not cute, no face expression.
+```
+
+---
+
+## Что генерировать не нужно
+
+- **Портрет для «Обо мне».** Нужна настоящая дневная фотография: сгенерированное лицо на сайте,
+  который обещает «только то, что можно проверить», — обман.
+- **Скриншоты кейсов.** Это настоящие снимки сайта, я переснимаю их сам.
+- **Превью для соцсетей.** Соберу из готовых объектов, когда серия будет утверждена.
+- **Картинки к пакетам, этапам и вопросам.** Там изображения ничего не объясняют и только
+  утяжеляют страницу.

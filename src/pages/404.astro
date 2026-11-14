@@ -1,8 +1,13 @@
 ---
 import Base from '@/layouts/Base.astro';
 import PageHero from '@/components/PageHero.astro';
+import { Image } from 'astro:assets';
+import { genImage } from '@/lib/gen';
 import { url } from '@/lib/url';
 import Icon from '@/components/Icon.astro';
+
+// Стеклянный спасательный круг: заблудились — вот выход.
+const buoy = genImage('notfound-buoy');
 
 const links = [
   { href: '/', label: 'Главная' },
@@ -13,7 +18,7 @@ const links = [
 ---
 
 <Base title="Страница не найдена" description="Такой страницы нет. Перейдите на главную или в другой раздел." noindex>
-  <PageHero id="nf-title" title="Такой страницы нет" lead="Возможно, адрес изменился или в нём опечатка. Вот куда можно перейти.">
+  <PageHero id="nf-title" title="Такой страницы нет" lead="Ошибка 404: адрес изменился или в нём опечатка. Вот куда можно перейти.">
     <Fragment slot="actions">
       <ul class="nf__links">
         {
@@ -27,20 +32,16 @@ const links = [
         }
       </ul>
     </Fragment>
-    <p class="nf__code" aria-hidden="true">404</p>
+    {buoy && <Image class="nf-object" src={buoy.src} alt="" widths={[320, 480, 640, 900]} sizes="(max-width: 1023px) 60vw, 34vw" quality={80} loading="eager" />}
   </PageHero>
 </Base>
 
 <style>
-  /* Код ошибки — крупными тонкими цифрами справа, вместо картинки. */
-  .nf__code {
-    justify-self: end;
-    font-family: var(--font-head);
-    font-weight: 250;
-    font-size: clamp(6rem, 3rem + 13vw, 15rem);
-    line-height: 0.9;
-    letter-spacing: -0.07em;
-    color: var(--accent);
+  .nf-object {
+    width: min(100%, 460px);
+    height: auto;
+    justify-self: center;
+    filter: drop-shadow(0 30px 32px rgba(26, 47, 251, 0.18));
   }
 
   .nf__links {
@@ -52,9 +53,8 @@ const links = [
   }
 
   @media (max-width: 1023px) {
-    .nf__code {
-      justify-self: start;
-      order: -1;
+    .nf-object {
+      width: min(70vw, 300px);
     }
   }
 </style>

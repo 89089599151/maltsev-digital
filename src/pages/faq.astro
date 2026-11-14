@@ -8,7 +8,8 @@ import { url } from '@/lib/url';
 import Icon from '@/components/Icon.astro';
 import { genImage } from '@/lib/gen';
 
-const sculpture = genImage('faq-dialogue');
+// Стеклянный морской конёк: силуэт сам напоминает знак вопроса.
+const sculpture = genImage('faq-seahorse');
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -38,8 +39,8 @@ const schema = {
         class="fq-object"
         src={sculpture.src}
         alt=""
-        widths={[320, 480, 640, 960]}
-        sizes="(max-width: 767px) 62vw, (max-width: 1023px) 320px, (min-width: 1440px) 480px, 34vw"
+        widths={[180, 260, 360, 520]}
+        sizes="(max-width: 394px) 38vw, (max-width: 1023px) 150px, 240px"
         quality={80}
         loading="eager"
         fetchpriority="high"
@@ -61,8 +62,9 @@ const schema = {
 </Base>
 
 <style>
+  /* Объект вертикальный: ширина небольшая, чтобы высота не раздувала первый экран. */
   .fq-object {
-    width: min(100%, 480px);
+    width: min(100%, 240px);
     height: auto;
     justify-self: center;
     filter: drop-shadow(0 24px 30px rgba(26, 47, 251, 0.13));
@@ -81,7 +83,7 @@ const schema = {
 
   @media (max-width: 1023px) {
     .fq-object {
-      width: min(62vw, 320px);
+      width: min(38vw, 150px);
     }
   }
 </style>

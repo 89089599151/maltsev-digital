@@ -2,7 +2,7 @@
 /**
  * Первый экран — белая сцена в скруглённой раме, на широком экране вместе с шапкой (она лежит внутри).
  * Слева одна колонка сверху вниз: заголовок, одна фраза о подходе, кнопка, внизу — два факта.
- * В центре — большой объект, справа — карточка с ценой и квадраты прямых контактов.
+ * В центре — большой объект, справа — карточка с ценой (в ней раковина с жемчужиной) и квадраты контактов.
  * Под рамой — метки сетки и подсказка о прокрутке.
  *
  * Объект: src/assets/gen/hero-object-v2.png (IMAGE_GENERATION_PROMPTS.md), запасные — hero-object
@@ -18,6 +18,8 @@ import { url } from '@/lib/url';
 import avatar from '@/assets/photos/owner-avatar.webp';
 
 const object = genImage('hero-object-v2') ?? genImage('hero-object') ?? genImage('hero-sculpture');
+// В карточке цены — свой объект; пока файла нет, там уменьшенная копия главного.
+const pearl = genImage('price-pearl');
 const tg = telegramUrl();
 const mail = emailUrl('Заявка на разработку сайта');
 const fastest = plans[0];
@@ -105,7 +107,11 @@ const fastest = plans[0];
 
     <a class="hn__card lift" href={url('/#pricing')}>
       <span class="hn__card-pic" aria-hidden="true">
-        {object && <Image src={object.src} alt="" widths={[320, 520]} sizes="260px" loading="eager" />}
+        {pearl ? (
+          <Image class="hn__card-pearl" src={pearl.src} alt="" widths={[240, 360, 520]} sizes="220px" loading="eager" />
+        ) : (
+          object && <Image src={object.src} alt="" widths={[320, 520]} sizes="260px" loading="eager" />
+        )}
       </span>
       <span class="hn__card-body">
         <span class="hn__card-v"><span>от</span> {formatPrice(minPrice)}</span>
@@ -427,6 +433,24 @@ const fastest = plans[0];
 
   .hn__card:hover .hn__card-pic img {
     transform: scale(1.08) rotate(-4deg);
+  }
+
+  /* Раковина с жемчужиной вписана целиком, с полями: главное в ней — светлая точка в центре. */
+  .hn__card-pic:has(.hn__card-pearl) {
+    position: relative;
+  }
+
+  .hn__card-pic img.hn__card-pearl {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 9%;
+    object-fit: contain;
+  }
+
+  .hn__card:hover .hn__card-pic img.hn__card-pearl {
+    transform: scale(1.06);
   }
 
   .hn__card-body {
