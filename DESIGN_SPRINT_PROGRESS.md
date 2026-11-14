@@ -1,6 +1,6 @@
 # Design sprint — прогресс
 
-Ветка: `design-sprint` (от `main`). В `main` не слито, на GitHub не запушено.
+Ветка `design-sprint` слита в `main` и запушена на GitHub 14.11.2026 (коммит `be22fef`).
 
 ## Визуальное направление
 
@@ -55,5 +55,5 @@
 
 ## Следующее действие
 
-Посмотреть ветку локально (`npm run dev`), затем слить `design-sprint` в `main` и запушить —
-пуш в `main` публикует сайт на GitHub Pages.
+Добавить реальные проекты в `src/content/projects/` и подключить онлайн-форму (`formspreeId`
+в `src/config/site.ts`). Пуш в `main` публикует сайт на GitHub Pages.
