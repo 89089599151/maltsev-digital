@@ -172,10 +172,11 @@ const caseUrl = url(`/portfolio/${project.id}/`);
     right: clamp(12px, 2.4vw, 36px);
     bottom: clamp(14px, 2.4vw, 36px);
     width: 21%;
-    padding: 5px;
-    border-radius: 20px;
-    background: var(--ink);
-    box-shadow: 0 30px 50px -24px rgba(10, 11, 20, 0.55);
+    border-radius: 14px;
+    background: var(--paper);
+    box-shadow:
+      0 0 0 1px rgba(10, 11, 20, 0.08),
+      0 40px 70px -40px rgba(16, 32, 200, 0.45);
     overflow: hidden;
   }
 
@@ -185,7 +186,6 @@ const caseUrl = url(`/portfolio/${project.id}/`);
     aspect-ratio: 376 / 814;
     object-fit: cover;
     object-position: top;
-    border-radius: 15px;
   }
 
   @media (max-width: 1023px) {
@@ -214,12 +214,7 @@ const caseUrl = url(`/portfolio/${project.id}/`);
 
     .wf__phone {
       width: 24%;
-      padding: 3px;
-      border-radius: 12px;
-    }
-
-    .wf__phone img {
-      border-radius: 9px;
+      border-radius: 10px;
     }
   }
 

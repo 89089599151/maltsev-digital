@@ -101,7 +101,7 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
     color: var(--muted);
   }
 
-  /* Главная: четыре белые карточки в ряд. */
+  /* Главная: четыре карточки в ряд; запуск выделен синим. */
   .ps--compact .ps__list {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -124,6 +124,24 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
 
   .ps--compact .ps__head {
     gap: 12px;
+  }
+
+  .ps--compact .ps__step:last-child {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .ps--compact .ps__step:last-child .ps__num {
+    color: var(--accent-ink);
+  }
+
+  .ps--compact .ps__step:last-child .ps__text {
+    color: var(--on-accent-muted);
+  }
+
+  .ps--compact .ps__step:last-child :global(.chip) {
+    color: var(--accent-ink);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
   }
 
   /* Услуги: строка на этап — номер, название и срок, описание, что нужно от вас. */

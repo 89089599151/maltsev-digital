@@ -2,7 +2,7 @@
 /**
  * «Пакеты и цены» на главной: одна секция вместо отдельных «Что я делаю» и «Цены».
  * Три строки — название пакета, для кого, срок, цена «от», кнопка. Без карточек и картинок: строки
- * разделены линиями, все три равны — выделение без причины только путает. Данные — src/config/pricing.ts.
+ * разделены линиями, BUSINESS выделен тёмной акцентной полосой. Данные — src/config/pricing.ts.
  */
 import SectionHead from './SectionHead.astro';
 import Icon from './Icon.astro';
@@ -29,7 +29,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   <ul class="pk__list" data-stagger>
     {
       rows.map((p) => (
-        <li class="pk__row">
+        <li class:list={['pk__row', { 'pk__row--featured': p.id === 'business' }]}>
           <div class="pk__head">
             <h3 class="pk__name">{p.name}</h3>
             <p class="pk__types">{p.types}</p>
@@ -42,7 +42,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
             <p class="pk__price">
               <span>от</span> {formatPrice(p.price)}
             </p>
-            <a class="btn btn--ink pk__cta" href={url(`/contacts/?plan=${p.id}`)}>
+            <a class:list={['btn', 'pk__cta', p.id === 'business' ? 'btn--accent' : 'btn--ink']} href={url(`/contacts/?plan=${p.id}`)}>
               Заказать <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
             </a>
           </div>
@@ -80,6 +80,17 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     gap: 6px;
   }
 
+  .pk__row--featured {
+    border-radius: var(--radius-lg);
+    border-bottom-color: transparent;
+    background: var(--night);
+    color: var(--night-ink);
+  }
+
+  .pk__row:has(+ .pk__row--featured) {
+    border-bottom-color: transparent;
+  }
+
   .pk__name {
     font-weight: 340;
     font-size: var(--fs-4);
@@ -102,6 +113,10 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     max-width: 44ch;
     line-height: 1.5;
     color: var(--muted);
+  }
+
+  .pk__row--featured .pk__for {
+    color: var(--night-muted);
   }
 
   .pk__time {
@@ -128,6 +143,10 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   .pk__price span {
     font-size: 0.55em;
     letter-spacing: 0;
+  }
+
+  .pk__row--featured .pk__price {
+    color: var(--accent-on-dark);
   }
 
   .pk__cta {
@@ -200,6 +219,9 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
       padding-inline: 16px;
     }
 
+    .pk__row--featured {
+      border-radius: 22px;
+    }
 
     .pk__calc {
       border-radius: 22px;
