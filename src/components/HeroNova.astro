@@ -5,8 +5,7 @@
  * В центре — большой объект, справа — карточка с ценой (в ней раковина с жемчужиной) и квадраты контактов.
  * Под рамой — метки сетки и подсказка о прокрутке.
  *
- * Объект: src/assets/gen/hero-object-v2.png (IMAGE_GENERATION_PROMPTS.md), запасные — hero-object
- * и hero-sculpture.
+ * Объект: src/assets/gen/hero-glass-wave.png (IMAGE_GENERATION_PROMPTS.md), запасной — hero-object-v2.
  */
 import { Image } from 'astro:assets';
 import ContactIcon from './ContactIcon.astro';
@@ -17,7 +16,7 @@ import { genImage } from '@/lib/gen';
 import { url } from '@/lib/url';
 import avatar from '@/assets/photos/owner-avatar.webp';
 
-const object = genImage('hero-object-v2') ?? genImage('hero-object') ?? genImage('hero-sculpture');
+const object = genImage('hero-glass-wave') ?? genImage('hero-object-v2');
 // В карточке цены — свой объект; пока файла нет, там уменьшенная копия главного.
 const pearl = genImage('price-pearl');
 const tg = telegramUrl();
@@ -60,7 +59,7 @@ const fastest = plans[0];
               src={object.src}
               alt=""
               widths={[480, 768, 1100, 1536]}
-              sizes="(max-width: 1023px) 92vw, 56vw"
+              sizes="(max-width: 1023px) 92vw, 64vw"
               quality={82}
               loading="eager"
               fetchpriority="high"
@@ -716,13 +715,13 @@ const fastest = plans[0];
       margin-top: clamp(20px, 3.4vh, 36px);
     }
 
-    /* Объект — по центру сцены, чуть правее и ниже заголовка. */
+    /* Волна повторяет свободную область: завиток над ценой, широкие складки слева внизу. */
     .hn__object {
       position: absolute;
-      left: 57%;
-      top: 66%;
-      width: clamp(480px, 54%, 900px);
-      translate: -50% -50%;
+      right: calc(var(--pad-x) + clamp(16px, 2vw, 32px));
+      top: clamp(88px, 10vh, 110px);
+      width: 64%;
+      aspect-ratio: 4 / 3;
     }
 
     .hn__stats {
@@ -802,8 +801,8 @@ const fastest = plans[0];
     }
 
     .hn__object {
-      top: 58%;
-      width: clamp(440px, 48%, 720px);
+      top: 92px;
+      width: 62%;
     }
 
     .hn__lead {

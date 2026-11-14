@@ -1,4 +1,4 @@
-# Задания на генерацию изображений — v4, серия «стеклянное море»
+# Задания на генерацию изображений — v5, серия «стеклянное море»
 
 Прошлые промпты (медуза, сборка окон для услуг, галерея и диалог) остались в истории git.
 
@@ -8,13 +8,14 @@
 и хромовое кольцо. На трёх страницах подряд это читается как одна и та же картинка, а облачка
 с вопросительным знаком и точками выглядят как иконка из мессенджера.
 
-Главный образ сайта — стеклянная медуза на первом экране. Новая серия продолжает его: на каждой
-странице один морской объект из того же стекла, со своим силуэтом и смыслом. Никаких панелей,
-символов и значков.
+Материал серии задан исходной стеклянной медузой `hero-object-v2.png`: синий электрик, прозрачный
+лазурный край и белые студийные блики. На первом экране её заменяет цельная стеклянная волна,
+созданная под свободную область существующего макета. На остальных страницах — морские объекты
+из того же стекла, со своим силуэтом и смыслом. Никаких панелей, символов и значков.
 
 | Страница | Объект | Смысл | Файл |
 |---|---|---|---|
-| Главная | медуза (уже есть) | — | `hero-object-v2.png` |
+| Главная | стеклянная волна | заполняет свободный контур без перестановки интерфейса | `hero-glass-wave.png` |
 | Работы | раковина наутилуса в разрезе — **стоит на сайте** | камеры — проекты, спираль — рост | `works-nautilus.png` |
 | Вопросы | морской конёк — **стоит на сайте** | силуэт сам похож на знак вопроса | `faq-seahorse.png` |
 | Контакты | бутылка с посланием — **стоит на сайте** | «напишите мне» | `contacts-bottle.png` |
@@ -33,8 +34,9 @@
 4. Делайте 3–4 варианта каждого объекта и выбирайте по силуэту: он должен узнаваться в размере
    со спичечный коробок.
 
-Вся серия сгенерирована и подключена 15.11.2026. Исходники лежат в `src/assets/gen/`: мусор по углам убран,
-пустые поля обрезаны (скрипт не хранится, шаги простые: обнулить альфу ниже 12, обрезать по объекту с запасом 4%).
+Объекты IMG-01–06 сгенерированы и подключены 15.11.2026. Исходники лежат в `src/assets/gen/`: мусор по углам
+убран, пустые поля обрезаны (скрипт не хранится, шаги простые: обнулить альфу ниже 12, обрезать по объекту
+с запасом 4%). Для новой волны сохранена исходная прозрачность генерации; её отдельный промпт — ниже.
 
 ## Общий стиль — добавлять в конец каждого промпта
 
@@ -44,6 +46,33 @@ Material and look: thick, heavy, polished blown art glass. Deep electric blue (#
 
 **Нельзя:** панели и окна браузера, ленты с хромовым кольцом вокруг объекта, знаки и буквы,
 мультяшные глаза и улыбки, тёмный фон, свечение вокруг объекта, пол и тень на полу.
+
+---
+
+## IMG-00 · `hero-glass-wave.png` — первый экран (готово)
+
+**Задача.** Вписать один красивый объект в отмеченную владельцем Г-образную область. Верхний завиток
+занимает место над высокой карточкой цены, широкие складки уходят влево и вниз. Заголовок, CTA,
+два факта, карточка цены и контакты сохраняют исходные позиции. По последней правке волна немного
+сдвинута влево, чтобы сократить зазор около звёздочки.
+
+**Референсы.** Первый — `src/assets/gen/hero-object-v2.png`, только материал, цвет и свет. Второй —
+скриншот владельца с красным контуром, только форма свободной области. Элементы сайта и контур
+не должны попадать в сгенерированное изображение.
+
+**Получено.** Встроенная генерация `image_gen`, PNG 1448×1086 с альфа-каналом, сохранён в
+`src/assets/gen/hero-glass-wave.png`. Формат задания — 4:3; общий блок 3:2 к этому промпту не добавляется.
+Варианты со скатом остались рабочими материалами в `output/hero-composition/` и не подключены.
+
+**Полный финальный промпт:**
+
+```text
+Generate ONE isolated premium glass sculpture on true transparent alpha. Landscape 4:3 canvas, 1536x1152.
+REFERENCE ROLES: Image 1 supplies ONLY the exact polished electric-blue blown-glass material, colour and bright white studio highlights. Image 2 is a website screenshot with a RED OUTLINE showing the precise available area. It is a composition guide ONLY. DO NOT generate the website, letters, text, buttons, cards, screenshot, red outline or any background. Output only the new glass object. The webpage elements cannot move; the object must adapt to their empty space.
+Subject: a single continuous sculptural OCEAN WAVE made of thick flowing blown art glass. An elegant asymmetric rising S-curve, like a museum glass masterpiece shaped by an ocean current. NOT a jellyfish, ray, fish, animal or character. No spheres or extra separate objects. The upper end is a broad beautifully rolled translucent wave crest in the UPPER RIGHT, with a large open curl and crisp cobalt edge. The main glass flow travels diagonally DOWN AND LEFT from this crest, widening into three generous flowing glass folds at the LOWER LEFT. The folds belong to one continuous wave sculpture, with rich refractive depth and beautiful internal gaps. They gently taper at their ends, no many tiny strings, no sharp spikes. Calm, precise, sophisticated, visually substantial but airy, strong elegant silhouette. Only a few delicate polished silver-chrome edges trace portions of the glass folds.
+CRITICAL silhouette and transparent cut-outs: Imagine the whole asset bounding box mapped to the red outline in screenshot 2. Occupy a hooked diagonal L-shaped footprint. The upper wave crest lives in the TOP-RIGHT rectangle: x=51% to96%, y=4% to28%. From there the sculpture bends left through a narrower neck near x=61%,y=37%, then becomes a broad flowing lower mass spanning x=5% to66%,y=40% to91%, ending towards the bottom-left. The TOP-LEFT region x<49%,y<32% MUST remain fully transparent for the headline. The RIGHT side below the crest, x>71%,y>32%, MUST remain fully transparent because the existing tall price card occupies that space. Also keep x>48%,y>79% transparent for the existing contact buttons. All glass must stay inside this diagonal L-shaped footprint; do not place a large body behind the price-card area. The shape should fill the allowed area generously, not look small inside a huge empty frame. Nothing cropped; 4% clear outer margins.
+Material: heavy polished blown art glass, deep electric blue #1A2FFB in thick folds, nearly clear icy azure at thin edges, strong refraction and soft internal caustics, crisp broad white specular highlights. Museum-quality CGI product render, bright clean studio light from the top left. The exact material family of image1. Blue, azure, white reflections and fine silver only. No purple, green, pink, orange or gold. NO aura or outer glow/haze, no floor, no pedestal, no cast ground shadow, no water background, no texture around the object, no bubbles, no ring, no surrounding confetti. Background must be fully transparent alpha including all negative spaces. No typography or logos.
+```
 
 ---
 
