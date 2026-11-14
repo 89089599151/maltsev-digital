@@ -1,187 +1,231 @@
 ---
 import { url } from '@/lib/url';
-import { site } from '@/config/site';
-import ContactLink from './ContactLink.astro';
+import { site, telegramUrl, emailUrl } from '@/config/site';
+import LogoMark from './LogoMark.astro';
 import Icon from './Icon.astro';
 
-
 const year = new Date().getFullYear();
+const telegram = telegramUrl();
+const email = emailUrl('Заявка на разработку сайта');
+const groups = [
+  { title: 'Сайт', links: [
+    { href: '/', label: 'Главная' },
+    { href: '/portfolio/', label: 'Работы' },
+    { href: '/services/', label: 'Услуги и цены' },
+    { href: '/about/', label: 'Обо мне' },
+  ] },
+  { title: 'По делу', links: [
+    { href: '/services/#process', label: 'Как я работаю' },
+    { href: '/services/#calculator', label: 'Расчёт стоимости' },
+    { href: '/faq/', label: 'Вопросы и ответы' },
+    { href: '/contacts/', label: 'Контакты' },
+  ] },
+];
 ---
 
 <footer class="ftr" aria-labelledby="ftr-title">
-  <h2 id="ftr-title" class="sr-only">{site.brand.name.value}</h2>
-  <div class="ftr__mark">
-    <p class="ftr__word" aria-hidden="true">
-      <span class="tone-mute">Maltsev</span> Digital
-    </p>
-  </div>
+  <h2 id="ftr-title" class="sr-only">{site.brand.name.value} — контакты и навигация</h2>
+  <div class="ftr__panel">
+    <div class="ftr__main">
+      <div class="ftr__identity">
+        <a class="ftr__signature" href={url('/')} aria-label={`${site.brand.name.value} — на главную`}>
+          <LogoMark class="ftr__logo" />
+          <span class="ftr__word" aria-hidden="true"><span>Maltsev</span><span>Digital</span></span>
+        </a>
+        <p class="ftr__description">Дизайн, разработка и запуск.<br />В одних руках.</p>
+        <p class="ftr__author">{site.brand.owner.value}</p>
+      </div>
 
-  <div class="ftr__grid">
-    <nav class="ftr__cols" aria-label="Разделы сайта">
-      <ul>
-        <li><a href={url('/')}>Главная</a></li>
-        <li><a href={url('/portfolio/')}>Работы</a></li>
-        <li><a href={url('/services/')}>Услуги и цены</a></li>
-      </ul>
-      <ul>
-        <li><a href={url('/services/#process')}>Как я работаю</a></li>
-        <li><a href={url('/services/#calculator')}>Расчёт стоимости</a></li>
-        <li><a href={url('/about/')}>Обо мне</a></li>
-      </ul>
-      <ul>
-        <li><a href={url('/faq/')}>Вопросы и ответы</a></li>
-        <li><a href={url('/contacts/')}>Контакты</a></li>
-        <li><a href={url('/privacy/')}>Политика конфиденциальности</a></li>
-      </ul>
-    </nav>
-    <div class="ftr__contacts">
-      <p class="ftr__lead">Напишите о задаче — предложу план, срок и цену.</p>
-      <ContactLink kind="telegram" />
-      <ContactLink kind="email" />
+      <div class="ftr__contacts">
+        <h3 class="ftr__label">Написать напрямую</h3>
+        {telegram ? (
+          <a class="ftr__telegram" href={telegram} target="_blank" rel="noopener">
+            <span><span class="ftr__channel">Telegram</span><strong>@{site.contacts.telegram.value}</strong></span>
+            <span class="ftr__telegram-arrow"><Icon name="arrow-ne" /></span>
+          </a>
+        ) : <p class="ftr__pending">Telegram будет указан перед запуском</p>}
+
+        <div class="ftr__email">
+          {email ? (
+            <a class="ftr__mail" href={email}>
+              <span class="ftr__channel">Почта</span>
+              <span>{site.contacts.email.value}</span>
+            </a>
+          ) : <p class="ftr__pending">Почта будет указана перед запуском</p>}
+          {email && (
+            <button class="ftr__copy" type="button" data-footer-copy data-email={site.contacts.email.value} hidden>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="3" /><path d="M15 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2" /></svg>
+              <span data-copy-label>Скопировать почту</span>
+            </button>
+          )}
+        </div>
+        <p class="sr-only" data-copy-status role="status" aria-live="polite"></p>
+        <p class="ftr__hours">{site.contacts.hours}.</p>
+      </div>
+
+      <nav class="ftr__nav" aria-label="Разделы сайта">
+        {groups.map((group) => (
+          <div class="ftr__group">
+            <h3 class="ftr__label">{group.title}</h3>
+            <ul>{group.links.map((link) => <li><a href={url(link.href)}>{link.label}</a></li>)}</ul>
+          </div>
+        ))}
+      </nav>
     </div>
-  </div>
 
-  <div class="ftr__bottom small">
-    <p>© {year} {site.brand.name.value}. {site.contacts.workFormat}.</p>
-    <a class="btn btn--ghost ftr__top" href="#top">Наверх <span class="arrow" aria-hidden="true"><Icon name="arrow-up" /></span></a>
+    <div class="ftr__bottom">
+      <p>© {year} {site.brand.name.value}<span>{site.contacts.workFormat}</span></p>
+      <a class="ftr__policy" href={url('/privacy/')}>Политика конфиденциальности</a>
+      <a class="ftr__top" href="#top" aria-label="Вернуться наверх"><span>Наверх</span><span class="ftr__top-icon"><Icon name="arrow-up" /></span></a>
+    </div>
   </div>
 </footer>
 
-<style>
-  .ftr {
-    margin-top: var(--section-gap);
-    padding-bottom: var(--margin);
+<script>
+  const button = document.querySelector<HTMLButtonElement>('[data-footer-copy]');
+  const label = button?.querySelector<HTMLElement>('[data-copy-label]');
+  const status = document.querySelector<HTMLElement>('[data-copy-status]');
+  if (button && label && status && navigator.clipboard?.writeText) {
+    button.hidden = false;
+    let reset: ReturnType<typeof setTimeout>;
+    button.addEventListener('click', async () => {
+      clearTimeout(reset);
+      try {
+        await navigator.clipboard.writeText(button.dataset.email ?? '');
+        label.textContent = 'Адрес скопирован';
+        status.textContent = 'Адрес электронной почты скопирован';
+      } catch {
+        label.textContent = 'Выделите адрес выше';
+        status.textContent = 'Не получилось скопировать. Выделите адрес электронной почты выше.';
+      }
+      reset = setTimeout(() => {
+        label.textContent = 'Скопировать почту';
+        status.textContent = '';
+      }, 3000);
+    });
   }
+</script>
 
-  /* Название во всю ширину: тонкий крупный набор, первое слово приглушено. */
-  .ftr__mark {
-    container-type: inline-size;
-    padding: clamp(20px, 3vw, 44px) clamp(20px, 3.4vw, 56px);
+<style>
+  .ftr { margin-top: var(--section-gap); padding-bottom: var(--margin); }
+  .ftr__panel {
+    padding: clamp(24px, 3.4vw, 52px);
+    border: 1px solid var(--glass-edge);
     border-radius: var(--radius-lg);
     background: var(--paper);
   }
-
+  .ftr__main {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: clamp(28px, 3.4vw, 52px);
+    align-items: start;
+  }
+  .ftr__signature {
+    display: flex; align-items: flex-start; gap: 16px; width: fit-content;
+    color: var(--ink); text-decoration: none;
+  }
+  .ftr__signature :global(.ftr__logo) {
+    flex: none; width: 32px; height: 32px; margin-top: 7px; color: var(--accent);
+  }
   .ftr__word {
-    font-family: var(--font-head);
-    font-weight: 300;
-    font-size: 17cqw;
-    line-height: 1.1;
-    letter-spacing: -0.06em;
-    white-space: nowrap;
+    display: grid; font-family: var(--font-head);
+    font-size: clamp(2.75rem, 4.6vw, 4.5rem); font-weight: 300;
+    line-height: 1.02; letter-spacing: -0.055em;
   }
-
-  .ftr__grid {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--gap);
-    margin-top: clamp(28px, 3vw, 44px);
+  .ftr__word > span:last-child { color: var(--accent-text); }
+  .ftr__description {
+    margin-top: 24px; max-width: 30ch; font-size: var(--step-small);
+    line-height: 1.6; color: var(--ink-2);
   }
-
-  .ftr__cols {
-    grid-column: 1 / 9;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--gap);
+  .ftr__author { margin-top: 16px; font-size: var(--fs-xs); color: var(--muted); }
+  .ftr__label {
+    margin: 0 0 20px; font-family: var(--font-display);
+    font-size: var(--fs-xs); font-weight: 500; line-height: 1.4; color: var(--muted);
   }
-
-  .ftr__cols ul {
-    list-style: none;
-    padding: 0;
-    display: grid;
-    gap: 10px;
-    align-content: start;
+  .ftr__telegram {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    min-height: 88px; padding: 16px 20px; border-radius: 18px;
+    background: var(--accent); color: var(--accent-ink); text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out);
   }
-
-  .ftr__cols a {
-    font-family: var(--font-display);
-    font-size: var(--step-small);
-    text-decoration: none;
-    color: var(--ink);
+  .ftr__telegram > span:first-child { display: grid; gap: 4px; }
+  .ftr__channel { display: block; font-size: var(--fs-xs); font-weight: 400; line-height: 1.4; }
+  .ftr__telegram strong { font-size: var(--fs-1); font-weight: 550; letter-spacing: -0.025em; }
+  .ftr__telegram-arrow {
+    display: grid; place-items: center; flex: none; width: 36px; height: 36px;
+    border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 50%;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .ftr__telegram:hover { background: var(--accent-deep); }
+  .ftr__telegram:hover .ftr__telegram-arrow { transform: translate(2px, -2px); }
+  .ftr__email { margin-top: 16px; padding: 0 4px 12px; border-bottom: 1px solid var(--line); }
+  .ftr__mail {
+    display: grid; gap: 6px; min-height: 56px; align-content: center;
+    color: var(--ink); text-decoration: none;
+  }
+  .ftr__mail .ftr__channel { color: var(--muted); }
+  .ftr__mail > span:last-child {
+    font-size: clamp(0.875rem, 1.05vw, 1rem); font-weight: 550;
+    letter-spacing: -0.02em; overflow-wrap: anywhere;
+  }
+  .ftr__mail:hover > span:last-child { color: var(--accent-text); }
+  .ftr__copy {
+    display: inline-flex; align-items: center; gap: 8px; min-width: 180px; min-height: 44px;
+    padding: 8px 0; background: transparent; color: var(--muted); font: inherit;
+    font-size: var(--fs-xs); text-align: left;
     transition: color var(--dur-fast) var(--ease-out);
   }
-
-  .ftr__cols a:hover {
-    color: var(--accent-deep);
+  .ftr__copy[hidden] { display: none; }
+  .ftr__copy:hover { color: var(--accent-text); }
+  .ftr__hours { max-width: 32ch; margin-top: 12px; font-size: var(--fs-xs); line-height: 1.5; color: var(--muted); }
+  .ftr__pending { font-size: var(--step-small); color: var(--muted); }
+  .ftr__nav { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; }
+  .ftr__nav ul { display: grid; list-style: none; margin: 0; padding: 0; }
+  .ftr__nav .ftr__label { margin-bottom: 12px; }
+  .ftr__nav a {
+    display: flex; align-items: center; min-height: 44px; width: fit-content;
+    font-size: var(--step-small); line-height: 1.4; color: var(--ink-2); text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
   }
-
-  .ftr__contacts {
-    grid-column: 9 / 13;
-    display: grid;
-    gap: var(--gap);
-    align-content: start;
-  }
-
-  .ftr__lead {
-    font-size: var(--step-body);
-    margin-bottom: 8px;
-  }
-
+  .ftr__nav a:hover { color: var(--accent-text); text-decoration: underline; text-underline-offset: 4px; }
   .ftr__bottom {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 24px;
-    align-items: center;
-    margin-top: clamp(28px, 3vw, 44px);
+    display: grid; grid-template-columns: 1fr auto auto; gap: 24px; align-items: center;
+    margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--line);
+    font-size: var(--fs-xs); line-height: 1.5; color: var(--muted);
   }
-
-  .ftr__bottom p:nth-child(2) {
-    max-width: 70ch;
+  .ftr__bottom p > span { display: block; }
+  .ftr__policy {
+    display: flex; align-items: center; min-height: 44px; color: inherit; text-decoration: none;
   }
-
-  .ftr__top {
-    min-height: 44px;
+  .ftr__policy:hover { color: var(--accent-text); text-decoration: underline; text-underline-offset: 4px; }
+  .ftr__top { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; color: var(--ink); text-decoration: none; }
+  .ftr__top-icon {
+    display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+    background: var(--bg); color: var(--accent-text); font-size: var(--fs-1);
+    transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
   }
-
-  @media (max-width: 1023px) {
-    .ftr__cols {
-      grid-column: 1 / -1;
-    }
-
-    .ftr__contacts {
-      grid-column: 1 / -1;
-      margin-top: 16px;
-    }
+  .ftr__top:hover .ftr__top-icon { background: var(--accent); color: var(--accent-ink); }
+  @media (max-width: 1199px) {
+    .ftr__main { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 32px; }
+    .ftr__nav { grid-column: 1 / -1; padding-top: 24px; border-top: 1px solid var(--line); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ftr__word { font-size: clamp(2.75rem, 6vw, 4rem); }
   }
-
-  @media (max-width: 767px) {
-
-    .ftr__grid {
-      grid-template-columns: 1fr;
-    }
-
-    .ftr__cols {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px 20px;
-    }
-
-    .ftr__cols ul:last-child {
-      grid-column: 1 / -1;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: 20px;
-    }
-
-    .ftr__cols ul:last-child li:last-child {
-      grid-column: 1 / -1;
-    }
-
-    /* Ссылки высотой с палец: по 44px, а не по строке текста. */
-    .ftr__cols ul {
-      gap: 0;
-    }
-
-    .ftr__cols a {
-      display: flex;
-      align-items: center;
-      min-height: 44px;
-    }
-
-    .ftr__bottom {
-      grid-template-columns: 1fr auto;
-    }
-
-    .ftr__bottom p:nth-child(2) {
-      grid-column: 1 / -1;
-      order: 3;
-    }
+  @media (max-width: 639px) {
+    .ftr__panel { padding: 24px 20px 20px; border-radius: 24px; }
+    .ftr__main { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .ftr__signature { align-items: center; gap: 12px; }
+    .ftr__signature :global(.ftr__logo) { width: 28px; height: 28px; margin: 0; }
+    .ftr__word { display: flex; gap: 0.2em; font-size: clamp(1.75rem, 7.6vw, 2.375rem); }
+    .ftr__description { margin-top: 16px; }
+    .ftr__author { margin-top: 8px; }
+    .ftr__label { margin-bottom: 12px; }
+    .ftr__bottom { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; margin-top: 24px; padding-top: 16px; }
+    .ftr__policy { grid-column: 1 / -1; grid-row: 2; }
+    .ftr__top > span:first-child { display: none; }
+    .ftr__top { justify-self: end; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ftr__telegram-arrow { transition: none; }
+    .ftr__telegram:hover .ftr__telegram-arrow { transform: none; }
   }
 </style>
