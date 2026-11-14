@@ -205,9 +205,11 @@ const mail = emailUrl('Заявка на разработку сайта');
     opacity: 0.8;
   }
 
+  /* Адрес почты не рвётся посреди слова: на узком экране кегль чуть меньше. */
   .ct__lv {
     font-family: var(--font-display);
     font-weight: 560;
+    font-size: clamp(0.875rem, 3.7vw, 1.0625rem);
     overflow-wrap: anywhere;
   }
 
