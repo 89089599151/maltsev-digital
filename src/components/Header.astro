@@ -5,13 +5,15 @@ import { site } from '@/config/site';
 import Icon from './Icon.astro';
 
 const nav = [
-  { href: '/', label: 'Главная' },
-  { href: '/portfolio/', label: 'Работы' },
-  { href: '/services/', label: 'Услуги и цены' },
-  { href: '/about/', label: 'Обо мне' },
-  { href: '/faq/', label: 'Вопросы' },
+  { href: '/', label: 'Главная', description: 'Начало и подход к работе' },
+  { href: '/portfolio/', label: 'Работы', description: 'Проекты и их история' },
+  { href: '/services/', label: 'Услуги и цены', description: 'Пакеты и калькулятор' },
+  { href: '/about/', label: 'Обо мне', description: 'Кто сделает ваш сайт' },
+  { href: '/faq/', label: 'Вопросы', description: 'Сроки, условия и ответы' },
 ];
 const current = Astro.url.pathname;
+// На странице контактов переходим к брифу, сохраняя уже заполненные поля.
+const contactHref = isActive(current, '/contacts/') ? url('/contacts/#brief-title') : url('/contacts/');
 ---
 
 <header class="hdr" data-header>
@@ -36,45 +38,60 @@ const current = Astro.url.pathname;
     <a class="hdr__cta btn btn--accent" href={url('/contacts/')}>
       Обсудить проект <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
     </a>
-    <button class="hdr__menu" type="button" aria-haspopup="dialog" aria-controls="site-menu" data-menu-open>
-      Меню
-    </button>
+    <div class="hdr__actions">
+      <a class="hdr__write" href={contactHref} aria-current={isActive(current, '/contacts/') ? 'page' : undefined}>
+        Написать <Icon name="arrow-ne" />
+      </a>
+      <button class="hdr__menu" type="button" aria-label="Открыть меню сайта" aria-haspopup="dialog" aria-controls="site-menu" aria-expanded="false" data-menu-open hidden>
+        <Icon name="menu" />
+      </button>
+    </div>
   </div>
 
-  <dialog class="menu" id="site-menu" aria-label="Меню сайта" data-menu>
-    <div class="menu__board">
-      <div class="menu__top">
-        <a class="hdr__brand" href={url('/')} aria-label="На главную">
-          <LogoMark class="hdr__mark" />
-          <span class="hdr__name">{site.brand.short}<span> {site.brand.second}</span></span>
-        </a>
-        <button class="menu__close" type="button" data-menu-close>Закрыть</button>
-      </div>
+  <noscript>
+    <nav class="hdr__fallback" aria-label="Разделы сайта">
+      <ul>{nav.map((item) => <li><a href={url(item.href)} aria-current={isActive(current, item.href) ? 'page' : undefined}>{item.label}</a></li>)}</ul>
+    </nav>
+  </noscript>
+</header>
+
+<dialog class="menu" id="site-menu" aria-labelledby="site-menu-title" data-menu>
+  <div class="menu__board">
+    <div class="menu__top">
+      <h2 id="site-menu-title">Куда перейдём?</h2>
+      <button class="menu__close" type="button" aria-label="Закрыть меню" data-menu-close autofocus><Icon name="close" /></button>
+    </div>
+    <nav class="menu__nav" aria-label="Разделы сайта">
       <ul class="menu__list">
         {nav.map((item) => (
           <li>
             <a href={url(item.href)} aria-current={isActive(current, item.href) ? 'page' : undefined}>
-              {item.label}
+              <span class="menu__label">{item.label}<small>{item.description}</small></span>
+              <Icon name={isActive(current, item.href) ? 'check' : 'arrow-ne'} />
             </a>
           </li>
         ))}
       </ul>
-      <a class="menu__cta" href={url('/contacts/')}>Обсудить проект <span aria-hidden="true"><Icon name="arrow" /></span></a>
-    </div>
-  </dialog>
-</header>
+    </nav>
+    <a class="menu__cta" href={contactHref} aria-current={isActive(current, '/contacts/') ? 'page' : undefined}>Обсудить проект <Icon name="arrow-ne" /></a>
+  </div>
+</dialog>
 
 <script>
-  // Шапка прячется при прокрутке вниз и возвращается при прокрутке вверх.
-  // Наверху страницы она прозрачная (на главной лежит на сцене первого экрана), при прокрутке — с фоном.
+  import { initMobileMenu } from '@/scripts/mobile-menu';
+  initMobileMenu();
+
+  // На телефоне панель остаётся под рукой; на десктопе сохраняется прежнее поведение.
   const header = document.querySelector<HTMLElement>('[data-header]');
+  const dialog = document.querySelector<HTMLDialogElement>('[data-menu]');
+  const desktop = window.matchMedia('(min-width: 1024px)');
   if (header) {
     let lastY = window.scrollY;
     let ticking = false;
     const update = () => {
       ticking = false;
       const y = window.scrollY;
-      const hide = y > lastY && y > 240 && !header.contains(document.activeElement);
+      const hide = desktop.matches && !dialog?.open && y > lastY && y > 240 && !header.contains(document.activeElement);
       header.classList.toggle('is-hidden', hide);
       header.classList.toggle('is-scrolled', y > 8);
       lastY = y;
@@ -87,26 +104,9 @@ const current = Astro.url.pathname;
       }
     }, { passive: true });
     header.addEventListener('focusin', () => header.classList.remove('is-hidden'));
-  }
-
-  const dialog = document.querySelector<HTMLDialogElement>('[data-menu]');
-  const openBtn = document.querySelector<HTMLButtonElement>('[data-menu-open]');
-  const closeBtn = document.querySelector<HTMLButtonElement>('[data-menu-close]');
-  if (dialog && openBtn && closeBtn) {
-    openBtn.addEventListener('click', () => {
-      dialog.showModal();
-      openBtn.setAttribute('aria-expanded', 'true');
-    });
-    closeBtn.addEventListener('click', () => dialog.close());
-    dialog.addEventListener('close', () => {
-      openBtn.setAttribute('aria-expanded', 'false');
-      openBtn.focus();
-    });
-    dialog.addEventListener('click', (e) => {
-      if (e.target === dialog) dialog.close();
-    });
-    window.matchMedia('(min-width: 1024px)').addEventListener('change', (e) => {
-      if (e.matches && dialog.open) dialog.close();
+    desktop.addEventListener('change', () => {
+      lastY = window.scrollY;
+      update();
     });
   }
 </script>
@@ -227,102 +227,243 @@ const current = Astro.url.pathname;
     }
   }
 
-  .hdr__menu {
+  .hdr__actions,
+  .hdr__fallback {
     display: none;
-    justify-self: end;
-    min-height: 46px;
-    padding-inline: 20px;
-    border-radius: 999px;
-    background: var(--ink);
-    color: var(--bg);
-    font-family: var(--font-display);
-    font-weight: 600;
   }
 
-  /* Меню для телефона и планшета */
+  /* Модальный лист расположен отдельно от шапки и её преобразований при прокрутке. */
   .menu {
+    position: fixed;
+    inset: 0;
     width: 100%;
     max-width: none;
     height: 100%;
+    height: 100dvh;
     max-height: none;
     margin: 0;
-    padding: var(--margin);
+    padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
     border: 0;
-    background: var(--bg);
+    background: transparent;
     color: var(--ink);
+    overflow: hidden;
+  }
+
+  .menu[open] {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
   }
 
   .menu::backdrop {
-    background: rgba(10, 11, 20, 0.4);
+    background: rgba(10, 11, 20, 0.28);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
   }
 
   .menu__board {
-    display: grid;
-    gap: var(--gap);
-    grid-template-rows: auto 1fr auto;
-    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(100%, 560px);
+    max-height: 100%;
+    padding: 18px;
+    border-radius: 28px;
+    background: var(--paper);
+    box-shadow: 0 -8px 48px rgba(10, 11, 20, 0.12);
+    overflow: hidden;
   }
 
   .menu__top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    min-height: 56px;
+    gap: 16px;
+    min-height: 44px;
+    flex: none;
+  }
+
+  .menu__top h2 {
+    font-size: var(--fs-2);
+    line-height: 1.1;
+    font-weight: 400;
+    letter-spacing: -0.04em;
   }
 
   .menu__close {
-    min-height: 46px;
-    padding-inline: 20px;
-    border-radius: 999px;
-    background: var(--surface-2);
-    font-family: var(--font-display);
-    font-weight: 600;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--bg);
+    font-size: var(--fs-1);
+  }
+
+  .menu__nav {
+    min-height: 0;
+    padding: 4px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .menu__list {
     list-style: none;
     padding: 0;
     display: grid;
-    gap: 6px;
-    align-content: start;
-    margin-top: 12px;
+    gap: 2px;
   }
 
   .menu__list a {
-    display: block;
-    padding: 16px 18px;
-    border-radius: var(--radius);
-    background: var(--surface);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    min-height: 66px;
+    padding: 10px 12px;
+    border-radius: 16px;
     font-family: var(--font-display);
     font-weight: 400;
-    font-size: clamp(1.625rem, 7vw, 2.25rem);
+    font-size: var(--step-body);
     letter-spacing: -0.04em;
     text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .menu__list a:hover {
+    background: var(--bg);
+  }
+
+  .menu__label {
+    display: grid;
+    gap: 3px;
+  }
+
+  .menu__label small {
+    font-size: var(--fs-xs);
+    line-height: 1.4;
+    letter-spacing: 0;
+    color: var(--muted);
   }
 
   .menu__list a[aria-current='page'] {
-    background: var(--ink);
-    color: var(--bg);
+    background: var(--accent-soft);
+    color: var(--accent-text);
   }
 
   .menu__cta {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    min-height: 64px;
-    padding-inline: 24px;
-    border-radius: 999px;
+    gap: 16px;
+    min-height: 56px;
+    padding: 12px 18px;
+    border-radius: 18px;
     background: var(--accent);
     color: var(--accent-ink);
     font-family: var(--font-display);
     font-weight: 600;
     font-size: var(--step-body);
     text-decoration: none;
+    flex: none;
+  }
+
+  .menu__cta:hover {
+    background: var(--accent-deep);
+  }
+
+  :global(html.site-menu-open) {
+    overflow: hidden;
+    scroll-behavior: auto;
+  }
+
+  :global(html.site-menu-open body) {
+    position: fixed;
+    top: var(--site-menu-scroll-y, 0px);
+    inset-inline: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .menu[open] .menu__board {
+      animation: menu-rise 320ms var(--ease-out) both;
+    }
+
+    .menu[open]::backdrop {
+      animation: menu-veil-in 200ms ease-out both;
+    }
+
+    .menu.is-closing .menu__board {
+      animation: menu-fall 180ms ease-in both;
+    }
+
+    .menu.is-closing::backdrop {
+      animation: menu-veil-out 180ms ease-in both;
+    }
+  }
+
+  @keyframes menu-rise {
+    from { transform: translateY(calc(100% + 24px)); }
+    to { transform: translateY(0); }
+  }
+
+  @keyframes menu-fall {
+    from { transform: translateY(0); }
+    to { transform: translateY(calc(100% + 24px)); }
+  }
+
+  @keyframes menu-veil-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes menu-veil-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
   }
 
   @media (max-width: 1023px) {
+    .hdr {
+      padding-block: max(10px, env(safe-area-inset-top)) 10px;
+      background: none;
+    }
+
     .hdr__row {
       grid-template-columns: 1fr auto;
+      gap: 8px;
+      min-height: 64px;
+      padding: 8px 10px;
+      border: 1px solid rgba(10, 11, 20, 0.08);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.94);
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 6px 24px rgba(30, 40, 100, 0.07);
+      transition: box-shadow var(--dur) var(--ease-out);
+    }
+
+    .hdr.is-scrolled .hdr__row {
+      box-shadow: 0 8px 30px rgba(30, 40, 100, 0.12);
+    }
+
+    .hdr__brand {
+      min-width: 0;
+      gap: 8px;
+    }
+
+    .hdr__name {
+      display: grid;
+      gap: 3px;
+      font-size: var(--fs-xs);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .hdr__name span {
+      font-size: 0.75rem;
+      font-weight: 400;
     }
 
     .hdr__nav,
@@ -330,9 +471,73 @@ const current = Astro.url.pathname;
       display: none;
     }
 
+    .hdr__actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-self: end;
+    }
+
+    .hdr__write {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      min-height: 44px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-family: var(--font-display);
+      font-size: var(--fs-xs);
+      line-height: 1.2;
+      font-weight: 550;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .hdr__write:hover {
+      background: var(--accent-deep);
+    }
+
     .hdr__menu {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border-radius: 50%;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: var(--fs-1);
+    }
+
+    .hdr__menu:hover {
+      background: var(--surface-2);
+    }
+
+    .hdr__fallback {
+      display: block;
+      padding-top: 10px;
+    }
+
+    .hdr__fallback ul {
+      display: flex;
+      flex-wrap: wrap;
+      list-style: none;
+      gap: 6px;
+      padding: 0;
+    }
+
+    .hdr__fallback a {
       display: inline-flex;
       align-items: center;
+      min-height: 44px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--paper);
+      font-size: var(--fs-xs);
+      text-decoration: none;
     }
   }
 </style>
