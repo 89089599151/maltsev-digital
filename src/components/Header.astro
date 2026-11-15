@@ -5,20 +5,32 @@ import { site } from '@/config/site';
 import Icon from './Icon.astro';
 
 const nav = [
-  { href: '/', label: 'Главная', description: 'Начало и подход к работе' },
-  { href: '/portfolio/', label: 'Работы', description: 'Проекты и их история' },
-  { href: '/services/', label: 'Услуги и цены', description: 'Пакеты и калькулятор' },
-  { href: '/about/', label: 'Обо мне', description: 'Кто сделает ваш сайт' },
-  { href: '/faq/', label: 'Вопросы', description: 'Сроки, условия и ответы' },
+  { href: '/', label: 'Главная' },
+  { href: '/portfolio/', label: 'Работы' },
+  { href: '/services/', label: 'Услуги и цены' },
+  { href: '/about/', label: 'Обо мне' },
+  { href: '/faq/', label: 'Вопросы' },
 ];
 const current = Astro.url.pathname;
+const onContacts = isActive(current, '/contacts/');
 // На странице контактов переходим к брифу, сохраняя уже заполненные поля.
-const contactHref = isActive(current, '/contacts/') ? url('/contacts/#brief-title') : url('/contacts/');
+const contactHref = onContacts ? url('/contacts/#brief-title') : url('/contacts/');
+
+// Остров: подпись кнопки меню — раздел, в котором находится посетитель.
+const section = nav.find((item) => isActive(current, item.href))?.label ?? (onContacts ? 'Контакты' : null);
+const menuLabel = section ?? 'Меню';
+const menuAria = section ? `Меню сайта. Сейчас открыт раздел «${section}»` : 'Меню сайта';
+
+// Статус в меню: до запуска скрипта — нейтральная строка с часами, дальше её уточняет mobile-menu.ts.
+const { workHours, responseMinutes, hours } = site.contacts;
+const hoursText = hours.charAt(0).toUpperCase() + hours.slice(1);
+const onlineText = `На связи · отвечу за ${responseMinutes} минут`;
+const offlineText = `Отвечу после ${workHours.from}:00 по Москве`;
 ---
 
 <header class="hdr" data-header>
   <div class="hdr__row">
-    <a class="hdr__brand" href={url('/')} aria-label={`${site.brand.name.value} — на главную`}>
+    <a class="hdr__brand" href={url('/')} aria-label={`${site.brand.name.value} — на главную`}>
       <LogoMark class="hdr__mark" />
       <span class="hdr__name">{site.brand.short}<span> {site.brand.second}</span></span>
     </a>
@@ -38,14 +50,6 @@ const contactHref = isActive(current, '/contacts/') ? url('/contacts/#brief-titl
     <a class="hdr__cta btn btn--accent" href={url('/contacts/')}>
       Обсудить проект <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
     </a>
-    <div class="hdr__actions">
-      <a class="hdr__write" href={contactHref} aria-current={isActive(current, '/contacts/') ? 'page' : undefined}>
-        Написать <Icon name="arrow-ne" />
-      </a>
-      <button class="hdr__menu" type="button" aria-label="Открыть меню сайта" aria-haspopup="dialog" aria-controls="site-menu" aria-expanded="false" data-menu-open hidden>
-        <Icon name="menu" />
-      </button>
-    </div>
   </div>
 
   <noscript>
@@ -55,33 +59,60 @@ const contactHref = isActive(current, '/contacts/') ? url('/contacts/#brief-titl
   </noscript>
 </header>
 
+<!-- Остров: навигация телефона под большим пальцем. Кнопка меню появляется после запуска скрипта. -->
+<div class="isl" data-island>
+  <button class="isl__menu" type="button" aria-label={menuAria} aria-haspopup="dialog" aria-controls="site-menu" aria-expanded="false" data-menu-open hidden>
+    <Icon name="menu" />
+    <span class="isl__fold"><span class="isl__label">{menuLabel}</span></span>
+  </button>
+  <a class="isl__write" href={contactHref} aria-label="Написать" aria-current={onContacts ? 'page' : undefined}>
+    <span class="isl__fold"><span class="isl__label">Написать</span></span>
+    <Icon name="arrow-ne" />
+  </a>
+</div>
+
 <dialog class="menu" id="site-menu" aria-labelledby="site-menu-title" data-menu>
-  <div class="menu__board">
-    <div class="menu__top">
-      <h2 id="site-menu-title">Куда перейдём?</h2>
-      <button class="menu__close" type="button" aria-label="Закрыть меню" data-menu-close autofocus><Icon name="close" /></button>
-    </div>
-    <nav class="menu__nav" aria-label="Разделы сайта">
+  <div class="menu__board" data-menu-board>
+    <h2 class="sr-only" id="site-menu-title">Разделы сайта</h2>
+    <span class="menu__grip" aria-hidden="true"></span>
+    <nav class="menu__nav" aria-label="Разделы сайта" data-menu-scroll>
       <ul class="menu__list">
         {nav.map((item) => (
           <li>
-            <a href={url(item.href)} aria-current={isActive(current, item.href) ? 'page' : undefined}>
-              <span class="menu__label">{item.label}<small>{item.description}</small></span>
+            <a href={url(item.href)} aria-current={isActive(current, item.href) ? 'page' : undefined} data-menu-item>
+              {item.label}
               <Icon name={isActive(current, item.href) ? 'check' : 'arrow-ne'} />
             </a>
           </li>
         ))}
       </ul>
     </nav>
-    <a class="menu__cta" href={contactHref} aria-current={isActive(current, '/contacts/') ? 'page' : undefined}>Обсудить проект <Icon name="arrow-ne" /></a>
+    <p
+      class="menu__status"
+      data-status
+      data-from={workHours.from}
+      data-to={workHours.to}
+      data-tz={workHours.timeZone}
+      data-online-text={onlineText}
+      data-offline-text={offlineText}
+    >
+      <span class="menu__dot" aria-hidden="true"></span>
+      <span data-status-text>{hoursText}</span>
+    </p>
+    <div class="menu__foot">
+      <button class="menu__close" type="button" aria-label="Закрыть меню" data-menu-close autofocus><Icon name="close" /></button>
+      <a class="menu__cta" href={contactHref} aria-current={onContacts ? 'page' : undefined} data-menu-item>Обсудить проект <Icon name="arrow-ne" /></a>
+    </div>
   </div>
 </dialog>
 
 <script>
   import { initMobileMenu } from '@/scripts/mobile-menu';
+  import { initIsland } from '@/scripts/island';
   initMobileMenu();
+  initIsland();
 
-  // На телефоне панель остаётся под рукой; на десктопе сохраняется прежнее поведение.
+  // Десктопная шапка прячется при прокрутке вниз; на телефоне она обычная часть страницы.
   const header = document.querySelector<HTMLElement>('[data-header]');
   const dialog = document.querySelector<HTMLDialogElement>('[data-menu]');
   const desktop = window.matchMedia('(min-width: 1024px)');
@@ -227,12 +258,14 @@ const contactHref = isActive(current, '/contacts/') ? url('/contacts/#brief-titl
     }
   }
 
-  .hdr__actions,
-  .hdr__fallback {
+  .hdr__fallback,
+  .isl {
     display: none;
   }
 
-  /* Модальный лист расположен отдельно от шапки и её преобразований при прокрутке. */
+  /* --- Меню: карточка, вырастающая из острова ---------------------------- */
+
+  /* Модальный диалог расположен отдельно от шапки и её преобразований при прокрутке. */
   .menu {
     position: fixed;
     inset: 0;
@@ -242,6 +275,7 @@ const contactHref = isActive(current, '/contacts/') ? url('/contacts/#brief-titl
     height: 100dvh;
     max-height: none;
     margin: 0;
+    /* Нижний и боковые отступы совпадают с островом: карточка растёт ровно из его места. */
     padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
     border: 0;
     background: transparent;
@@ -264,46 +298,32 @@ const contactHref = isActive(current, '/contacts/') ? url('/contacts/#brief-titl
   .menu__board {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
     width: min(100%, 560px);
     max-height: 100%;
-    padding: 18px;
-    border-radius: 28px;
+    padding: 8px 10px 10px;
+    border-radius: 32px;
     background: var(--paper);
     box-shadow: 0 -8px 48px rgba(10, 11, 20, 0.12);
     overflow: hidden;
+    /* Смахивание вниз: карточка следует за пальцем. */
+    transform: translateY(var(--menu-drag, 0px));
+    -webkit-user-select: none;
+    user-select: none;
   }
 
-  .menu__top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    min-height: 44px;
+  .menu__grip {
+    align-self: center;
+    width: 36px;
+    height: 4px;
+    margin-block: 2px 4px;
+    border-radius: 999px;
+    background: var(--surface-3);
     flex: none;
-  }
-
-  .menu__top h2 {
-    font-size: var(--fs-2);
-    line-height: 1.1;
-    font-weight: 400;
-    letter-spacing: -0.04em;
-  }
-
-  .menu__close {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    flex: none;
-    border-radius: 50%;
-    background: var(--bg);
-    font-size: var(--fs-1);
   }
 
   .menu__nav {
     min-height: 0;
-    padding: 4px;
     overflow-y: auto;
     overscroll-behavior: contain;
   }
@@ -320,31 +340,27 @@ const contactHref = isActive(current, '/contacts/') ? url('/contacts/#brief-titl
     justify-content: space-between;
     align-items: center;
     gap: 16px;
-    min-height: 66px;
-    padding: 10px 12px;
-    border-radius: 16px;
+    min-height: 56px;
+    padding: 8px 18px;
+    border-radius: 20px;
     font-family: var(--font-display);
-    font-weight: 400;
-    font-size: var(--step-body);
-    letter-spacing: -0.04em;
+    font-weight: 450;
+    font-size: var(--fs-1);
+    line-height: 1.2;
+    letter-spacing: -0.03em;
     text-decoration: none;
-    transition: background-color var(--dur-fast) var(--ease-out);
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+
+  .menu__list a :global(.icon) {
+    font-size: var(--fs-0);
+    color: var(--muted);
   }
 
   .menu__list a:hover {
     background: var(--bg);
-  }
-
-  .menu__label {
-    display: grid;
-    gap: 3px;
-  }
-
-  .menu__label small {
-    font-size: var(--fs-xs);
-    line-height: 1.4;
-    letter-spacing: 0;
-    color: var(--muted);
   }
 
   .menu__list a[aria-current='page'] {
@@ -352,24 +368,93 @@ const contactHref = isActive(current, '/contacts/') ? url('/contacts/#brief-titl
     color: var(--accent-text);
   }
 
+  .menu__list a[aria-current='page'] :global(.icon) {
+    color: inherit;
+  }
+
+  /* Раздел под пальцем во время жеста «зажал — провёл — отпустил». */
+  .menu__list a.is-target {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .menu__list a.is-target :global(.icon) {
+    color: inherit;
+  }
+
+  .menu__status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 36px;
+    padding-inline: 18px;
+    font-size: var(--fs-xs);
+    line-height: 1.3;
+    color: var(--muted);
+    flex: none;
+  }
+
+  .menu__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--surface-3);
+    flex: none;
+  }
+
+  .menu__status[data-online='true'] {
+    color: var(--ink-2);
+  }
+
+  .menu__status[data-online='true'] .menu__dot {
+    background: var(--success);
+    box-shadow: 0 0 0 4px rgba(31, 122, 58, 0.16);
+  }
+
+  /* Низ карточки повторяет остров: слева круглая кнопка, справа синяя — палец остаётся на месте. */
+  .menu__foot {
+    display: flex;
+    gap: 6px;
+    flex: none;
+  }
+
+  .menu__close {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--bg);
+    font-size: var(--fs-1);
+  }
+
+  .menu__close:hover {
+    background: var(--surface-2);
+  }
+
   .menu__cta {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 16px;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
     min-height: 56px;
-    padding: 12px 18px;
-    border-radius: 18px;
+    padding: 12px 20px;
+    white-space: nowrap;
+    border-radius: 999px;
     background: var(--accent);
     color: var(--accent-ink);
     font-family: var(--font-display);
     font-weight: 600;
     font-size: var(--step-body);
     text-decoration: none;
-    flex: none;
+    transition: background-color var(--dur-fast) var(--ease-out);
   }
 
-  .menu__cta:hover {
+  .menu__cta:hover,
+  .menu__cta.is-target {
     background: var(--accent-deep);
   }
 
@@ -387,31 +472,72 @@ const contactHref = isActive(current, '/contacts/') ? url('/contacts/#brief-titl
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .menu[open] .menu__board {
-      animation: menu-rise 320ms var(--ease-out) both;
+    .menu__board {
+      transition: transform 240ms var(--ease-out);
     }
 
-    .menu[open]::backdrop {
-      animation: menu-veil-in 200ms ease-out both;
+    .menu__board.is-dragging {
+      transition: none;
+    }
+
+    /* Пока скрипт измеряет остров, анимация не стартует — иначе она началась бы без координат. */
+    .menu[open]:not(.is-measuring) .menu__board {
+      animation: menu-grow 360ms var(--ease-out) both;
+    }
+
+    .menu[open]:not(.is-measuring) :is(.menu__grip, .menu__nav, .menu__status) {
+      animation: menu-content-in 280ms 70ms var(--ease-out) both;
+    }
+
+    .menu[open]:not(.is-measuring)::backdrop {
+      animation: menu-veil-in 220ms ease-out both;
     }
 
     .menu.is-closing .menu__board {
-      animation: menu-fall 180ms ease-in both;
+      animation: menu-shrink 220ms var(--ease-inout) both;
+    }
+
+    .menu.is-closing :is(.menu__grip, .menu__nav, .menu__status) {
+      animation: menu-content-out 120ms ease-in both;
+    }
+
+    .menu.is-closing.is-dropping .menu__board {
+      animation: menu-drop 220ms ease-in both;
+    }
+
+    .menu.is-closing.is-dropping :is(.menu__grip, .menu__nav, .menu__status) {
+      animation: none;
     }
 
     .menu.is-closing::backdrop {
-      animation: menu-veil-out 180ms ease-in both;
+      animation: menu-veil-out 220ms ease-in both;
     }
   }
 
-  @keyframes menu-rise {
-    from { transform: translateY(calc(100% + 24px)); }
-    to { transform: translateY(0); }
+  /* Координаты острова относительно карточки записывает mobile-menu.ts перед открытием. */
+  @keyframes menu-grow {
+    from { clip-path: inset(var(--isl-t, 0px) var(--isl-r, 0px) var(--isl-b, 0px) var(--isl-l, 0px) round 32px); }
+    to { clip-path: inset(0px 0px 0px 0px round 32px); }
   }
 
-  @keyframes menu-fall {
-    from { transform: translateY(0); }
+  @keyframes menu-shrink {
+    from { clip-path: inset(0px 0px 0px 0px round 32px); }
+    to { clip-path: inset(var(--isl-t, 0px) var(--isl-r, 0px) var(--isl-b, 0px) var(--isl-l, 0px) round 32px); }
+  }
+
+  @keyframes menu-drop {
+    from { transform: translateY(var(--menu-drag, 0px)); }
     to { transform: translateY(calc(100% + 24px)); }
+  }
+
+  @keyframes menu-content-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes menu-content-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
   }
 
   @keyframes menu-veil-in {
@@ -424,46 +550,19 @@ const contactHref = isActive(current, '/contacts/') ? url('/contacts/#brief-titl
     to { opacity: 0; }
   }
 
+  /* --- Телефон и планшет: логотип сверху, остров снизу -------------------- */
+
   @media (max-width: 1023px) {
+    /* Шапка — обычная часть страницы: навигация живёт в острове. */
     .hdr {
-      padding-block: max(10px, env(safe-area-inset-top)) 10px;
+      position: static;
+      padding-block: max(12px, env(safe-area-inset-top)) 4px;
       background: none;
     }
 
     .hdr__row {
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      min-height: 64px;
-      padding: 8px 10px;
-      border: 1px solid rgba(10, 11, 20, 0.08);
-      border-radius: 26px;
-      background: rgba(255, 255, 255, 0.94);
-      -webkit-backdrop-filter: blur(18px);
-      backdrop-filter: blur(18px);
-      box-shadow: 0 6px 24px rgba(30, 40, 100, 0.07);
-      transition: box-shadow var(--dur) var(--ease-out);
-    }
-
-    .hdr.is-scrolled .hdr__row {
-      box-shadow: 0 8px 30px rgba(30, 40, 100, 0.12);
-    }
-
-    .hdr__brand {
-      min-width: 0;
-      gap: 8px;
-    }
-
-    .hdr__name {
-      display: grid;
-      gap: 3px;
-      font-size: var(--fs-xs);
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-    }
-
-    .hdr__name span {
-      font-size: 0.75rem;
-      font-weight: 400;
+      grid-template-columns: 1fr;
+      min-height: 48px;
     }
 
     .hdr__nav,
@@ -471,49 +570,135 @@ const contactHref = isActive(current, '/contacts/') ? url('/contacts/#brief-titl
       display: none;
     }
 
-    .hdr__actions {
+    /* Запас внизу страницы, чтобы остров не закрывал конец подвала. */
+    :global(body) {
+      padding-bottom: calc(62px + 12px + max(12px, env(safe-area-inset-bottom)));
+    }
+
+    .isl {
+      position: fixed;
+      z-index: 60;
+      inset-inline: 0;
+      bottom: max(12px, env(safe-area-inset-bottom));
       display: flex;
       align-items: center;
       gap: 6px;
-      justify-self: end;
+      width: fit-content;
+      max-width: calc(100% - 24px);
+      margin-inline: auto;
+      padding: 6px;
+      border: 1px solid rgba(10, 11, 20, 0.08);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.94);
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
+      box-shadow:
+        0 2px 6px rgba(10, 11, 20, 0.06),
+        0 16px 36px -12px rgba(30, 40, 100, 0.3);
+      /* При переходе между страницами остров остаётся на месте, меняется только подпись. */
+      view-transition-name: site-island;
     }
 
-    .hdr__write {
+    /* Пока открыто меню, остров «стал» карточкой. */
+    :global(html.site-menu-open) .isl {
+      visibility: hidden;
+    }
+
+    /* Открыта клавиатура — остров уходит вниз и не закрывает поля формы. */
+    .isl.is-away {
+      transform: translateY(calc(100% + 32px));
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .isl__menu,
+    .isl__write {
       display: inline-flex;
-      justify-content: center;
       align-items: center;
-      gap: 4px;
-      min-height: 44px;
-      padding: 10px 12px;
+      min-width: 48px;
+      height: 48px;
+      padding: 0 15px;
       border-radius: 999px;
-      background: var(--accent);
-      color: var(--accent-ink);
       font-family: var(--font-display);
-      font-size: var(--fs-xs);
+      font-size: var(--step-small);
       line-height: 1.2;
       font-weight: 550;
-      text-decoration: none;
+      letter-spacing: -0.01em;
       white-space: nowrap;
+      text-decoration: none;
     }
 
-    .hdr__write:hover {
+    .isl__menu :global(.icon),
+    .isl__write :global(.icon) {
+      font-size: 18px;
+    }
+
+    .isl__menu {
+      min-width: 0;
+      background: var(--bg);
+      color: var(--ink);
+      /* Жест начинается на кнопке: страница под пальцем не прокручивается, текст не выделяется. */
+      touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .isl__menu:hover {
+      background: var(--surface-2);
+    }
+
+    .isl__write {
+      flex: none;
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    .isl__write:hover {
       background: var(--accent-deep);
     }
 
-    .hdr__menu {
+    /* Подпись складывается до нуля, когда остров сжат: остаются две круглые кнопки. */
+    .isl__fold {
       display: grid;
-      place-items: center;
-      width: 44px;
-      height: 44px;
-      padding: 0;
-      border-radius: 50%;
-      background: var(--bg);
-      color: var(--ink);
-      font-size: var(--fs-1);
+      grid-template-columns: 1fr;
+      min-width: 0;
+      overflow: hidden;
     }
 
-    .hdr__menu:hover {
-      background: var(--surface-2);
+    .isl__label {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .isl__menu .isl__label {
+      padding-inline: 8px 3px;
+    }
+
+    .isl__write .isl__label {
+      padding-inline: 3px 6px;
+    }
+
+    .isl.is-compact .isl__fold {
+      grid-template-columns: 0fr;
+      opacity: 0;
+    }
+
+    .isl.is-compact .isl__label {
+      padding-inline: 0;
+      /* Пока подпись складывается, многоточие не мелькает. */
+      text-overflow: clip;
+    }
+
+    /* Самые узкие телефоны: подпись «Услуги и цены» помещается целиком. */
+    @media (max-width: 359px) {
+      .isl__menu,
+      .isl__write {
+        padding-inline: 13px;
+        font-size: var(--fs-xs);
+      }
     }
 
     .hdr__fallback {
@@ -538,6 +723,44 @@ const contactHref = isActive(current, '/contacts/') ? url('/contacts/#brief-titl
       background: var(--paper);
       font-size: var(--fs-xs);
       text-decoration: none;
+    }
+  }
+
+  @media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+    .isl {
+      transition:
+        transform var(--dur) var(--ease-out),
+        opacity var(--dur-fast) var(--ease-out),
+        visibility 0s;
+    }
+
+    .isl.is-away {
+      transition:
+        transform var(--dur) var(--ease-out),
+        opacity var(--dur-fast) var(--ease-out),
+        visibility 0s var(--dur);
+    }
+
+    .isl__fold {
+      transition:
+        grid-template-columns var(--dur) var(--ease-out),
+        opacity var(--dur-fast) var(--ease-out);
+    }
+
+    .isl__label {
+      transition: padding var(--dur) var(--ease-out);
+    }
+
+    .isl__menu,
+    .isl__write {
+      transition:
+        background-color var(--dur-fast) var(--ease-out),
+        transform var(--dur-fast) var(--ease-out);
+    }
+
+    .isl__menu:active,
+    .isl__write:active {
+      transform: scale(0.96);
     }
   }
 </style>

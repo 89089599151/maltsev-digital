@@ -11,6 +11,13 @@ export interface Confirmable<T> {
   confirmed: boolean;
 }
 
+/**
+ * Часы, когда вы на связи, и срок ответа. Из этих чисел собираются тексты на сайте
+ * и статус «На связи» в мобильном меню. Подтверждено владельцем 15.11.2026.
+ */
+const workHours = { from: 10, to: 20, timeZone: 'Europe/Moscow' } as const;
+const responseMinutes = 15;
+
 export const site = {
   brand: {
     /** Название бренда в текстах. В логотипе — капсом (short + second). */
@@ -35,9 +42,11 @@ export const site = {
     telegram: { value: 'mltsv_srg', confirmed: true } as Confirmable<string>,
     email: { value: 'sergey_maltsev_00@vk.com', confirmed: true } as Confirmable<string>,
     /** Через какое время вы обычно отвечаете. Обещание клиенту. */
-    responseTime: { value: 'в течение 15 минут в рабочее время', confirmed: true } as Confirmable<string>,
-    /** Часы, в которые действует обещание о времени ответа. Подтверждено владельцем 15.11.2026. */
-    hours: 'ежедневно с 10:00 до 20:00 по Москве',
+    responseTime: { value: `в течение ${responseMinutes} минут в рабочее время`, confirmed: true } as Confirmable<string>,
+    responseMinutes,
+    /** Часы, в которые действует обещание о времени ответа. */
+    hours: `ежедневно с ${workHours.from}:00 до ${workHours.to}:00 по Москве`,
+    workHours,
     workFormat: 'Удалённо, по всей России',
   },
 
