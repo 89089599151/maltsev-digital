@@ -122,22 +122,26 @@ const mail = emailUrl('Заявка на разработку сайта');
 </script>
 
 <style>
+  /* Одна тёмная сцена на оба столбца: белая карточка формы вложена в неё, как скриншоты в блоке «Работы». */
   .ct__stage {
     display: grid;
     grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-    gap: var(--gap);
-    align-items: start;
+    gap: clamp(24px, 3vw, 56px);
+    align-items: stretch;
+    padding: clamp(12px, 1.2vw, 18px);
+    padding-left: clamp(24px, 4vw, 64px);
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(70% 90% at 0% 100%, rgba(26, 47, 251, 0.34) 0%, rgba(26, 47, 251, 0) 68%),
+      var(--night);
+    color: var(--night-ink);
   }
 
   .ct__info {
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
-    align-self: start;
-    padding: clamp(var(--space-6), 3.4vw, var(--space-12));
-    border-radius: var(--radius-lg);
-    background: var(--night);
-    color: var(--night-ink);
+    padding-block: clamp(24px, 3.4vw, 56px);
   }
 
   .ct__title {
@@ -218,12 +222,13 @@ const mail = emailUrl('Заявка на разработку сайта');
     font-size: var(--step-body);
   }
 
+  /* Подпись исполнителя прижата к низу сцены — столбцы заканчиваются на одной линии. */
   .ct__person {
     display: flex;
     gap: 14px;
     align-items: center;
-    margin-top: var(--space-2);
-    padding-top: 0;
+    margin-top: auto;
+    padding-top: var(--space-6);
   }
 
   .ct__avatar {
@@ -250,7 +255,7 @@ const mail = emailUrl('Заявка на разработку сайта');
     gap: var(--space-4);
     align-content: start;
     padding: clamp(var(--space-6), 2.6vw, 40px);
-    border-radius: var(--radius-lg);
+    border-radius: calc(var(--radius-lg) - 8px);
     background: var(--paper);
     color: var(--ink);
   }
@@ -404,6 +409,10 @@ const mail = emailUrl('Заявка на разработку сайта');
     font-weight: 600;
   }
 
+  .ct__status:empty {
+    display: none;
+  }
+
   .ct__success {
     display: grid;
     gap: 8px;
@@ -428,14 +437,46 @@ const mail = emailUrl('Заявка на разработку сайта');
   @media (max-width: 1023px) {
     .ct__stage {
       grid-template-columns: 1fr;
+      gap: 0;
+      padding: clamp(10px, 1.6vw, 16px);
+    }
+
+    .ct__info {
+      padding: clamp(16px, 3vw, 32px) clamp(10px, 2.4vw, 28px) clamp(24px, 3.4vw, 40px);
+    }
+
+    .ct__person {
+      margin-top: 0;
+      padding-top: 0;
     }
   }
 
   @media (max-width: 767px) {
-    .ct__info,
-    .ct__card {
-      padding: var(--space-6);
+    .ct__stage {
       border-radius: 24px;
+    }
+
+    .ct__card {
+      padding: 20px;
+      border-radius: 16px;
+    }
+  }
+
+  /* На телефоне адрес почты должен встать в одну строку: стрелка уходит, поля плашки меньше. */
+  @media (max-width: 479px) {
+    .ct__link {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 8px;
+      padding-inline: 8px;
+    }
+
+    .ct__ico {
+      width: 32px;
+      height: 32px;
+    }
+
+    .ct__arr {
+      display: none;
     }
   }
 </style>
