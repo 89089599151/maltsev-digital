@@ -1,8 +1,7 @@
 ---
 /**
- * Подвал: одна белая панель. Сверху — фраза о подходе, два столбца ссылок и прямые контакты
- * строками под линиями (как списки на остальных страницах). Ниже — имя студии во всю ширину
- * панели, тем же тонким начертанием, что и заголовки, и строка со служебными ссылками.
+ * Общий компактный подвал: навигация, прямые контакты и служебные ссылки
+ * на фоне страницы. Тонкие разделители связывают его с остальным сайтом.
  */
 import { url } from '@/lib/url';
 import { site, telegramUrl, emailUrl } from '@/config/site';
@@ -30,11 +29,6 @@ const columns = [
   <h2 id="ftr-title" class="sr-only">{site.brand.name.value} — контакты и навигация</h2>
   <div class="ftr__panel">
     <div class="ftr__top">
-      <div class="ftr__lead">
-        <p class="ftr__say">Дизайн, разработка и запуск — в одних руках.</p>
-        <p class="ftr__hours">Отвечаю {site.contacts.hours}.</p>
-      </div>
-
       <nav class="ftr__nav" aria-label="Разделы сайта">
         {columns.map((links) => (
           <ul>{links.map((link) => <li><a href={url(link.href)}>{link.label}</a></li>)}</ul>
@@ -121,34 +115,21 @@ const columns = [
 
 <style>
   .ftr {
-    margin-top: var(--section-gap);
+    margin-top: 32px;
     padding-bottom: var(--margin);
   }
 
-  /* Панель — контейнер: имя студии считает кегль от её ширины и всегда встаёт от края до края. */
   .ftr__panel {
     container-type: inline-size;
-    padding: clamp(24px, 4vw, 64px);
-    padding-bottom: clamp(16px, 1.8vw, 28px);
-    border-radius: var(--radius-lg);
-    background: var(--paper);
+    padding: 32px 0 16px;
+    border-top: 1px solid var(--line);
   }
 
   .ftr__top {
     display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 4fr) minmax(0, 4fr);
-    gap: clamp(32px, 5vw, 88px);
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: clamp(32px, 8vw, 128px);
     align-items: start;
-  }
-
-  .ftr__say {
-    max-width: 15ch;
-    font-family: var(--font-head);
-    font-weight: 360;
-    font-size: var(--fs-4);
-    line-height: 1.05;
-    letter-spacing: -0.045em;
-    text-wrap: balance;
   }
 
   .ftr__hours {
@@ -178,7 +159,7 @@ const columns = [
     min-height: 44px;
     width: fit-content;
     font-family: var(--font-display);
-    font-size: var(--fs-0);
+    font-size: var(--step-small);
     line-height: 1.3;
     color: var(--ink);
     text-decoration: none;
@@ -308,15 +289,14 @@ const columns = [
     color: inherit;
   }
 
-  /* Имя студии: одна строка от края до края панели. */
   .ftr__word {
     display: block;
-    margin-top: clamp(40px, 6vw, 96px);
+    margin-top: 28px;
     font-family: var(--font-head);
-    font-weight: 300;
-    font-size: 17cqi;
-    line-height: 0.9;
-    letter-spacing: -0.06em;
+    font-weight: 450;
+    font-size: 26px;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
     white-space: nowrap;
     color: var(--ink);
     text-decoration: none;
@@ -338,7 +318,7 @@ const columns = [
     grid-template-columns: auto minmax(0, 1fr) auto auto;
     gap: 8px clamp(20px, 3vw, 48px);
     align-items: center;
-    margin-top: clamp(20px, 2.4vw, 36px);
+    margin-top: 20px;
     padding-top: clamp(12px, 1.4vw, 20px);
     border-top: 1px solid var(--line);
     font-size: var(--fs-xs);
@@ -386,33 +366,10 @@ const columns = [
     color: var(--accent-ink);
   }
 
-  @media (max-width: 1099px) {
-    .ftr__top {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .ftr__lead {
-      grid-column: 1 / -1;
-    }
-
-    .ftr__say {
-      max-width: 22ch;
-    }
-  }
-
   @media (max-width: 699px) {
-    .ftr__panel {
-      padding: 24px 20px 12px;
-      border-radius: 24px;
-    }
-
     .ftr__top {
       grid-template-columns: minmax(0, 1fr);
-      gap: 28px;
-    }
-
-    .ftr__word {
-      margin-top: 36px;
+      gap: 24px;
     }
 
     .ftr__bottom {
@@ -438,4 +395,5 @@ const columns = [
       display: none;
     }
   }
+
 </style>

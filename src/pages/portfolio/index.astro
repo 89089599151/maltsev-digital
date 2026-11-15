@@ -2,170 +2,192 @@
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '@/layouts/Base.astro';
-import PageHero from '@/components/PageHero.astro';
+import BrowserShot from '@/components/BrowserShot.astro';
 import ProjectCard from '@/components/ProjectCard.astro';
-import WorkFeature from '@/components/WorkFeature.astro';
-import CtaBand from '@/components/CtaBand.astro';
+import Icon from '@/components/Icon.astro';
 import { categories } from '@/config/portfolio';
 import { url } from '@/lib/url';
-import { genImage } from '@/lib/gen';
 
-// Стеклянная раковина наутилуса в разрезе: камеры — как проекты.
-const sculpture = genImage('works-nautilus');
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const [featured, ...rest] = projects;
 const used = categories.filter((c) => rest.some((p) => p.data.category === c.id));
 const pattern = ['wide', 'normal', 'tall', 'normal', 'normal', 'wide', 'normal'] as const;
+const desktop = featured?.data.responsive.desktop ?? featured?.data.cover;
+const mobile = featured?.data.responsive.mobile;
 ---
 
 <Base
   title="Работы — портфолио веб-разработчика"
-  description="Портфолио Maltsev Digital: реальные сайты с разбором задачи, дизайна и разработки. Первый кейс — этот сайт, от идеи до запуска."
+  description="Рассмотрите проекты Maltsev Digital на компьютере и телефоне. Дизайн, разработка и решения — в подробном разборе."
+  bodyClass="portfolio-experience"
 >
-  <PageHero
-    id="pf-title"
-    title="Работы"
-    lead={featured
-      ? 'Каждый проект — с задачей, решениями и ссылкой на живой сайт. Первый кейс — этот сайт: он сделан так же, как будет сделан ваш.'
-      : 'Готовлю проекты к публикации. Каждый появится с разбором задачи, дизайна и разработки.'}
-    compact
-  >
-    {sculpture && (
-      <Image
-        class="pf-object"
-        src={sculpture.src}
-        alt=""
-        widths={[320, 480, 640, 960]}
-        sizes="(max-width: 767px) 62vw, (max-width: 1023px) 320px, (min-width: 1440px) 480px, 34vw"
-        quality={80}
-        loading="eager"
-        fetchpriority="high"
-        draggable="false"
-      />
-    )}
-  </PageHero>
+  <div class="pf">
+    <header class="pf__intro">
+      <h1>Работы</h1>
+      <p>{featured ? 'Первый проект — этот сайт. Можно посмотреть экраны и открыть подробный разбор.' : 'Готовлю проекты к публикации. Здесь будут их история и результат.'}</p>
+    </header>
 
-  {featured && <WorkFeature project={featured} head={false} />}
-
-  {rest.length > 0 && (
-    <section class="section pf-list" aria-labelledby="pf-list-title">
-      <h2 id="pf-list-title" class="head pf-list__title" data-split>Ещё проекты</h2>
-      {used.length > 1 && (
-        <div class="filters" role="group" aria-label="Фильтр по категориям" data-filters>
-          <button type="button" class="filter" aria-pressed="true" data-filter="all">Все</button>
-          {used.map((c) => (
-            <button type="button" class="filter" aria-pressed="false" data-filter={c.id}>{c.label}</button>
-          ))}
+    {featured && desktop && (
+      <article class="pf-project" aria-labelledby="pf-project-title" data-project-viewer data-view="desktop">
+        <div class="pf-project__heading">
+          <h2 id="pf-project-title">{featured.data.title}</h2>
+          <p>{featured.data.isConcept ? 'Концепт' : featured.data.category === 'personal' ? 'Личный проект' : 'Проект'}<span aria-hidden="true"> · </span>{featured.data.year}</p>
         </div>
-      )}
-      <div class="grid" data-grid>
-        {rest.map((p, i) => <ProjectCard project={p} size={pattern[i % pattern.length]} />)}
-      </div>
-      <p class="filters__empty" data-filter-empty hidden>В этой категории пока нет проектов.</p>
-    </section>
-  )}
 
-  <CtaBand
-    id="pf-next-title"
-    title="Следующий кейс — ваш"
-    text="Расскажите об идее — предложу формат, стоимость и план работы."
-    action={{ href: url('/contacts/'), label: 'Обсудить проект' }}
-    more={{ href: url('/services/'), label: 'Пакеты и цены' }}
-  />
+        <div class="pf-viewer">
+          {mobile && (
+            <div class="pf-switch" role="tablist" aria-label="Посмотреть сайт на устройстве" data-device-switch hidden>
+              <span class="pf-switch__thumb" aria-hidden="true"></span>
+              <button id="pf-tab-desktop" type="button" role="tab" aria-controls="pf-desktop" aria-selected="true" data-device="desktop">Компьютер</button>
+              <button id="pf-tab-phone" type="button" role="tab" aria-controls="pf-phone" aria-selected="false" tabindex="-1" data-device="phone">Телефон</button>
+            </div>
+          )}
+          <div class="pf-screen pf-screen--desktop" id="pf-desktop" role={mobile ? 'tabpanel' : undefined} aria-labelledby={mobile ? 'pf-tab-desktop' : 'pf-project-title'} tabindex={mobile ? 0 : undefined} aria-hidden="false">
+            <BrowserShot src={desktop} alt={featured.data.coverAlt} widths={[640, 960, 1280, 1600, 1920]} sizes="(max-width: 639px) 84vw, (max-width: 1023px) 78vw, 960px" loading="eager" />
+          </div>
+          {mobile && (
+            <div class="pf-screen pf-screen--phone" id="pf-phone" role="tabpanel" aria-labelledby="pf-tab-phone" tabindex="-1" aria-hidden="true">
+              <div class="pf-phone">
+                <Image src={mobile} alt={`${featured.data.title}: первый экран на телефоне`} widths={[240, 376, 560, 752]} sizes="260px" loading="eager" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div class="pf-project__summary">
+          <p>{featured.data.summary}</p>
+          <div class="pf-project__actions">
+            <a class="btn btn--ink" href={url(`/portfolio/${featured.id}/`)}>Смотреть кейс <span class="arrow" aria-hidden="true"><Icon name="arrow-ne" /></span></a>
+            <a class="btn btn--ghost" href={url('/contacts/')}>Обсудить проект <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
+          </div>
+        </div>
+      </article>
+    )}
+
+    {rest.length > 0 && (
+      <section class="pf-more" aria-labelledby="pf-more-title">
+        <h2 id="pf-more-title" class="head">Ещё проекты</h2>
+        {used.length > 1 && (
+          <div class="filters" role="group" aria-label="Фильтр по категориям" data-filters>
+            <button type="button" aria-pressed="true" data-filter="all">Все</button>
+            {used.map((c) => <button type="button" aria-pressed="false" data-filter={c.id}>{c.label}</button>)}
+          </div>
+        )}
+        <div class="pf-grid" data-grid>{rest.map((p, i) => <ProjectCard project={p} size={pattern[i % pattern.length]} />)}</div>
+        <p data-filter-empty hidden>В этой категории пока нет проектов.</p>
+      </section>
+    )}
+
+  </div>
 </Base>
 
 <script>
-  const wrap = document.querySelector<HTMLElement>('[data-filters]');
+  const viewer = document.querySelector<HTMLElement>('[data-project-viewer]');
+  const switches = viewer?.querySelector<HTMLElement>('[data-device-switch]');
+  if (viewer && switches) {
+    const buttons = Array.from(switches.querySelectorAll<HTMLButtonElement>('[data-device]'));
+    const panels = Array.from(viewer.querySelectorAll<HTMLElement>('[role="tabpanel"]'));
+    const select = (device: string, keyboard = false) => {
+      if (keyboard) viewer.dataset.instant = '';
+      viewer.dataset.view = device;
+      for (const button of buttons) {
+        const active = button.dataset.device === device;
+        button.setAttribute('aria-selected', String(active));
+        button.tabIndex = active ? 0 : -1;
+      }
+      for (const panel of panels) {
+        const active = panel.id === `pf-${device}`;
+        panel.setAttribute('aria-hidden', String(!active));
+        panel.tabIndex = active ? 0 : -1;
+      }
+      if (keyboard) requestAnimationFrame(() => requestAnimationFrame(() => delete viewer.dataset.instant));
+    };
+    select(matchMedia('(max-width: 639px)').matches ? 'phone' : 'desktop');
+    switches.hidden = false;
+    requestAnimationFrame(() => { viewer.dataset.ready = ''; });
+    for (const button of buttons) {
+      button.addEventListener('click', (event) => select(button.dataset.device ?? 'desktop', event.detail === 0));
+      button.addEventListener('keydown', (event) => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const index = buttons.indexOf(button);
+        const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + buttons.length) % buttons.length;
+        select(buttons[next].dataset.device ?? 'desktop', true);
+        buttons[next].focus({ preventScroll: true });
+      });
+    }
+  }
+
+  const filters = document.querySelector<HTMLElement>('[data-filters]');
   const grid = document.querySelector<HTMLElement>('[data-grid]');
   const empty = document.querySelector<HTMLElement>('[data-filter-empty]');
-  if (wrap && grid) {
-    const buttons = Array.from(wrap.querySelectorAll<HTMLButtonElement>('[data-filter]'));
-    buttons.forEach((btn) =>
-      btn.addEventListener('click', () => {
-        const f = btn.dataset.filter;
-        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-        let shown = 0;
-        grid.querySelectorAll<HTMLElement>('[data-category]').forEach((card) => {
-          const on = f === 'all' || card.dataset.category === f;
-          card.hidden = !on;
-          if (on) shown++;
-        });
-        if (empty) empty.hidden = shown > 0;
-      }),
-    );
+  if (filters && grid) {
+    const buttons = Array.from(filters.querySelectorAll<HTMLButtonElement>('[data-filter]'));
+    for (const button of buttons) button.addEventListener('click', () => {
+      for (const other of buttons) other.setAttribute('aria-pressed', String(other === button));
+      let shown = 0;
+      for (const card of grid.querySelectorAll<HTMLElement>('[data-category]')) {
+        card.hidden = button.dataset.filter !== 'all' && card.dataset.category !== button.dataset.filter;
+        if (!card.hidden) shown++;
+      }
+      if (empty) empty.hidden = shown > 0;
+    });
   }
 </script>
 
 <style>
-  .pf-object {
-    width: min(100%, 480px);
-    height: auto;
-    justify-self: center;
-    filter: drop-shadow(0 24px 30px rgba(26, 47, 251, 0.13));
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .pf-object {
-      animation: pf-float 8s ease-in-out infinite;
-    }
-  }
-
-  @keyframes pf-float {
-    0%, 100% { transform: translateY(5px) rotate(-0.6deg); }
-    50% { transform: translateY(-5px) rotate(0.6deg); }
-  }
-
+  .pf { margin-inline: calc(var(--margin) - var(--page-pad)); padding: clamp(28px, 3vw, 48px) max(20px, calc(var(--page-pad) - var(--margin))); border-radius: var(--radius-lg); background: var(--paper); }
+  .pf__intro { padding: 0 0 clamp(36px, 4vw, 56px); }
+  .pf__intro h1 { font-size: clamp(3rem, 0.4rem + 5vw, 5.75rem); font-weight: 300; line-height: 1.02; letter-spacing: -0.055em; }
+  .pf__intro p { max-width: 48ch; margin: 20px 0 0; font-size: var(--step-body); line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
+  .pf-project__heading { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 0 4px 20px; }
+  .pf-project__heading h2 { font-size: clamp(1.5rem, 2.5vw, 2rem); font-weight: 360; line-height: 1.15; letter-spacing: -0.04em; }
+  .pf-project__heading > p { font-size: var(--fs-xs); color: var(--muted); }
+  .pf-viewer { position: relative; height: clamp(440px, 49vw, 640px); container-type: size; overflow: hidden; isolation: isolate; border-radius: calc(var(--radius-lg) - 8px); background: radial-gradient(ellipse at 65% 20%, var(--stage-glow), transparent 70%), linear-gradient(var(--stage-1), var(--stage-2)); }
+  .pf-screen { position: absolute; inset: 0 0 80px; display: grid; place-items: center; padding: 16px; opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(10px) scale(0.985); }
+  .pf-project[data-ready] .pf-screen { transition: opacity 220ms ease, transform 320ms var(--ease-out), visibility 0s linear 220ms; }
+  .pf-project[data-view='desktop'] .pf-screen--desktop,
+  .pf-project[data-view='phone'] .pf-screen--phone { opacity: 1; visibility: visible; pointer-events: auto; transform: none; transition-delay: 0s; }
+  .pf-screen--desktop :global(.bs) { width: min(88cqw, calc((100cqh - 144px) * 1.58), 960px); box-shadow: 0 1px 2px rgba(10, 11, 20, .06), 0 24px 56px -28px rgba(36, 51, 96, .32); }
+  .pf-phone { height: min(82cqh, calc(100cqh - 136px), 520px); max-width: 86cqw; aspect-ratio: 376 / 814; padding: 3px; border: 1px solid rgba(10, 11, 20, .12); border-radius: 26px; background: var(--paper); overflow: hidden; box-shadow: 0 1px 2px rgba(10, 11, 20, .08), 0 24px 56px -28px rgba(36, 51, 96, .36); }
+  .pf-phone img { display: block; width: 100%; height: 100%; border-radius: 22px; object-fit: cover; object-position: top; }
+  .pf-switch { position: absolute; z-index: 2; left: 50%; bottom: 22px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(264px, calc(100% - 24px)); padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255, 255, 255, .86); backdrop-filter: blur(16px); transform: translateX(-50%); }
+  .pf-switch[hidden] { display: none; }
+  .pf-switch__thumb { position: absolute; inset: 4px auto 4px 4px; width: calc((100% - 8px) / 2); border-radius: inherit; background: var(--ink); transition: transform 220ms var(--ease-out); }
+  .pf-project[data-view='phone'] .pf-switch__thumb { transform: translateX(100%); }
+  .pf-switch button { position: relative; z-index: 1; min-height: 44px; padding: 10px 12px; border-radius: 999px; background: transparent; font-size: 14px; font-weight: 500; color: var(--muted); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .pf-switch button[aria-selected='true'] { color: var(--paper); }
+  .pf-switch button:active { opacity: .65; }
+  .pf-project[data-instant] .pf-screen,
+  .pf-project[data-instant] .pf-switch__thumb { transition: none; }
+  .pf-project__summary { display: flex; justify-content: space-between; align-items: center; gap: 32px; padding: 28px 4px 0; }
+  .pf-project__summary > p { max-width: 54ch; font-size: var(--step-body); line-height: 1.6; color: var(--muted); }
+  .pf-project__summary .btn { flex: none; }
+  .pf-project__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .pf-more { margin-top: 80px; }
+  .pf-more .head { margin-bottom: 28px; }
+  .pf-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); }
+  .pf-grid > :global(.pc:only-child) { grid-column: 1 / -1; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  .filters button { min-height: 44px; padding: 10px 18px; border-radius: 999px; background: var(--bg); color: var(--ink); }
+  .filters button[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
   @media (max-width: 1023px) {
-    .pf-object {
-      width: min(62vw, 320px);
-    }
+    .pf-project__summary { display: grid; gap: 24px; }
   }
-
-  .pf-list__title {
-    margin-bottom: clamp(24px, 3vw, 40px);
+  @media (max-width: 639px) {
+    .pf { padding-block: 28px; border-radius: 24px; }
+    .pf__intro { padding-bottom: 32px; }
+    .pf__intro h1 { font-size: 3rem; }
+    .pf__intro p { margin-top: 16px; }
+    .pf-project__heading { display: grid; gap: 8px; padding-bottom: 16px; }
+    .pf-viewer { height: 520px; border-radius: 16px; }
+    .pf-project__summary { gap: 20px; padding: 24px 0 0; }
+    .pf-project__actions { display: grid; }
+    .pf-project__actions .btn { width: 100%; }
   }
-
-  .filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 24px;
-  }
-
-  .filter {
-    min-height: 48px;
-    padding: 12px 18px;
-    border-radius: 999px;
-    background: var(--paper);
-    font-size: var(--fs-0);
-    font-weight: 550;
-    transition:
-      background-color var(--dur-fast) var(--ease-out),
-      color var(--dur-fast) var(--ease-out);
-  }
-
-  .filter:hover {
-    background: var(--surface-2);
-  }
-
-  .filter[aria-pressed='true'] {
-    background: var(--ink);
-    color: var(--bg);
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--gap);
-    grid-auto-flow: dense;
-  }
-
-  .grid > :global(.pc:only-child) {
-    grid-column: 1 / -1;
-  }
-
-  .filters__empty {
-    padding: 40px 0;
-    color: var(--muted);
+  @media (prefers-reduced-motion: reduce) {
+    .pf-project[data-ready] .pf-screen,
+    .pf-switch__thumb { transition: none; transform: none; }
+    .pf-project[data-view='phone'] .pf-switch__thumb { transform: translateX(100%); }
   }
 </style>

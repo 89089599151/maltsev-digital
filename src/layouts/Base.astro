@@ -15,6 +15,7 @@ interface Props {
   noindex?: boolean;
   /** Дополнительная разметка Schema.org для страницы. */
   schema?: Record<string, unknown>;
+  bodyClass?: string;
 }
 
 const {
@@ -23,6 +24,7 @@ const {
   ogImage = '/og-white-blue.jpg',
   noindex = false,
   schema,
+  bodyClass,
 } = Astro.props;
 
 const fullTitle = title ? `${title} — ${site.brand.name.value}` : site.seo.defaultTitle;
@@ -86,7 +88,7 @@ const orgSchema = {
       })();
     </script>
   </head>
-  <body id="top">
+  <body id="top" class={bodyClass}>
     <a class="skip-link" href="#main">К содержимому</a>
     <div class="page">
       <Header />
