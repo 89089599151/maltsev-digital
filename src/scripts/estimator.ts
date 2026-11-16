@@ -40,6 +40,7 @@ export function initEstimator(): void {
   const mirror = document.querySelector<HTMLElement>('[data-out-mirror]');
   const mirrorSum = document.querySelector<HTMLElement>('[data-out-mirror-sum]');
   const toggles = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-addon]'));
+  const steps = Array.from(form.querySelectorAll<HTMLButtonElement>('button[data-step]'));
   const chosen = new Set<string>();
   // Расчёт уходит в остров и лист «Написать» только после того, как посетитель сам что-то поменял.
   let touched = false;
@@ -59,6 +60,10 @@ export function initEstimator(): void {
     }
     const pages = Number(range.value);
     pagesOut.value = String(pages);
+    for (const btn of steps) {
+      const dir = Number(btn.dataset.step);
+      btn.disabled = isLanding || (dir < 0 ? pages <= Number(range.min) : pages >= Number(range.max));
+    }
 
     // Пакет определяется типом сайта. Страницы сверх пакета — доплата за каждую, без смены пакета.
     const plan = cfg.plans.find((p) => p.id === type) ?? cfg.plans[1];
@@ -129,6 +134,18 @@ export function initEstimator(): void {
     touched = true;
     calc();
   });
+
+  // Степпер вместо ползунка: «−» и «+» меняют число страниц на одну.
+  for (const btn of steps) {
+    btn.hidden = false;
+    btn.addEventListener('click', () => {
+      const next = Math.min(Number(range.max), Math.max(Number(range.min), Number(range.value) + Number(btn.dataset.step)));
+      if (String(next) === range.value) return;
+      range.value = String(next);
+      range.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  }
+  if (steps.length) form.classList.add('is-stepper');
 
   for (const btn of toggles) {
     btn.hidden = false;

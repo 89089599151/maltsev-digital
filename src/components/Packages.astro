@@ -125,7 +125,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   }
 
   .pk__time {
-    font-size: var(--fs-xs);
+    font-size: var(--step-small);
     font-weight: 600;
     font-family: var(--font-display);
   }
@@ -172,9 +172,14 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     margin-top: clamp(24px, 3vw, 40px);
     padding: clamp(22px, 2.4vw, 32px) clamp(24px, 3vw, 40px);
     border-radius: var(--radius-lg);
-    background: var(--accent);
-    color: var(--accent-ink);
+    background: var(--paper);
+    color: var(--ink);
     text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .pk__calc:hover {
+    background: var(--surface-solid);
   }
 
   .pk__calc-t {
@@ -185,7 +190,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   }
 
   .pk__calc-d {
-    color: var(--on-accent-muted);
+    color: var(--muted);
   }
 
   .pk__calc-go {
@@ -194,8 +199,8 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     width: 52px;
     height: 52px;
     border-radius: 50%;
-    background: var(--paper);
-    color: var(--accent-text);
+    background: var(--accent);
+    color: var(--accent-ink);
     font-size: var(--fs-1);
     transition: transform var(--dur) var(--ease-out);
   }

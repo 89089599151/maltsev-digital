@@ -6,7 +6,6 @@
 import { Image } from 'astro:assets';
 import Base from '@/layouts/Base.astro';
 import PageHero from '@/components/PageHero.astro';
-import ManifestSplit from '@/components/ManifestSplit.astro';
 import CtaBand from '@/components/CtaBand.astro';
 import Icon from '@/components/Icon.astro';
 import { site } from '@/config/site';
@@ -71,7 +70,6 @@ const tools = [
     </div>
   </section>
 
-  <ManifestSplit />
 
   <section class="section split" data-island-section="Принципы" aria-labelledby="ab-principles">
     <h2 id="ab-principles" class="head" data-split>Принципы</h2>
@@ -129,6 +127,13 @@ const tools = [
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+  }
+
+  /* На телефоне две кнопки одной ширины, друг под другом. */
+  @media (max-width: 767px) {
+    .ab-actions :global(.btn) {
+      flex: 1 1 100%;
+    }
   }
 
   .ab-photo {

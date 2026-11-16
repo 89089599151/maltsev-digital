@@ -59,13 +59,13 @@ const me = [
     }
 
     <article class="mf__card mf__card--ai" aria-labelledby="mf-ai">
-      <h3 id="mf-ai" class="mf__card-title">Делает ИИ</h3>
+      <h3 id="mf-ai" class="mf__card-title">Берёт ИИ</h3>
       <ul class="mf__list">{ai.map((t) => <li>{t}</li>)}</ul>
       <p class="mf__foot">Поэтому сроки — недели, а не месяцы</p>
     </article>
 
     <article class="mf__card mf__card--me" aria-labelledby="mf-me">
-      <h3 id="mf-me" class="mf__card-title">Решаю я</h3>
+      <h3 id="mf-me" class="mf__card-title">Остаётся за мной</h3>
       <ul class="mf__list">{me.map((t) => <li>{t}</li>)}</ul>
       <p class="mf__foot">Вы говорите с тем, кто делает сайт</p>
     </article>
@@ -183,13 +183,13 @@ const me = [
     border-radius: var(--radius-lg);
   }
 
+  /* ИИ — вспомогательная колонка: контур без заливки; решения человека — белая карточка. */
   .mf__card--ai {
-    background: var(--paper);
+    box-shadow: inset 0 0 0 1px var(--line);
   }
 
   .mf__card--me {
-    background: var(--night);
-    color: var(--night-ink);
+    background: var(--paper);
   }
 
   .mf__card-title {
@@ -227,12 +227,8 @@ const me = [
     translate: 0 -1px;
   }
 
-  .mf__card--me .mf__list li {
-    border-color: rgba(241, 242, 250, 0.14);
-  }
-
   .mf__card--me .mf__list li::before {
-    background: var(--accent-on-dark);
+    background: var(--accent);
   }
 
   .mf__foot {
@@ -240,7 +236,7 @@ const me = [
     align-self: flex-start;
     padding: 8px 14px;
     border-radius: 999px;
-    background: var(--bg);
+    background: var(--paper);
     font-family: var(--font-display);
     font-weight: 550;
     font-size: var(--step-small);

@@ -3,11 +3,12 @@
  * Общий компактный подвал: навигация, прямые контакты и служебные ссылки
  * на фоне страницы. Тонкие разделители связывают его с остальным сайтом.
  */
-import { url } from '@/lib/url';
+import { url, isActive } from '@/lib/url';
 import { site, telegramUrl, emailUrl } from '@/config/site';
 import Icon from './Icon.astro';
 
 const year = new Date().getFullYear();
+const current = Astro.url.pathname;
 const telegram = telegramUrl();
 const email = emailUrl('Заявка на разработку сайта');
 const columns = [
@@ -31,7 +32,7 @@ const columns = [
     <div class="ftr__top">
       <nav class="ftr__nav" aria-label="Разделы сайта">
         {columns.map((links) => (
-          <ul>{links.map((link) => <li><a href={url(link.href)}>{link.label}</a></li>)}</ul>
+          <ul>{links.map((link) => <li><a href={url(link.href)} aria-current={!link.href.includes('#') && isActive(current, link.href) ? 'page' : undefined}>{link.label}</a></li>)}</ul>
         ))}
       </nav>
 
@@ -168,6 +169,20 @@ const columns = [
 
   .ftr__nav a:hover {
     color: var(--accent-text);
+  }
+
+  /* Текущая страница: синяя точка перед названием. */
+  .ftr__nav a[aria-current='page'] {
+    gap: 8px;
+    font-weight: 560;
+  }
+
+  .ftr__nav a[aria-current='page']::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
   }
 
   /* Контакты — те же строки под линиями, что и списки на страницах. */
@@ -364,6 +379,16 @@ const columns = [
   .ftr__up:hover .ftr__up-icon {
     background: var(--accent);
     color: var(--accent-ink);
+  }
+
+  /* На главной блок заявки с Telegram и почтой стоит прямо над подвалом, на странице контактов они
+     в первом экране — подвал их не повторяет. */
+  :global(body:has(#contact, .ct-direct)) .ftr__contacts {
+    display: none;
+  }
+
+  :global(body:has(#contact, .ct-direct)) .ftr__top {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   @media (max-width: 699px) {

@@ -110,9 +110,13 @@ const H = headingLevel;
     height: 36px;
     justify-self: end;
     border-radius: 50%;
-    background: var(--ink);
-    color: var(--bg);
+    background: var(--paper);
+    color: var(--ink);
     transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+  }
+
+  summary:hover .faq__icon {
+    background: var(--surface-2);
   }
 
   .faq__item[open] .faq__icon {
@@ -159,6 +163,11 @@ const H = headingLevel;
       position: static;
       gap: 18px;
       padding-right: 0;
+    }
+
+    /* Без видимого заголовка (страница «Вопросы») подсказка «если ответа нет» идёт после списка. */
+    .faq__side:has(> .sr-only:first-child) {
+      order: 2;
     }
   }
 

@@ -4,6 +4,7 @@
  * Лендинг — всегда одна страница; страницы сверх пакета считаются доплатой за каждую.
  * Дополнительные работы добавляются кнопками «+» в списке «Дополнительно» ниже (data-addon).
  * Кнопка переносит расчёт в форму заявки.
+ * Число страниц меняется кнопками «−» и «+», как степпер в iOS; ползунок остаётся только без скрипта.
  */
 import { plans, addons, extraPagePrice, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
@@ -55,7 +56,11 @@ const start = plans[1];
 
     <div class="est__pages tile">
       <label class="est__legend" for="est-pages">Страниц</label>
-      <output class="est__pages-val" for="est-pages" data-pages-out>6</output>
+      <div class="est__count">
+        <button class="est__step" type="button" data-step="-1" aria-label="Меньше страниц" aria-controls="est-pages" hidden><Icon name="minus" /></button>
+        <output class="est__pages-val" for="est-pages" data-pages-out>6</output>
+        <button class="est__step" type="button" data-step="1" aria-label="Больше страниц" aria-controls="est-pages" hidden><Icon name="plus" /></button>
+      </div>
       <input id="est-pages" type="range" name="pages" min="1" max="15" value="6" step="1" aria-describedby="est-pages-note" />
       <p class="est__pages-note small" id="est-pages-note" data-pages-note>Главная, услуги, о компании, контакты и так далее. Больше 15 страниц — посчитаю отдельно.</p>
     </div>
@@ -194,6 +199,54 @@ const start = plans[1];
     font-size: clamp(4rem, 2rem + 4vw, 6.5rem);
     line-height: 0.9;
     letter-spacing: -0.04em;
+  }
+
+  .est__count {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .est__step {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: var(--fs-1);
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      scale var(--dur-fast) var(--ease-out);
+  }
+
+  .est__step[hidden] {
+    display: none;
+  }
+
+  .est__step:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+
+  .est__step:active:not(:disabled) {
+    scale: 0.92;
+  }
+
+  .est__step:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  /* Со скриптом число страниц меняют кнопки; ползунок остаётся в форме, но не виден. */
+  :global(.is-stepper) input[type='range'] {
+    display: none;
+  }
+
+  :global(.is-stepper) .est__pages-note {
+    margin-top: var(--space-6);
   }
 
   input[type='range'] {
