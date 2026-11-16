@@ -1,16 +1,16 @@
 import { SHEET_OPEN_CLASS } from './island-sheet';
 import { ESTIMATE_EVENT, shortSum, type EstimateDetail } from '@/lib/estimate';
 
-/** Сколько пикселей нужно прокрутить, чтобы остров сменил состояние: защита от дрожания. */
-const SCROLL_STEP = 6;
-/** Выше этой отметки остров всегда развёрнут. */
+/** Остров сжимается, когда до конца страницы осталось не больше этого расстояния. */
+const END_ENTER = 8;
+/** И разворачивается, когда читатель поднялся от конца дальше этого: запас от дрожания у края. */
+const END_LEAVE = 32;
+/** На странице короче этой прокрутки остров не сжимается вовсе. */
 const COMPACT_FROM = 240;
 /** Раздел считается текущим, когда его начало поднялось выше этой доли высоты экрана. */
 const PROBE = 0.45;
 /** Сколько раздел должен оставаться текущим, чтобы подпись сменилась: быстрая прокрутка её не дёргает. */
 const SETTLE_MS = 180;
-/** На сколько сжатый остров раскрывается, чтобы показать новый раздел. */
-const PEEK_MS = 1800;
 
 const EASE = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
 
@@ -22,7 +22,8 @@ const isTextField = (target: EventTarget | null): boolean =>
       !['checkbox', 'radio', 'range', 'button', 'submit', 'reset', 'file', 'color'].includes(target.type)));
 
 /**
- * Остров в покое. Сжимается при чтении вниз и уходит, пока открыта клавиатура.
+ * Остров в покое. Пока страницу читают, он развёрнут; сжимается до двух кнопок только в самом конце
+ * страницы, где навигацию повторяет подвал, и разворачивается при движении вверх. Уходит, пока открыта клавиатура.
  * Подпись кнопки меню следует за читателем: раздел страницы ([data-island-section]) под его взглядом,
  * а после работы с калькулятором — пакет и сумма расчёта; синяя кнопка тогда отправляет расчёт.
  */
@@ -42,11 +43,8 @@ export function initIsland(): void {
   const pageLabel = menuLabel?.textContent ?? '';
   const writeText = writeLabel?.textContent ?? '';
   const writeAria = write?.getAttribute('aria-label') ?? '';
-  let lastY = window.scrollY;
   let ticking = false;
   let compact = false;
-  let peeking = false;
-  let peekTimer: number | undefined;
   let section: string | null = null;
   let pending: string | null = null;
   let settleTimer: number | undefined;
@@ -77,23 +75,12 @@ export function initIsland(): void {
   const render = () => {
     const live = estimate !== null;
     island.classList.toggle('is-live', live);
-    // Расчёт остаётся на виду; новый раздел сжатый остров показывает коротким раскрытием.
-    island.classList.toggle('is-compact', compact && !live && !peeking && !desktop.matches);
+    // Расчёт остаётся на виду даже в конце страницы.
+    island.classList.toggle('is-compact', compact && !live && !desktop.matches);
     const sum = estimate ? shortSum(estimate.sum) : '';
     setLabel(menuLabel, estimate ? (narrow.matches ? sum : `${estimate.plan} · ${sum}`) : (section ?? pageLabel));
     setLabel(writeLabel, live ? 'Отправить' : writeText);
     write?.setAttribute('aria-label', live ? 'Отправить расчёт' : writeAria);
-  };
-
-  const peek = () => {
-    window.clearTimeout(peekTimer);
-    peeking = false;
-    if (!compact || estimate || reducedMotion.matches) return;
-    peeking = true;
-    peekTimer = window.setTimeout(() => {
-      peeking = false;
-      render();
-    }, PEEK_MS);
   };
 
   /** Раздел под взглядом: последний по порядку, чьё начало уже выше контрольной линии. */
@@ -115,7 +102,6 @@ export function initIsland(): void {
     settleTimer = window.setTimeout(() => {
       if (pending === section) return;
       section = pending;
-      peek();
       render();
     }, SETTLE_MS);
   };
@@ -125,17 +111,11 @@ export function initIsland(): void {
     // При открытом листе страница зафиксирована и её прокрутка обнулена — это не движение читателя.
     if (desktop.matches || root.classList.contains(SHEET_OPEN_CLASS)) return;
     if (sections.length) trackSection();
-    const y = window.scrollY;
-    const delta = y - lastY;
-    if (Math.abs(delta) < SCROLL_STEP) return;
-    const next = delta > 0 && y > COMPACT_FROM;
-    lastY = y;
+    const range = root.scrollHeight - window.innerHeight;
+    const left = range - window.scrollY;
+    const next = range > COMPACT_FROM && left <= (compact ? END_LEAVE : END_ENTER);
     if (next === compact) return;
     compact = next;
-    if (!compact) {
-      window.clearTimeout(peekTimer);
-      peeking = false;
-    }
     render();
   };
 
@@ -151,8 +131,6 @@ export function initIsland(): void {
   document.addEventListener(ESTIMATE_EVENT, (event) => {
     const first = estimate === null;
     estimate = (event as CustomEvent<EstimateDetail>).detail;
-    window.clearTimeout(peekTimer);
-    peeking = false;
     render();
     // Остров отзывается на каждое изменение суммы — как итог в калькуляторе.
     if (canAnimate()) {
@@ -166,10 +144,7 @@ export function initIsland(): void {
   document.addEventListener('focusout', () => island.classList.remove('is-away'));
 
   desktop.addEventListener('change', () => {
-    lastY = window.scrollY;
     compact = false;
-    peeking = false;
-    window.clearTimeout(peekTimer);
     island.classList.remove('is-away');
     render();
     schedule();
