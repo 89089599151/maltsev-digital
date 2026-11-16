@@ -183,13 +183,14 @@ const me = [
     border-radius: var(--radius-lg);
   }
 
-  /* ИИ — вспомогательная колонка: контур без заливки; решения человека — белая карточка. */
+  /* ИИ — белая карточка; решения человека — тёмная, рядом с тёмным портретом. */
   .mf__card--ai {
-    box-shadow: inset 0 0 0 1px var(--line);
+    background: var(--paper);
   }
 
   .mf__card--me {
-    background: var(--paper);
+    background: var(--night);
+    color: var(--night-ink);
   }
 
   .mf__card-title {
@@ -227,8 +228,12 @@ const me = [
     translate: 0 -1px;
   }
 
+  .mf__card--me .mf__list li {
+    border-color: rgba(241, 242, 250, 0.14);
+  }
+
   .mf__card--me .mf__list li::before {
-    background: var(--accent);
+    background: var(--accent-on-dark);
   }
 
   .mf__foot {
@@ -236,7 +241,7 @@ const me = [
     align-self: flex-start;
     padding: 8px 14px;
     border-radius: 999px;
-    background: var(--paper);
+    background: var(--bg);
     font-family: var(--font-display);
     font-weight: 550;
     font-size: var(--step-small);

@@ -2,8 +2,8 @@
 /**
  * «Пакеты и цены» на главной: одна секция вместо отдельных «Что я делаю» и «Цены».
  * Три строки — название пакета, для кого, срок, цена «от», кнопка. Без карточек и картинок: строки
- * разделены линиями, рекомендуемый BUSINESS — синей полосой, как и на странице услуг: синий на сайте
- * означает главное действие и рекомендуемый пакет. Данные — src/config/pricing.ts.
+ * разделены линиями. У пакета свой цвет, тот же, что на странице услуг: START — без заливки,
+ * BUSINESS (рекомендуемый) — синяя полоса, PREMIUM — тёмная. Данные — src/config/pricing.ts.
  */
 import SectionHead from './SectionHead.astro';
 import Icon from './Icon.astro';
@@ -30,7 +30,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   <ul class="pk__list" data-stagger>
     {
       rows.map((p) => (
-        <li class:list={['pk__row', { 'pk__row--featured': p.id === 'business' }]}>
+        <li class:list={['pk__row', { 'pk__row--featured': p.id === 'business', 'pk__row--premium': p.id === 'premium' }]}>
           <div class="pk__head">
             <h3 class="pk__name">{p.name}</h3>
             <p class="pk__types">{p.types}</p>
@@ -43,7 +43,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
             <p class="pk__price">
               <span>от</span> {formatPrice(p.price)}
             </p>
-            <a class:list={['btn', 'pk__cta', p.id === 'business' ? 'pk__cta--light' : 'btn--ink']} href={url(`/contacts/?plan=${p.id}`)}>
+            <a class:list={['btn', 'pk__cta', p.id === 'business' ? 'pk__cta--light' : p.id === 'premium' ? 'btn--accent' : 'btn--ink']} href={url(`/contacts/?plan=${p.id}`)}>
               Заказать <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
             </a>
           </div>
@@ -90,6 +90,22 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
 
   .pk__row--featured :focus-visible {
     outline-color: var(--paper);
+  }
+
+  .pk__row--premium {
+    margin-top: 8px;
+    border-radius: var(--radius-lg);
+    border-bottom-color: transparent;
+    background: var(--night);
+    color: var(--night-ink);
+  }
+
+  .pk__row--premium .pk__for {
+    color: var(--night-muted);
+  }
+
+  .pk__row--premium .pk__price {
+    color: var(--accent-on-dark);
   }
 
   .pk__row:has(+ .pk__row--featured) {
@@ -240,7 +256,8 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
       gap: 12px 16px;
     }
 
-    .pk__row--featured {
+    .pk__row--featured,
+    .pk__row--premium {
       border-radius: 22px;
     }
 
