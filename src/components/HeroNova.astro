@@ -826,11 +826,13 @@ const fastest = plans[0];
     }
 
     /* Волна повторяет свободную область: завиток над ценой, широкие складки слева внизу. */
+    /* На широких экранах заголовок упирается в свой предел размера, а волна продолжала бы расти
+       и подходить к звёздочке вплотную, — её ширина ограничена, она прижата вправо. */
     .hn__object {
       position: absolute;
       right: calc(var(--pad-x) + clamp(16px, 2vw, 32px));
       top: clamp(88px, 10vh, 110px);
-      width: 64%;
+      width: min(64%, 860px);
       aspect-ratio: 4 / 3;
     }
 
@@ -912,7 +914,7 @@ const fastest = plans[0];
 
     .hn__object {
       top: 92px;
-      width: 62%;
+      width: min(62%, 840px);
     }
 
     .hn__lead {
