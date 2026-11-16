@@ -1,0 +1,128 @@
+---
+/**
+ * Куда уйдёт заявка, пока приём заявок на сайте не подключён: переключатель «Telegram | Почта»
+ * вместо двух одинаково заметных кнопок отправки. Кнопка формы одна; её подпись и пояснение под
+ * переключателем меняет forms.ts. Поле начинается с «_» — в текст заявки оно не попадает.
+ * Компонент ничего не выводит, если доступен только один канал.
+ */
+import { telegramUrl, emailUrl } from '@/config/site';
+
+interface Props {
+  /** Префикс id, чтобы на странице могло быть несколько форм. */
+  id: string;
+}
+const { id } = Astro.props;
+const both = Boolean(telegramUrl() && emailUrl());
+
+const hints = {
+  telegram: 'Текст заявки скопируется и откроется чат — останется вставить его и отправить.',
+  mail: 'Откроется письмо с готовым текстом — останется нажать «Отправить».',
+};
+---
+
+{
+  both && (
+    <fieldset class="chs" data-channel>
+      <legend class="chs__label">Куда отправить</legend>
+      <div class="chs__track">
+        <label class="chs__opt">
+          <input type="radio" name="_channel" value="telegram" checked />
+          <span>Telegram</span>
+        </label>
+        <label class="chs__opt">
+          <input type="radio" name="_channel" value="mail" />
+          <span>Почта</span>
+        </label>
+      </div>
+      <p class="chs__hint" id={`${id}-channel-hint`} data-channel-hint data-hint-telegram={hints.telegram} data-hint-mail={hints.mail}>
+        {hints.telegram}
+      </p>
+    </fieldset>
+  )
+}
+
+<style>
+  .chs {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  /* float кладёт legend внутрь fieldset, а не на его рамку. */
+  .chs__label {
+    float: left;
+    width: 100%;
+    padding: 0;
+    margin-bottom: 8px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step-small);
+  }
+
+  /* Переключатель-сегменты, как в iOS: дорожка и белая «таблетка» у выбранного варианта. */
+  .chs__track {
+    clear: both;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+  }
+
+  .chs__opt {
+    position: relative;
+    display: block;
+    cursor: pointer;
+  }
+
+  .chs__opt input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .chs__opt span {
+    display: grid;
+    place-items: center;
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 9px;
+    font-family: var(--font-display);
+    font-weight: 550;
+    font-size: var(--step-small);
+    color: var(--ink-2);
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
+  }
+
+  .chs__opt:hover span {
+    color: var(--ink);
+  }
+
+  .chs__opt input:checked + span {
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow:
+      0 1px 2px rgba(10, 11, 20, 0.08),
+      0 4px 12px -4px rgba(10, 11, 20, 0.14);
+  }
+
+  .chs__opt input:focus-visible + span {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .chs__hint {
+    font-size: var(--fs-xs);
+    line-height: 1.45;
+    color: var(--muted);
+  }
+</style>

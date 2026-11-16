@@ -2,7 +2,8 @@
 /**
  * Три пакета на странице услуг: название, цена, для кого, объём и срок, главное в составе, кнопка.
  * Полный состав, исключения и правки — в раскрывающемся блоке внутри карточки, чтобы не держать
- * на экране таблицу сравнения. Средний пакет — синий, старший — тёмный. Данные — src/config/pricing.ts.
+ * на экране таблицу сравнения. Рекомендуемый BUSINESS — синий, как на главной; START и PREMIUM —
+ * белые с одинаковой чёрной кнопкой. Данные — src/config/pricing.ts.
  */
 import SectionHead from './SectionHead.astro';
 import Icon from './Icon.astro';
@@ -90,13 +91,6 @@ const scopes: Record<string, string> = { start: 'Одна страница', bus
     --pl-line: rgba(255, 255, 255, 0.24);
     background: var(--accent);
     color: var(--accent-ink);
-  }
-
-  .pl__card--premium {
-    --pl-muted: var(--night-muted);
-    --pl-line: rgba(241, 242, 250, 0.16);
-    background: var(--night);
-    color: var(--night-ink);
   }
 
   .pl__head {
@@ -188,10 +182,6 @@ const scopes: Record<string, string> = { start: 'Одна страница', bus
     color: var(--pl-muted);
   }
 
-  .pl__card--premium .pl__list :global(.icon) {
-    color: var(--accent-on-dark);
-  }
-
   .pl__btn {
     background: var(--ink);
     color: var(--bg);
@@ -208,15 +198,6 @@ const scopes: Record<string, string> = { start: 'Одна страница', bus
 
   .pl__card--business .pl__btn:is(:hover, :focus-visible) {
     background: var(--bg);
-  }
-
-  .pl__card--premium .pl__btn {
-    background: var(--accent);
-    color: var(--accent-ink);
-  }
-
-  .pl__card--premium .pl__btn:is(:hover, :focus-visible) {
-    background: var(--accent-hover);
   }
 
   .pl__card--business :global(:focus-visible) {

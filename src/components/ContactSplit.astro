@@ -5,6 +5,7 @@
  */
 import { Image } from 'astro:assets';
 import ContactIcon from './ContactIcon.astro';
+import ChannelSwitch from './ChannelSwitch.astro';
 import { site, telegramUrl, emailUrl } from '@/config/site';
 import { url } from '@/lib/url';
 import avatar from '@/assets/photos/owner-avatar.webp';
@@ -92,17 +93,11 @@ const mail = emailUrl('Заявка на разработку сайта');
           </label>
           <span class="ct__err" id="ct-consent-err"></span>
 
+          {!endpoint && <ChannelSwitch id="ct" />}
+
           <button class="ct__submit" type="submit">
             <span data-label>{endpoint ? 'Отправить заявку' : 'Отправить на почту'}</span>
           </button>
-          {
-            !endpoint && tg && (
-              <button class="ct__submit ct__submit--alt" type="button" data-send-telegram>
-                Отправить в Telegram
-              </button>
-            )
-          }
-          {!endpoint && <p class="ct__hint">Письмо с заявкой откроется в вашей почте. В Telegram текст скопируется — останется вставить его в чат.</p>}
           <p class="ct__status" data-status role="status" aria-live="polite"></p>
         </fieldset>
       </form>
@@ -386,22 +381,6 @@ const mail = emailUrl('Заявка на разработку сайта');
 
   .ct__submit:disabled {
     cursor: not-allowed;
-  }
-
-  .ct__submit--alt {
-    margin-top: 0;
-    background: var(--ink);
-    color: var(--bg);
-  }
-
-  .ct__submit--alt:hover:not(:disabled) {
-    background: var(--ink-hover);
-  }
-
-  .ct__hint {
-    font-size: var(--fs-xs);
-    line-height: 1.45;
-    color: var(--muted);
   }
 
   .ct__status {

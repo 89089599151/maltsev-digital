@@ -2,7 +2,8 @@
 /**
  * «Пакеты и цены» на главной: одна секция вместо отдельных «Что я делаю» и «Цены».
  * Три строки — название пакета, для кого, срок, цена «от», кнопка. Без карточек и картинок: строки
- * разделены линиями, BUSINESS выделен тёмной акцентной полосой. Данные — src/config/pricing.ts.
+ * разделены линиями, рекомендуемый BUSINESS — синей полосой, как и на странице услуг: синий на сайте
+ * означает главное действие и рекомендуемый пакет. Данные — src/config/pricing.ts.
  */
 import SectionHead from './SectionHead.astro';
 import Icon from './Icon.astro';
@@ -42,7 +43,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
             <p class="pk__price">
               <span>от</span> {formatPrice(p.price)}
             </p>
-            <a class:list={['btn', 'pk__cta', p.id === 'business' ? 'btn--accent' : 'btn--ink']} href={url(`/contacts/?plan=${p.id}`)}>
+            <a class:list={['btn', 'pk__cta', p.id === 'business' ? 'pk__cta--light' : 'btn--ink']} href={url(`/contacts/?plan=${p.id}`)}>
               Заказать <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
             </a>
           </div>
@@ -83,8 +84,12 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   .pk__row--featured {
     border-radius: var(--radius-lg);
     border-bottom-color: transparent;
-    background: var(--night);
-    color: var(--night-ink);
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .pk__row--featured :focus-visible {
+    outline-color: var(--paper);
   }
 
   .pk__row:has(+ .pk__row--featured) {
@@ -116,7 +121,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   }
 
   .pk__row--featured .pk__for {
-    color: var(--night-muted);
+    color: var(--on-accent-muted);
   }
 
   .pk__time {
@@ -145,12 +150,18 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     letter-spacing: 0;
   }
 
-  .pk__row--featured .pk__price {
-    color: var(--accent-on-dark);
-  }
-
   .pk__cta {
     min-height: 52px;
+  }
+
+  /* Кнопка на синей полосе — белая, как в синей карточке BUSINESS на странице услуг. */
+  .pk__cta--light {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  .pk__cta--light:is(:hover, :focus-visible) {
+    background: var(--bg);
   }
 
   .pk__calc {

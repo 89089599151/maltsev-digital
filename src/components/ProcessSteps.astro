@@ -3,8 +3,11 @@
  * «Как идёт работа».
  * На главной (compact) — четыре укрупнённых шага в ряд и ссылка на подробный процесс.
  * На странице услуг — все семь этапов списком: срок, что происходит и что нужно от вас.
- * Секция статична: без закрепления и горизонтальной ленты, на любом экране читается сверху вниз.
+ * На телефоне секция короче: на главной четыре карточки листаются вбок, следующая выглядывает
+ * из-за края; на странице услуг этапы сворачиваются в список, как вопросы, — открыт первый
+ * (process-accordion.ts). Без скрипта все этапы открыты.
  */
+import Icon from './Icon.astro';
 import SectionHead from './SectionHead.astro';
 import { stages, stagesShort, type Stage } from '@/data/content';
 import { url } from '@/lib/url';
@@ -32,23 +35,40 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
         <li class="ps__step">
           <span class="ps__num num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
           <div class="ps__head">
-            <h3 class="ps__name">{s.name}</h3>
+            <h3 class="ps__name">
+              <span data-ps-name>{s.name}</span>
+              {!compact && <span class="ps__name-i" aria-hidden="true" hidden><Icon name="plus" /></span>}
+            </h3>
             {s.duration && <p class="ps__dur"><span class="chip chip--line">{s.duration}</span></p>}
           </div>
-          <p class="ps__text">{s.text}</p>
-          {s.fromYou && (
-            <p class="ps__you">
-              <span>От вас</span>
-              {s.fromYou}
-            </p>
-          )}
+          <div class="ps__body" id={compact ? undefined : `ps-step-${i + 1}`} data-ps-body>
+            <p class="ps__text">{s.text}</p>
+            {s.fromYou && (
+              <p class="ps__you">
+                <span>От вас</span>
+                {s.fromYou}
+              </p>
+            )}
+          </div>
         </li>
       ))
     }
   </ol>
 </section>
 
+{!compact && (
+  <script>
+    import { initProcessAccordion } from '@/scripts/process-accordion';
+    initProcessAccordion();
+  </script>
+)}
+
 <style>
+  /* Обёртка описания не участвует в раскладке: текст и «от вас» — ячейки сетки шага. */
+  .ps__body {
+    display: contents;
+  }
+
   .ps__list {
     list-style: none;
     padding: 0;
@@ -178,8 +198,26 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
   }
 
   @media (max-width: 767px) {
+    /* Главная: карточки в ленту на всю ширину экрана, следующая выглядывает справа. */
     .ps--compact .ps__list {
-      grid-template-columns: minmax(0, 1fr);
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 78%;
+      margin-inline: calc(-1 * var(--page-pad));
+      padding: 2px var(--page-pad) 6px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--page-pad);
+      scrollbar-width: none;
+    }
+
+    .ps--compact .ps__list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ps--compact .ps__step {
+      scroll-snap-align: start;
     }
 
     .ps--compact .ps__step {
@@ -204,6 +242,94 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
       grid-row: 1 / 4;
       font-size: 1.75rem;
       line-height: 1.1;
+    }
+
+    /* Услуги: этапы — раскрывающийся список. Строка этапа целиком нажимается. */
+    .ps--full.is-accordion .ps__step:not(.is-open) .ps__body {
+      display: none;
+    }
+
+    .ps--full.is-accordion .ps__step:not(.is-open) {
+      row-gap: 0;
+    }
+
+    .ps--full.is-accordion .ps__step:not(.is-open) .ps__num {
+      grid-row: auto;
+    }
+
+    .ps--full.is-accordion .ps__step {
+      position: relative;
+      padding-block: 18px;
+    }
+
+    .ps--full.is-accordion .ps__name {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+  }
+
+  /* Кнопку названия создаёт скрипт, поэтому её стили глобальные (без метки компонента). */
+  :global(.ps__toggle) {
+    all: unset;
+    display: contents;
+  }
+
+  /* Значок «+» нужен только свёрнутому списку на телефоне. */
+  .ps__name-i {
+    display: none;
+  }
+
+  @media (max-width: 767px) {
+    .ps--full.is-accordion :global(.ps__toggle) {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 44px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Нажимается вся строка этапа, а не только название. */
+    .ps--full.is-accordion :global(.ps__toggle::after) {
+      content: '';
+      position: absolute;
+      inset: 0;
+    }
+
+    /* У открытого этапа нажимается только строка с названием: текст можно выделять и читать. */
+    .ps--full.is-accordion .ps__step.is-open :global(.ps__toggle::after) {
+      display: none;
+    }
+
+    .ps--full.is-accordion :global(.ps__toggle:focus-visible) {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
+      border-radius: 8px;
+    }
+
+    .ps--full.is-accordion .ps__name-i {
+      display: grid;
+      place-items: center;
+      flex: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--paper);
+      font-size: var(--fs-0);
+      transition:
+        rotate var(--dur) var(--ease-out),
+        background-color var(--dur-fast) var(--ease-out),
+        color var(--dur-fast) var(--ease-out);
+    }
+
+    .ps--full.is-accordion .ps__step.is-open .ps__name-i {
+      rotate: 45deg;
+      background: var(--accent);
+      color: var(--accent-ink);
     }
   }
 </style>

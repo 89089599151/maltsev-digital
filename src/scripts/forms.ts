@@ -1,8 +1,9 @@
 /**
  * Отправка заявок.
  * - С Formspree (data-endpoint): без перезагрузки, успех — только после положительного ответа сервиса.
- * - Без Formspree (data-mailto): форма проверяет поля и собирает письмо, которое открывается в почтовом
- *   приложении посетителя; кнопка [data-send-telegram] копирует тот же текст и открывает Telegram.
+ * - Без Formspree (data-mailto): форма проверяет поля и собирает текст заявки. Кнопка отправки одна;
+ *   канал выбирается переключателем «Telegram | Почта» (ChannelSwitch, поле _channel): для почты
+ *   открывается письмо в почтовом приложении, для Telegram текст копируется и открывается чат.
  *   Сайт ничего не отправляет сам и не делает вид, что отправил.
  */
 
@@ -73,8 +74,9 @@ export function initLeadForms(): void {
 
     form.noValidate = true;
 
+    // Служебные поля (имя с «_»: ловушка для ботов, канал отправки) не проверяются и не попадают в текст.
     const fields = Array.from(form.querySelectorAll<Field>('input, textarea, select')).filter(
-      (el) => el.name && el.type !== 'hidden' && el.name !== '_gotcha',
+      (el) => el.name && el.type !== 'hidden' && !el.name.startsWith('_'),
     );
 
     const validate = (): boolean => {
@@ -104,35 +106,54 @@ export function initLeadForms(): void {
 
     if (!endpoint && mailto) {
       const subject = form.querySelector<HTMLInputElement>('input[name="_subject"]')?.value ?? 'Заявка с сайта';
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (!validate()) return;
+      const tgUrl = form.dataset.telegram;
+      const label = submit.querySelector<HTMLElement>('[data-label]');
+      const hint = form.querySelector<HTMLElement>('[data-channel-hint]');
+      const channels = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="_channel"]'));
+      const channel = (): 'telegram' | 'mail' =>
+        channels.find((el) => el.checked)?.value === 'telegram' && tgUrl ? 'telegram' : 'mail';
+
+      // Подпись кнопки говорит, что произойдёт: «Отправить в Telegram» или «Отправить на почту».
+      const syncChannel = () => {
+        const current = channel();
+        if (label) label.textContent = current === 'telegram' ? 'Отправить в Telegram' : 'Отправить на почту';
+        if (hint) hint.textContent = (current === 'telegram' ? hint.dataset.hintTelegram : hint.dataset.hintMail) ?? '';
+        if (status) status.textContent = '';
+      };
+      channels.forEach((el) => el.addEventListener('change', syncChannel));
+      syncChannel();
+
+      const sendMail = () => {
         const body = composeBrief(form, fields);
         window.location.href = `mailto:${mailto}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         if (status)
           status.textContent = `Открываю почту с готовым письмом — останется нажать «Отправить». Если ничего не открылось, напишите на ${mailto}.`;
-      });
+      };
 
-      const tgButton = form.querySelector<HTMLButtonElement>('[data-send-telegram]');
-      const tgUrl = form.dataset.telegram;
-      if (tgButton && tgUrl) {
-        tgButton.addEventListener('click', async () => {
-          if (!validate()) return;
-          const body = `${subject}\n${composeBrief(form, fields)}`;
-          let copied = false;
-          try {
-            await navigator.clipboard.writeText(body);
-            copied = true;
-          } catch {
-            /* буфер обмена недоступен — откроем чат без текста */
-          }
-          window.open(tgUrl, '_blank', 'noopener');
-          if (status)
-            status.textContent = copied
-              ? 'Текст заявки скопирован. Вставьте его в открывшийся чат и отправьте.'
-              : 'Открываю Telegram. Скопировать текст не получилось — опишите задачу в чате.';
-        });
-      }
+      const sendTelegram = async () => {
+        if (!tgUrl) return;
+        const body = `${subject}
+${composeBrief(form, fields)}`;
+        let copied = false;
+        try {
+          await navigator.clipboard.writeText(body);
+          copied = true;
+        } catch {
+          /* буфер обмена недоступен — откроем чат без текста */
+        }
+        window.open(tgUrl, '_blank', 'noopener');
+        if (status)
+          status.textContent = copied
+            ? 'Текст заявки скопирован. Вставьте его в открывшийся чат и отправьте.'
+            : 'Открываю Telegram. Скопировать текст не получилось — опишите задачу в чате.';
+      };
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!validate()) return;
+        if (channel() === 'telegram') void sendTelegram();
+        else sendMail();
+      });
       return;
     }
     if (!endpoint) return;
