@@ -1,0 +1,27 @@
+---
+/**
+ * Строка «на связи» в листах острова. До запуска скрипта — нейтральная строка с часами работы,
+ * дальше её уточняет availability-status.ts. Часы и срок ответа — src/config/site.ts.
+ */
+import { site } from '@/config/site';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+const { workHours, responseMinutes, hours } = site.contacts;
+const hoursText = hours.charAt(0).toUpperCase() + hours.slice(1);
+---
+
+<p
+  class:list={['sheet__status', className]}
+  data-availability
+  data-from={workHours.from}
+  data-to={workHours.to}
+  data-tz={workHours.timeZone}
+  data-online-text={`На связи · отвечу за ${responseMinutes} минут`}
+  data-offline-text={`Отвечу после ${workHours.from}:00 по Москве`}
+>
+  <span class="sheet__dot" aria-hidden="true"></span>
+  <span data-availability-text>{hoursText}</span>
+</p>

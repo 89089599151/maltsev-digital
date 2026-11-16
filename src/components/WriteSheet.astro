@@ -1,0 +1,500 @@
+---
+/**
+ * Лист «Написать»: вырастает из синей кнопки острова, как меню (оболочка — src/styles/sheet.css).
+ * Способы связи одним списком: Telegram, почта с копированием адреса и, когда подключён приём заявок
+ * (site.forms.formspreeId), короткая заявка из двух полей прямо в листе. Внизу — путь к подробному брифу.
+ * Расчёт из калькулятора прикладывается к сообщению сам (write-sheet.ts).
+ */
+import ContactIcon from './ContactIcon.astro';
+import Icon from './Icon.astro';
+import AvailabilityLine from './AvailabilityLine.astro';
+import { site, telegramUrl, emailUrl } from '@/config/site';
+import { url } from '@/lib/url';
+
+const subject = 'Заявка на разработку сайта';
+const tg = telegramUrl();
+const mail = emailUrl(subject);
+// Адрес почты переносится только перед «@», а не посреди слова.
+const [mailName, mailHost] = site.contacts.email.value.split('@');
+const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.formspreeId}` : '';
+---
+
+<dialog class="sheet ws" id="write-sheet" aria-labelledby="ws-title" data-write-sheet>
+  <div class="sheet__board" data-sheet-board>
+    <span class="sheet__grip" aria-hidden="true"></span>
+
+    <div class="ws__view sheet__in" data-write-view="ways" data-sheet-scroll>
+      <div class="ws__head">
+        <h2 class="ws__title" id="ws-title">Написать</h2>
+        <AvailabilityLine />
+      </div>
+
+      <p class="ws__estimate" data-write-estimate hidden>
+        <span class="ws__k">Ваш расчёт — добавлю его в сообщение</span>
+        <span class="ws__v" data-write-estimate-text></span>
+      </p>
+
+      <ul class="ws__ways">
+        {
+          tg && (
+            <li>
+              <a class="ws__way" href={tg} target="_blank" rel="noopener" data-write-telegram>
+                <span class="ws__ico ws__ico--accent"><ContactIcon kind="telegram" /></span>
+                <span class="ws__txt">
+                  <span class="ws__k">Telegram — быстрее всего</span>
+                  <span class="ws__v">@{site.contacts.telegram.value}</span>
+                </span>
+                <Icon name="arrow-ne" />
+              </a>
+            </li>
+          )
+        }
+        {
+          mail && (
+            <li class="ws__split">
+              <a class="ws__way" href={mail} data-write-mail>
+                <span class="ws__ico"><ContactIcon kind="email" /></span>
+                <span class="ws__txt">
+                  <span class="ws__k" data-write-mail-note>Почта</span>
+                  <span class="ws__v ws__v--mail">{mailName}<wbr />@{mailHost}</span>
+                </span>
+              </a>
+              <button class="ws__copy" type="button" aria-label="Скопировать адрес почты" data-write-copy data-email={site.contacts.email.value} hidden>
+                <svg data-copy-icon width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="3" /><path d="M15 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2" /></svg>
+                <span data-copy-done hidden><Icon name="check" /></span>
+              </button>
+            </li>
+          )
+        }
+        {
+          endpoint && (
+            <li>
+              <button class="ws__way" type="button" data-write-form-open>
+                <span class="ws__ico">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z" /><path d="m13.5 6.5 4 4" /></svg>
+                </span>
+                <span class="ws__txt">
+                  <span class="ws__k">Два поля — напишу вам сам</span>
+                  <span class="ws__v">Короткая заявка</span>
+                </span>
+                <Icon name="arrow" />
+              </button>
+            </li>
+          )
+        }
+      </ul>
+      <p class="sr-only" role="status" aria-live="polite" data-write-live></p>
+    </div>
+
+    {
+      endpoint && (
+        <div class="ws__view ws__view--form" data-write-view="form" data-sheet-scroll hidden>
+          <div class="ws__bar">
+            <button class="ws__back" type="button" aria-label="Назад к способам связи" data-write-back>
+              <Icon name="arrow" />
+            </button>
+            <h3 class="ws__title ws__title--sm">Короткая заявка</h3>
+          </div>
+
+          <form class="ws__form" data-lead-form data-endpoint={endpoint} method="post" action={endpoint}>
+            <fieldset>
+              <legend class="sr-only">Короткая заявка</legend>
+              <input type="hidden" name="_subject" value="Короткая заявка из листа «Написать»" />
+              <input type="hidden" name="source" value={`Лист «Написать», страница ${Astro.url.pathname}`} />
+              <input type="hidden" name="estimate" value="" data-estimate-field />
+              <div class="hp" aria-hidden="true"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></div>
+
+              <label class="ws__field">
+                <span class="ws__label">Ваше имя</span>
+                <input name="name" type="text" autocomplete="name" required minlength="2" data-error-id="ws-name-err" aria-describedby="ws-name-err" />
+              </label>
+              <span class="ws__err" id="ws-name-err"></span>
+
+              <label class="ws__field">
+                <span class="ws__label">Telegram, телефон или почта</span>
+                <input name="contact" type="text" required minlength="4" data-error-id="ws-contact-err" aria-describedby="ws-contact-err" />
+              </label>
+              <span class="ws__err" id="ws-contact-err"></span>
+
+              <label class="ws__consent">
+                <input type="checkbox" name="consent" value="Согласие получено" required data-error-id="ws-consent-err" aria-describedby="ws-consent-err" />
+                <span>Согласен на обработку персональных данных по <a href={url('/privacy/')}>политике</a></span>
+              </label>
+              <span class="ws__err" id="ws-consent-err"></span>
+
+              <button class="ws__submit" type="submit"><span data-label>Отправить заявку</span></button>
+              <p class="ws__status" data-status role="status" aria-live="polite"></p>
+            </fieldset>
+          </form>
+          <div class="ws__success" data-success hidden tabindex="-1">
+            <p class="ws__v">Заявка получена</p>
+            <p>Спасибо! Свяжусь с вами {site.contacts.responseTime.value} по указанному контакту.</p>
+          </div>
+        </div>
+      )
+    }
+
+    <div class="sheet__foot">
+      <button class="sheet__close" type="button" aria-label="Закрыть" data-sheet-close autofocus><Icon name="close" /></button>
+      <a class="ws__brief" href={url('/contacts/')} data-write-brief>Подробный бриф <Icon name="arrow-ne" /></a>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .ws__view {
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .ws__view[hidden] {
+    display: none;
+  }
+
+  .ws__head {
+    padding: 4px 18px 0;
+  }
+
+  .ws__title {
+    font-family: var(--font-head);
+    font-weight: 450;
+    font-size: 1.75rem;
+    line-height: 1.1;
+    letter-spacing: -0.045em;
+  }
+
+  .ws__title--sm {
+    font-size: var(--fs-1);
+    letter-spacing: -0.03em;
+  }
+
+  .ws__k {
+    font-size: var(--fs-xs);
+    line-height: 1.35;
+    color: var(--muted);
+  }
+
+  .ws__v {
+    font-family: var(--font-display);
+    font-weight: 550;
+    font-size: var(--fs-0);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+  }
+
+  /* Адрес почты длинный: на узком экране кегль меньше, чтобы он встал в одну строку. */
+  .ws__v--mail {
+    font-size: clamp(0.75rem, 3.75vw, 1rem);
+  }
+
+  /* Расчёт из калькулятора: тот же синий тон, что у подписи острова. */
+  .ws__estimate {
+    display: grid;
+    gap: 2px;
+    padding: 12px 18px;
+    border-radius: 20px;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+
+  .ws__estimate[hidden] {
+    display: none;
+  }
+
+  .ws__estimate .ws__k {
+    color: inherit;
+    opacity: 0.8;
+  }
+
+  .ws__ways {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 2px;
+  }
+
+  .ws__way {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    min-height: 68px;
+    padding: 10px 18px 10px 12px;
+    border-radius: 20px;
+    color: var(--ink);
+    text-align: left;
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .ws__way:hover {
+    background: var(--bg);
+  }
+
+  .ws__way > :global(.icon) {
+    font-size: var(--fs-0);
+    color: var(--muted);
+  }
+
+  .ws__ico {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg);
+  }
+
+  .ws__way:hover .ws__ico:not(.ws__ico--accent) {
+    background: var(--surface-2);
+  }
+
+  .ws__ico--accent {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .ws__txt {
+    display: grid;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  /* Почта: строка-ссылка и отдельная кнопка «скопировать» справа. */
+  .ws__split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2px;
+    padding-right: 12px;
+  }
+
+  .ws__split .ws__way {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding-right: 8px;
+  }
+
+  .ws__copy,
+  .ws__back {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--ink);
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+
+  .ws__copy[hidden] {
+    display: none;
+  }
+
+  .ws__copy:hover,
+  .ws__back:hover {
+    background: var(--surface-2);
+  }
+
+  .ws__copy [data-copy-done] {
+    display: grid;
+  }
+
+  .ws__copy [data-copy-done][hidden] {
+    display: none;
+  }
+
+  .ws__copy.is-done {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  /* Самые узкие телефоны: поля строк меньше, адрес почты помещается целиком. */
+  @media (max-width: 359px) {
+    .ws__way {
+      gap: 10px;
+      padding-left: 6px;
+    }
+
+    .ws__split {
+      padding-right: 6px;
+    }
+
+    .ws__head,
+    .ws__estimate {
+      padding-inline: 12px;
+    }
+  }
+
+  .ws__brief {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+    min-height: 56px;
+    padding: 12px 20px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step-body);
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .ws__brief:hover {
+    background: var(--ink-hover);
+  }
+
+  /* --- Короткая заявка ---------------------------------------------------- */
+
+  .ws__view--form {
+    gap: 12px;
+    padding: 0 8px 6px;
+  }
+
+  .ws__bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ws__back :global(.icon) {
+    rotate: 180deg;
+  }
+
+  fieldset {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  fieldset:disabled {
+    opacity: 0.62;
+  }
+
+  .ws__field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .ws__label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step-small);
+  }
+
+  .ws__field input {
+    width: 100%;
+    min-height: 52px;
+    padding: 13px 16px;
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    color: var(--ink);
+    font-family: var(--font-display);
+    /* Не меньше 16px: иначе iOS приближает страницу при фокусе в поле. */
+    font-size: 1rem;
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .ws__field input:focus {
+    outline: none;
+    background: var(--surface-solid);
+    border-color: var(--ink);
+  }
+
+  .ws__field input[aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+
+  .ws__err {
+    font-family: var(--font-display);
+    font-size: var(--step-small);
+    font-weight: 600;
+    color: var(--danger);
+  }
+
+  .ws__err:empty,
+  .ws__status:empty {
+    display: none;
+  }
+
+  .ws__consent {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: var(--step-small);
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .ws__consent input {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    accent-color: var(--accent);
+  }
+
+  .ws__submit {
+    min-height: 56px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step-body);
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .ws__submit:hover:not(:disabled) {
+    background: var(--accent-deep);
+  }
+
+  .ws__status {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step-small);
+  }
+
+  .ws__success {
+    display: grid;
+    gap: 8px;
+    padding: 20px;
+    border-radius: 20px;
+    background: var(--accent-soft);
+  }
+
+  .ws__success[hidden] {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ws__view.is-entering {
+      animation: ws-view-in 260ms var(--ease-out) both;
+    }
+  }
+
+  @keyframes ws-view-in {
+    from {
+      opacity: 0;
+      transform: translateX(var(--ws-shift, 16px));
+    }
+  }
+</style>

@@ -1,3 +1,5 @@
+import { ESTIMATE_EVENT, type EstimateDetail } from '@/lib/estimate';
+
 interface EstPlan {
   id: string;
   name: string;
@@ -39,6 +41,8 @@ export function initEstimator(): void {
   const mirrorSum = document.querySelector<HTMLElement>('[data-out-mirror-sum]');
   const toggles = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-addon]'));
   const chosen = new Set<string>();
+  // Расчёт уходит в остров и лист «Написать» только после того, как посетитель сам что-то поменял.
+  let touched = false;
 
   form.addEventListener('submit', (e) => e.preventDefault());
 
@@ -104,15 +108,27 @@ export function initEstimator(): void {
     const params = new URLSearchParams({ plan: plan.id, pages: String(pages), sum: String(sum) });
     if (ids.length) params.set('addons', ids.join(','));
     outLink.href = `${cfg.contactUrl}?${params}`;
+
+    if (!touched) return;
+    // Тот же порядок и слова, что в брифе (brief-params.ts).
+    const parts = [`пакет ${plan.name}`, `страниц: ${pages}`];
+    if (names.length) parts.push(`дополнительно: ${names.join(', ').toLowerCase()}`);
+    parts.push(`ориентир ${fmt(sum)}`);
+    const detail: EstimateDetail = { plan: plan.name, sum, summary: parts.join(', '), href: outLink.href };
+    document.dispatchEvent(new CustomEvent(ESTIMATE_EVENT, { detail }));
   };
 
   form.querySelectorAll<HTMLInputElement>('input[name="type"]').forEach((r) =>
     r.addEventListener('change', () => {
       range.value = r.dataset.pages ?? range.value;
+      touched = true;
       calc();
     }),
   );
-  form.addEventListener('input', calc);
+  form.addEventListener('input', () => {
+    touched = true;
+    calc();
+  });
 
   for (const btn of toggles) {
     btn.hidden = false;
@@ -120,6 +136,7 @@ export function initEstimator(): void {
       const id = btn.dataset.addon!;
       if (chosen.has(id)) chosen.delete(id);
       else chosen.add(id);
+      touched = true;
       calc();
       // Итог чуть «подпрыгивает», чтобы изменение заметили.
       outSum.classList.remove('is-bumped');

@@ -58,7 +58,7 @@ const schema = {
   </PageHero>
   <PricingCards />
 
-  <section class="section split" id="terms" aria-labelledby="terms-title">
+  <section class="section split" id="terms" data-island-section="Условия" aria-labelledby="terms-title">
     <h2 id="terms-title" class="head" data-split>Условия</h2>
     <dl class="rows" data-stagger>
       {
@@ -75,7 +75,7 @@ const schema = {
   <Estimator />
 
   <!-- Дополнительные работы -->
-  <section class="section extras" aria-labelledby="extras-title">
+  <section class="section extras" data-island-section="Доп. работы" aria-labelledby="extras-title">
     <div class="extras__head">
       <h2 id="extras-title" class="head">Дополнительно</h2>
       <p>Можно добавить к любому пакету. Нажмите «+», и работа попадёт в расчёт выше. Каждая страница сверх лимита — {formatPrice(extraPagePrice)}.</p>

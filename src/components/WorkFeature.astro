@@ -27,7 +27,7 @@ const mobile = d.responsive.mobile;
 const caseUrl = url(`/portfolio/${project.id}/`);
 ---
 
-<section class="wf section" id="work" aria-labelledby={head ? 'wf-title' : 'wf-name'}>
+<section class="wf section" id="work" data-island-section={head ? 'Работы' : undefined} aria-labelledby={head ? 'wf-title' : 'wf-name'}>
   {head && <SectionHead
     id="wf-title"
     title="Работы"

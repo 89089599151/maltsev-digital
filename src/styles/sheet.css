@@ -1,0 +1,205 @@
+/*
+ * Лист, вырастающий из острова: общая оболочка мобильного меню и листа «Написать».
+ * Поведение — src/scripts/island-sheet.ts, содержимое — в компонентах Header и WriteSheet.
+ */
+
+/* Модальный диалог расположен отдельно от шапки и её преобразований при прокрутке. */
+.sheet {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  /* Нижний и боковые отступы совпадают с островом: карточка растёт ровно из его места.
+     --sheet-kb — высота экранной клавиатуры, её записывает write-sheet.ts. */
+  padding: max(12px, env(safe-area-inset-top)) 12px calc(max(12px, env(safe-area-inset-bottom)) + var(--sheet-kb, 0px));
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.sheet[open] {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sheet::backdrop {
+  background: rgba(10, 11, 20, 0.28);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.sheet__board {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: min(100%, 560px);
+  max-height: 100%;
+  padding: 8px 10px 10px;
+  border-radius: 32px;
+  background: var(--paper);
+  box-shadow: 0 -8px 48px rgba(10, 11, 20, 0.12);
+  overflow: hidden;
+  /* Смахивание вниз: карточка следует за пальцем. */
+  transform: translateY(var(--sheet-drag, 0px));
+}
+
+.sheet__grip {
+  align-self: center;
+  width: 36px;
+  height: 4px;
+  margin-block: 2px 4px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  flex: none;
+}
+
+/* Строка «на связи»: до запуска скрипта — часы работы, дальше её уточняет availability-status.ts. */
+.sheet__status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  font-size: var(--fs-xs);
+  line-height: 1.3;
+  color: var(--muted);
+  flex: none;
+}
+
+.sheet__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  flex: none;
+}
+
+.sheet__status[data-online='true'] {
+  color: var(--ink-2);
+}
+
+.sheet__status[data-online='true'] .sheet__dot {
+  background: var(--success);
+  box-shadow: 0 0 0 4px rgba(31, 122, 58, 0.16);
+}
+
+/* Низ карточки повторяет остров: слева круглая кнопка, справа главное действие — палец остаётся на месте. */
+.sheet__foot {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}
+
+.sheet__close {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--bg);
+  font-size: var(--fs-1);
+}
+
+.sheet__close:hover {
+  background: var(--surface-2);
+}
+
+/* Пока открыт лист, страница под ним зафиксирована. */
+html.site-menu-open {
+  overflow: hidden;
+  scroll-behavior: auto;
+}
+
+html.site-menu-open body {
+  position: fixed;
+  top: var(--site-menu-scroll-y, 0px);
+  inset-inline: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sheet__board {
+    transition: transform 240ms var(--ease-out);
+  }
+
+  .sheet__board.is-dragging {
+    transition: none;
+  }
+
+  /* Пока скрипт измеряет остров, анимация не стартует — иначе она началась бы без координат. */
+  .sheet[open]:not(.is-measuring) .sheet__board {
+    animation: sheet-grow 360ms var(--ease-out) both;
+  }
+
+  /* .sheet__in — содержимое, которое проявляется, когда карточка уже выросла. */
+  .sheet[open]:not(.is-measuring) :is(.sheet__grip, .sheet__in) {
+    animation: sheet-content-in 280ms 70ms var(--ease-out) both;
+  }
+
+  .sheet[open]:not(.is-measuring)::backdrop {
+    animation: sheet-veil-in 220ms ease-out both;
+  }
+
+  .sheet.is-closing .sheet__board {
+    animation: sheet-shrink 220ms var(--ease-inout) both;
+  }
+
+  .sheet.is-closing :is(.sheet__grip, .sheet__in) {
+    animation: sheet-content-out 120ms ease-in both;
+  }
+
+  .sheet.is-closing.is-dropping .sheet__board {
+    animation: sheet-drop 220ms ease-in both;
+  }
+
+  .sheet.is-closing.is-dropping :is(.sheet__grip, .sheet__in) {
+    animation: none;
+  }
+
+  .sheet.is-closing::backdrop {
+    animation: sheet-veil-out 220ms ease-in both;
+  }
+}
+
+/* Координаты острова относительно карточки записывает island-sheet.ts перед открытием. */
+@keyframes sheet-grow {
+  from { clip-path: inset(var(--isl-t, 0px) var(--isl-r, 0px) var(--isl-b, 0px) var(--isl-l, 0px) round 32px); }
+  to { clip-path: inset(0px 0px 0px 0px round 32px); }
+}
+
+@keyframes sheet-shrink {
+  from { clip-path: inset(0px 0px 0px 0px round 32px); }
+  to { clip-path: inset(var(--isl-t, 0px) var(--isl-r, 0px) var(--isl-b, 0px) var(--isl-l, 0px) round 32px); }
+}
+
+@keyframes sheet-drop {
+  from { transform: translateY(var(--sheet-drag, 0px)); }
+  to { transform: translateY(calc(100% + 24px)); }
+}
+
+@keyframes sheet-content-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sheet-content-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes sheet-veil-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sheet-veil-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}

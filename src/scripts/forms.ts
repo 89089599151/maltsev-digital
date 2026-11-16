@@ -67,7 +67,9 @@ export function initLeadForms(): void {
     const status = form.querySelector<HTMLElement>('[data-status]');
     const submit = form.querySelector<HTMLButtonElement>('[type="submit"]');
     const success = form.parentElement?.querySelector<HTMLElement>('[data-success]');
-    if (!submit || (!endpoint && !mailto)) return;
+    // Формы подключают несколько компонентов одной страницы — каждая форма настраивается один раз.
+    if (!submit || (!endpoint && !mailto) || form.dataset.leadReady) return;
+    form.dataset.leadReady = 'true';
 
     form.noValidate = true;
 

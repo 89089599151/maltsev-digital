@@ -82,14 +82,14 @@ const schema = {
       <BrowserShot src={d.cover} alt={d.coverAlt} widths={[640, 1000, 1600, 2000]} sizes="(max-width: 1023px) 92vw, 78vw" loading="eager" />
     </figure>
 
-    <section class="section split" aria-labelledby="task-title">
+    <section class="section split" data-island-section="Задача" aria-labelledby="task-title">
       <h2 id="task-title" class="head" data-split>Задача</h2>
       <p class="pj-lead" data-reveal>{d.task}</p>
     </section>
 
     {
       d.results.length > 0 && (
-        <section class="section split" aria-labelledby="res-title">
+        <section class="section split" data-island-section="Результат" aria-labelledby="res-title">
           <h2 id="res-title" class="head" data-split>Результат</h2>
           <dl class="rows" data-stagger>
             {d.results.map((r) => (
@@ -105,7 +105,7 @@ const schema = {
 
     {
       d.designNotes.length > 0 && (
-        <section class="section split" aria-labelledby="design-title">
+        <section class="section split" data-island-section="Решения" aria-labelledby="design-title">
           <h2 id="design-title" class="head" data-split>Решения</h2>
           <ul class="pj-notes" data-stagger>
             {d.designNotes.map((n) => <li>{n}</li>)}
@@ -116,7 +116,7 @@ const schema = {
 
     {
       (d.gallery.length > 0 || devices.length > 0) && (
-        <section class="section" aria-labelledby="gal-title">
+        <section class="section" data-island-section="Экраны" aria-labelledby="gal-title">
           <h2 id="gal-title" class="head pj-screens-title" data-split>Экраны</h2>
           {d.gallery.length > 0 && (
             <div class="pj-gallery" data-stagger>
@@ -144,7 +144,7 @@ const schema = {
       )
     }
 
-    <section class="section split pj-story" aria-labelledby="story-title">
+    <section class="section split pj-story" data-island-section="Как сделано" aria-labelledby="story-title">
       <h2 id="story-title" class="head" data-split>Как это сделано</h2>
       <div class="prose" data-reveal>
         <Content />

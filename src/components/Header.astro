@@ -3,6 +3,8 @@ import LogoMark from './LogoMark.astro';
 import { url, isActive } from '@/lib/url';
 import { site } from '@/config/site';
 import Icon from './Icon.astro';
+import AvailabilityLine from './AvailabilityLine.astro';
+import WriteSheet from './WriteSheet.astro';
 
 const nav = [
   { href: '/', label: 'Главная' },
@@ -20,12 +22,6 @@ const contactHref = onContacts ? url('/contacts/#brief-title') : url('/contacts/
 const section = nav.find((item) => isActive(current, item.href))?.label ?? (onContacts ? 'Контакты' : null);
 const menuLabel = section ?? 'Меню';
 const menuAria = section ? `Меню сайта. Сейчас открыт раздел «${section}»` : 'Меню сайта';
-
-// Статус в меню: до запуска скрипта — нейтральная строка с часами, дальше её уточняет mobile-menu.ts.
-const { workHours, responseMinutes, hours } = site.contacts;
-const hoursText = hours.charAt(0).toUpperCase() + hours.slice(1);
-const onlineText = `На связи · отвечу за ${responseMinutes} минут`;
-const offlineText = `Отвечу после ${workHours.from}:00 по Москве`;
 ---
 
 <header class="hdr" data-header>
@@ -59,23 +55,24 @@ const offlineText = `Отвечу после ${workHours.from}:00 по Моск�
   </noscript>
 </header>
 
-<!-- Остров: навигация телефона под большим пальцем. Кнопка меню появляется после запуска скрипта. -->
+<!-- Остров: навигация телефона под большим пальцем. Кнопка меню появляется после запуска скрипта.
+     Подписи меняет island.ts: раздел страницы под взглядом читателя и расчёт из калькулятора. -->
 <div class="isl" data-island>
   <button class="isl__menu" type="button" aria-label={menuAria} aria-haspopup="dialog" aria-controls="site-menu" aria-expanded="false" data-menu-open hidden>
     <Icon name="menu" />
-    <span class="isl__fold"><span class="isl__label">{menuLabel}</span></span>
+    <span class="isl__fold"><span class="isl__label" data-island-menu-label>{menuLabel}</span></span>
   </button>
-  <a class="isl__write" href={contactHref} aria-label="Написать" aria-current={onContacts ? 'page' : undefined}>
-    <span class="isl__fold"><span class="isl__label">Написать</span></span>
+  <a class="isl__write" href={contactHref} aria-label="Написать" aria-current={onContacts ? 'page' : undefined} data-write-open>
+    <span class="isl__fold"><span class="isl__label" data-island-write-label>Написать</span></span>
     <Icon name="arrow-ne" />
   </a>
 </div>
 
-<dialog class="menu" id="site-menu" aria-labelledby="site-menu-title" data-menu>
-  <div class="menu__board" data-menu-board>
+<dialog class="sheet menu" id="site-menu" aria-labelledby="site-menu-title" data-menu>
+  <div class="sheet__board" data-sheet-board>
     <h2 class="sr-only" id="site-menu-title">Разделы сайта</h2>
-    <span class="menu__grip" aria-hidden="true"></span>
-    <nav class="menu__nav" aria-label="Разделы сайта" data-menu-scroll>
+    <span class="sheet__grip" aria-hidden="true"></span>
+    <nav class="menu__nav sheet__in" aria-label="Разделы сайта" data-sheet-scroll>
       <ul class="menu__list">
         {nav.map((item) => (
           <li>
@@ -87,34 +84,27 @@ const offlineText = `Отвечу после ${workHours.from}:00 по Моск�
         ))}
       </ul>
     </nav>
-    <p
-      class="menu__status"
-      data-status
-      data-from={workHours.from}
-      data-to={workHours.to}
-      data-tz={workHours.timeZone}
-      data-online-text={onlineText}
-      data-offline-text={offlineText}
-    >
-      <span class="menu__dot" aria-hidden="true"></span>
-      <span data-status-text>{hoursText}</span>
-    </p>
-    <div class="menu__foot">
-      <button class="menu__close" type="button" aria-label="Закрыть меню" data-menu-close autofocus><Icon name="close" /></button>
+    <AvailabilityLine class="menu__status sheet__in" />
+    <div class="sheet__foot">
+      <button class="sheet__close" type="button" aria-label="Закрыть меню" data-sheet-close autofocus><Icon name="close" /></button>
       <a class="menu__cta" href={contactHref} aria-current={onContacts ? 'page' : undefined} data-menu-item>Обсудить проект <Icon name="arrow-ne" /></a>
     </div>
   </div>
 </dialog>
 
+<!-- На странице контактов бриф уже на экране: «Написать» ведёт к нему, лист не нужен. -->
+{!onContacts && <WriteSheet />}
+
 <script>
   import { initMobileMenu } from '@/scripts/mobile-menu';
   import { initIsland } from '@/scripts/island';
+  import { initWriteSheet } from '@/scripts/write-sheet';
   initMobileMenu();
+  initWriteSheet();
   initIsland();
 
   // Десктопная шапка прячется при прокрутке вниз; на телефоне она обычная часть страницы.
   const header = document.querySelector<HTMLElement>('[data-header]');
-  const dialog = document.querySelector<HTMLDialogElement>('[data-menu]');
   const desktop = window.matchMedia('(min-width: 1024px)');
   if (header) {
     let lastY = window.scrollY;
@@ -122,7 +112,7 @@ const offlineText = `Отвечу после ${workHours.from}:00 по Моск�
     const update = () => {
       ticking = false;
       const y = window.scrollY;
-      const hide = desktop.matches && !dialog?.open && y > lastY && y > 240 && !header.contains(document.activeElement);
+      const hide = desktop.matches && y > lastY && y > 240 && !header.contains(document.activeElement);
       header.classList.toggle('is-hidden', hide);
       header.classList.toggle('is-scrolled', y > 8);
       lastY = y;
@@ -263,63 +253,12 @@ const offlineText = `Отвечу после ${workHours.from}:00 по Моск�
     display: none;
   }
 
-  /* --- Меню: карточка, вырастающая из острова ---------------------------- */
+  /* --- Меню: содержимое листа (оболочка — src/styles/sheet.css) ------------ */
 
-  /* Модальный диалог расположен отдельно от шапки и её преобразований при прокрутке. */
-  .menu {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    max-width: none;
-    height: 100%;
-    height: 100dvh;
-    max-height: none;
-    margin: 0;
-    /* Нижний и боковые отступы совпадают с островом: карточка растёт ровно из его места. */
-    padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
-    border: 0;
-    background: transparent;
-    color: var(--ink);
-    overflow: hidden;
-  }
-
-  .menu[open] {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-  }
-
-  .menu::backdrop {
-    background: rgba(10, 11, 20, 0.28);
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
-  }
-
-  .menu__board {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    width: min(100%, 560px);
-    max-height: 100%;
-    padding: 8px 10px 10px;
-    border-radius: 32px;
-    background: var(--paper);
-    box-shadow: 0 -8px 48px rgba(10, 11, 20, 0.12);
-    overflow: hidden;
-    /* Смахивание вниз: карточка следует за пальцем. */
-    transform: translateY(var(--menu-drag, 0px));
+  /* Жест «зажал — провёл — отпустил» идёт по карточке: текст под пальцем не выделяется. */
+  .menu :global(.sheet__board) {
     -webkit-user-select: none;
     user-select: none;
-  }
-
-  .menu__grip {
-    align-self: center;
-    width: 36px;
-    height: 4px;
-    margin-block: 2px 4px;
-    border-radius: 999px;
-    background: var(--surface-3);
-    flex: none;
   }
 
   .menu__nav {
@@ -382,55 +321,8 @@ const offlineText = `Отвечу после ${workHours.from}:00 по Моск�
     color: inherit;
   }
 
-  .menu__status {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 36px;
+  .menu :global(.menu__status) {
     padding-inline: 18px;
-    font-size: var(--fs-xs);
-    line-height: 1.3;
-    color: var(--muted);
-    flex: none;
-  }
-
-  .menu__dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--surface-3);
-    flex: none;
-  }
-
-  .menu__status[data-online='true'] {
-    color: var(--ink-2);
-  }
-
-  .menu__status[data-online='true'] .menu__dot {
-    background: var(--success);
-    box-shadow: 0 0 0 4px rgba(31, 122, 58, 0.16);
-  }
-
-  /* Низ карточки повторяет остров: слева круглая кнопка, справа синяя — палец остаётся на месте. */
-  .menu__foot {
-    display: flex;
-    gap: 6px;
-    flex: none;
-  }
-
-  .menu__close {
-    display: grid;
-    place-items: center;
-    width: 56px;
-    height: 56px;
-    flex: none;
-    border-radius: 50%;
-    background: var(--bg);
-    font-size: var(--fs-1);
-  }
-
-  .menu__close:hover {
-    background: var(--surface-2);
   }
 
   .menu__cta {
@@ -456,98 +348,6 @@ const offlineText = `Отвечу после ${workHours.from}:00 по Моск�
   .menu__cta:hover,
   .menu__cta.is-target {
     background: var(--accent-deep);
-  }
-
-  :global(html.site-menu-open) {
-    overflow: hidden;
-    scroll-behavior: auto;
-  }
-
-  :global(html.site-menu-open body) {
-    position: fixed;
-    top: var(--site-menu-scroll-y, 0px);
-    inset-inline: 0;
-    width: 100%;
-    overflow: hidden;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .menu__board {
-      transition: transform 240ms var(--ease-out);
-    }
-
-    .menu__board.is-dragging {
-      transition: none;
-    }
-
-    /* Пока скрипт измеряет остров, анимация не стартует — иначе она началась бы без координат. */
-    .menu[open]:not(.is-measuring) .menu__board {
-      animation: menu-grow 360ms var(--ease-out) both;
-    }
-
-    .menu[open]:not(.is-measuring) :is(.menu__grip, .menu__nav, .menu__status) {
-      animation: menu-content-in 280ms 70ms var(--ease-out) both;
-    }
-
-    .menu[open]:not(.is-measuring)::backdrop {
-      animation: menu-veil-in 220ms ease-out both;
-    }
-
-    .menu.is-closing .menu__board {
-      animation: menu-shrink 220ms var(--ease-inout) both;
-    }
-
-    .menu.is-closing :is(.menu__grip, .menu__nav, .menu__status) {
-      animation: menu-content-out 120ms ease-in both;
-    }
-
-    .menu.is-closing.is-dropping .menu__board {
-      animation: menu-drop 220ms ease-in both;
-    }
-
-    .menu.is-closing.is-dropping :is(.menu__grip, .menu__nav, .menu__status) {
-      animation: none;
-    }
-
-    .menu.is-closing::backdrop {
-      animation: menu-veil-out 220ms ease-in both;
-    }
-  }
-
-  /* Координаты острова относительно карточки записывает mobile-menu.ts перед открытием. */
-  @keyframes menu-grow {
-    from { clip-path: inset(var(--isl-t, 0px) var(--isl-r, 0px) var(--isl-b, 0px) var(--isl-l, 0px) round 32px); }
-    to { clip-path: inset(0px 0px 0px 0px round 32px); }
-  }
-
-  @keyframes menu-shrink {
-    from { clip-path: inset(0px 0px 0px 0px round 32px); }
-    to { clip-path: inset(var(--isl-t, 0px) var(--isl-r, 0px) var(--isl-b, 0px) var(--isl-l, 0px) round 32px); }
-  }
-
-  @keyframes menu-drop {
-    from { transform: translateY(var(--menu-drag, 0px)); }
-    to { transform: translateY(calc(100% + 24px)); }
-  }
-
-  @keyframes menu-content-in {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes menu-content-out {
-    from { opacity: 1; }
-    to { opacity: 0; }
-  }
-
-  @keyframes menu-veil-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes menu-veil-out {
-    from { opacity: 1; }
-    to { opacity: 0; }
   }
 
   /* --- Телефон и планшет: логотип сверху, остров снизу -------------------- */
@@ -690,6 +490,28 @@ const offlineText = `Отвечу после ${workHours.from}:00 по Моск�
       padding-inline: 0;
       /* Пока подпись складывается, многоточие не мелькает. */
       text-overflow: clip;
+    }
+
+    /* Расчёт из калькулятора: подпись меню становится суммой, синяя кнопка — «Отправить». */
+    .isl.is-live .isl__menu {
+      background: var(--accent-soft);
+      color: var(--accent-text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .isl.is-live .isl__write :global(.icon) {
+      display: none;
+    }
+
+    .isl.is-live .isl__write .isl__label {
+      padding-inline: 5px;
+    }
+
+    @media (max-width: 399px) {
+      .isl.is-live .isl__menu,
+      .isl.is-live .isl__write {
+        font-size: var(--fs-xs);
+      }
     }
 
     /* Самые узкие телефоны: подпись «Услуги и цены» помещается целиком. */

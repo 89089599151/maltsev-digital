@@ -18,7 +18,7 @@ const types: Record<string, string> = {
 const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
 ---
 
-<section class="pk section" id="pricing" aria-labelledby="pk-title">
+<section class="pk section" id="pricing" data-island-section="Пакеты" aria-labelledby="pk-title">
   <SectionHead
     id="pk-title"
     title="Пакеты и цены"
