@@ -4,13 +4,15 @@
  * Слева одна колонка сверху вниз: заголовок, одна фраза о подходе, кнопка, внизу — два факта.
  * В центре — большой объект, справа — карточка с ценой (в ней раковина с жемчужиной) и квадраты контактов.
  * Под рамой — метки сетки и подсказка о прокрутке.
- * На телефоне первый экран короче: заголовок, текст, кнопка и строка из трёх фактов (цена, срок,
- * скорость); квадраты контактов, карточка цены и подсказка о прокрутке там не показываются —
+ * На телефоне: заголовок, текст, кнопка, целая стеклянная медуза, два крупных факта и карточка цены.
+ * Квадраты контактов, подпись про срок ответа и подсказка о прокрутке там не показываются —
  * написать можно из острова внизу экрана.
  *
- * Объект: src/assets/gen/hero-glass-wave.png (IMAGE_GENERATION_PROMPTS.md), запасной — hero-object-v2.
+ * Объект: на широком экране — волна src/assets/gen/hero-glass-wave.png, вписанная в свободную область
+ * макета; на телефоне — медуза hero-object-v2: она целиком помещается в узкий экран и легче по цвету,
+ * а нижняя часть волны там обрезалась в плотное тёмно-синее пятно. Браузер грузит только одну из двух.
  */
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import ContactIcon from './ContactIcon.astro';
 import Icon from './Icon.astro';
 import { minPrice, formatPrice, pricingConfirmed, plans } from '@/config/pricing';
@@ -20,6 +22,11 @@ import { url } from '@/lib/url';
 import avatar from '@/assets/photos/owner-avatar.webp';
 
 const object = genImage('hero-glass-wave') ?? genImage('hero-object-v2');
+const phoneObject = genImage('hero-object-v2');
+const phoneSet =
+  object && phoneObject && phoneObject.src !== object.src
+    ? await getImage({ src: phoneObject.src, widths: [480, 768, 1100], format: 'webp', quality: 82 })
+    : null;
 // В карточке цены — свой объект; пока файла нет, там уменьшенная копия главного.
 const pearl = genImage('price-pearl');
 const tg = telegramUrl();
@@ -53,38 +60,23 @@ const fastest = plans[0];
       <p class="hn__cta-note">Отвечу {site.contacts.responseTime.value}</p>
     </div>
 
-    <!-- Телефон: главное одной строкой, как виджеты iOS. Цена ведёт к пакетам. -->
-    <ul class="hn__facts" aria-label="Коротко о работе">
-      <li>
-        <a class="hn__fact hn__fact--link" href={url('/#pricing')}>
-          <span class="hn__fact-k">Сайт от</span>
-          <span class="hn__fact-v">{formatPrice(minPrice)}</span>
-        </a>
-      </li>
-      <li class="hn__fact">
-        <span class="hn__fact-k">Рабочих дней</span>
-        <span class="hn__fact-v">от 7</span>
-      </li>
-      <li class="hn__fact">
-        <span class="hn__fact-k">Скорость</span>
-        <span class="hn__fact-v">90+<small>/100</small></span>
-      </li>
-    </ul>
-
     <div class="hn__object" aria-hidden="true">
       <div class="hn__float" data-float="26">
         {
           object && (
-            <Image
-              class="hn__img"
-              src={object.src}
-              alt=""
-              widths={[480, 768, 1100, 1536]}
-              sizes="(max-width: 1023px) 92vw, 64vw"
-              quality={82}
-              loading="eager"
-              fetchpriority="high"
-            />
+            <picture>
+              {phoneSet && <source media="(max-width: 639px)" srcset={phoneSet.srcSet.attribute} sizes="92vw" type="image/webp" />}
+              <Image
+                class="hn__img"
+                src={object.src}
+                alt=""
+                widths={[480, 768, 1100, 1536]}
+                sizes="(max-width: 1023px) 92vw, 64vw"
+                quality={82}
+                loading="eager"
+                fetchpriority="high"
+              />
+            </picture>
           )
         }
       </div>
@@ -590,7 +582,6 @@ const fastest = plans[0];
 
     .hn__lead,
     .hn__cta,
-    .hn__facts,
     .hn__stats,
     .hn__social,
     .hn__card {
@@ -658,91 +649,27 @@ const fastest = plans[0];
     }
   }
 
-  /* --- Три факта: только на телефоне ------------------------------------------ */
-  .hn__facts {
-    display: none;
-  }
-
+  /* --- Телефон: кнопка, медуза, два факта и карточка цены -------------------- */
   @media (max-width: 639px) {
-    .hn__facts {
-      position: relative;
-      z-index: 2;
-      display: grid;
-      /* Цена длиннее остальных значений — ей колонка шире. */
-      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
-      gap: 8px;
-      list-style: none;
-      padding: 0;
-    }
-
-    .hn__facts li {
-      display: grid;
-    }
-
-    .hn__fact {
-      display: grid;
-      align-content: space-between;
-      gap: 10px;
-      min-height: 76px;
-      padding: 12px 12px 13px;
-      border-radius: 18px;
-      background: var(--bg);
-      color: var(--ink);
-      text-decoration: none;
-    }
-
-    .hn__fact--link {
-      transition:
-        background-color var(--dur-fast) var(--ease-out),
-        transform var(--dur-fast) var(--ease-out);
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .hn__fact--link:hover {
-      background: var(--accent-soft);
-    }
-
-    .hn__fact--link:active {
-      transform: scale(0.97);
-    }
-
-    .hn__fact-k {
-      font-size: var(--fs-xs);
-      line-height: 1.25;
-      color: var(--muted);
-    }
-
-    .hn__fact-v {
-      font-family: var(--font-head);
-      font-weight: 400;
-      font-size: clamp(1.0625rem, 5.4vw, 1.375rem);
-      line-height: 1;
-      letter-spacing: -0.04em;
-      white-space: nowrap;
-    }
-
-    .hn__fact--link .hn__fact-v {
-      color: var(--accent-text);
-    }
-
-    .hn__fact-v small {
-      font-size: 0.6em;
-      letter-spacing: 0;
-      color: var(--muted);
-    }
-
-    /* Остальное первого экрана на телефоне: факты выше волны, лишнее убрано. */
-    .hn__object {
-      order: 1;
-    }
-
+    /* Пояснения под цифрами и прямые контакты есть ниже по странице и в острове. */
     .hn__spark,
     .hn__cta-note,
-    .hn__stats,
+    .hn__stat-t,
     .hn__social,
-    .hn__card,
     .hn__scroll {
       display: none;
+    }
+
+    .hn__object {
+      margin-block: -6px -10px;
+    }
+
+    .hn__stat {
+      padding: 16px 16px 18px;
+    }
+
+    .hn__stat-l {
+      line-height: 1.3;
     }
   }
 
