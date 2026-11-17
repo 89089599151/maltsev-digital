@@ -161,7 +161,7 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
 
   .ws__title {
     font-family: var(--font-head);
-    font-weight: 450;
+    font-weight: 400;
     font-size: 1.75rem;
     line-height: 1.1;
     letter-spacing: -0.045em;
@@ -180,7 +180,7 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
 
   .ws__v {
     font-family: var(--font-display);
-    font-weight: 550;
+    font-weight: 500;
     font-size: var(--fs-0);
     line-height: 1.3;
     letter-spacing: -0.02em;
@@ -196,7 +196,7 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     display: grid;
     gap: 2px;
     padding: 12px 18px;
-    border-radius: 20px;
+    border-radius: var(--radius);
     background: var(--accent-soft);
     color: var(--accent-text);
   }
@@ -225,7 +225,7 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     width: 100%;
     min-height: 68px;
     padding: 10px 18px 10px 12px;
-    border-radius: 20px;
+    border-radius: var(--radius);
     color: var(--ink);
     text-align: left;
     text-decoration: none;
@@ -402,9 +402,9 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     width: 100%;
     min-height: 52px;
     padding: 13px 16px;
-    border: 2px solid transparent;
+    border: 1.5px solid var(--field-line);
     border-radius: var(--radius-sm);
-    background: var(--surface-2);
+    background: var(--field);
     color: var(--ink);
     font-family: var(--font-display);
     /* Не меньше 16px: иначе iOS приближает страницу при фокусе в поле. */
@@ -417,7 +417,8 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
   .ws__field input:focus {
     outline: none;
     background: var(--surface-solid);
-    border-color: var(--ink);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
   }
 
   .ws__field input[aria-invalid='true'] {
@@ -477,7 +478,7 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     display: grid;
     gap: 8px;
     padding: 20px;
-    border-radius: 20px;
+    border-radius: var(--radius);
     background: var(--accent-soft);
   }
 

@@ -163,7 +163,7 @@ const fastest = plans[0];
     grid-template-columns: minmax(0, 1fr);
     row-gap: 18px;
     padding: 28px 20px 20px;
-    border-radius: 26px;
+    border-radius: var(--radius-lg);
     /* Белая сцена: холодное свечение за объектом, чтобы стекло не висело в пустоте. */
     background:
       radial-gradient(46% 52% at 58% 56%, rgba(26, 47, 251, 0.13) 0%, rgba(26, 47, 251, 0) 70%),
@@ -186,7 +186,7 @@ const fastest = plans[0];
     display: grid;
     font-family: var(--font-head);
     font-weight: 300;
-    font-size: clamp(2.375rem, 10.6vw, 4.5rem);
+    font-size: clamp(2.375rem, 11.2vw, 4.5rem);
     line-height: 1.02;
     letter-spacing: -0.055em;
   }
@@ -235,7 +235,7 @@ const fastest = plans[0];
     background: var(--ink);
     color: var(--bg);
     font-family: var(--font-display);
-    font-weight: 550;
+    font-weight: 600;
     font-size: var(--fs-0);
     letter-spacing: -0.01em;
     text-decoration: none;
@@ -334,7 +334,7 @@ const fastest = plans[0];
     display: grid;
     align-content: start;
     padding: 18px 18px 20px;
-    border-radius: 22px;
+    border-radius: var(--radius);
     background: rgba(255, 255, 255, 0.72);
     box-shadow:
       inset 0 0 0 1px rgba(10, 11, 20, 0.07),
@@ -345,7 +345,7 @@ const fastest = plans[0];
 
   .hn__stat-v {
     font-family: var(--font-head);
-    font-weight: 380;
+    font-weight: 300;
     font-size: clamp(1.875rem, 1.2rem + 1.6vw, 2.625rem);
     line-height: 1;
     letter-spacing: -0.05em;
@@ -361,7 +361,7 @@ const fastest = plans[0];
   .hn__stat-l {
     margin-top: 2px;
     font-family: var(--font-display);
-    font-weight: 550;
+    font-weight: 500;
     font-size: var(--fs-0);
     letter-spacing: -0.02em;
   }
@@ -389,7 +389,7 @@ const fastest = plans[0];
     place-items: center;
     width: 56px;
     height: 56px;
-    border-radius: 16px;
+    border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.86);
     box-shadow: inset 0 0 0 1px rgba(10, 11, 20, 0.24);
     color: var(--ink);
@@ -424,7 +424,7 @@ const fastest = plans[0];
     display: grid;
     grid-template-columns: 38% minmax(0, 1fr);
     padding: 8px;
-    border-radius: 26px;
+    border-radius: var(--radius);
     background: var(--paper);
     box-shadow:
       inset 0 0 0 1px rgba(10, 11, 20, 0.14),
@@ -438,7 +438,7 @@ const fastest = plans[0];
     display: grid;
     place-items: center;
     min-height: 132px;
-    border-radius: 19px;
+    border-radius: calc(var(--radius) - 8px);
     background:
       radial-gradient(70% 70% at 50% 60%, rgba(61, 79, 255, 0.55) 0%, rgba(61, 79, 255, 0) 72%),
       var(--night);
@@ -483,8 +483,8 @@ const fastest = plans[0];
 
   .hn__card-v {
     font-family: var(--font-head);
-    font-weight: 380;
-    font-size: clamp(1.75rem, 1.2rem + 1.3vw, 2.375rem);
+    font-weight: 300;
+    font-size: var(--fs-3);
     line-height: 1;
     letter-spacing: -0.05em;
     color: var(--accent-text);
@@ -499,7 +499,7 @@ const fastest = plans[0];
   .hn__card-l {
     margin-top: 2px;
     font-family: var(--font-display);
-    font-weight: 550;
+    font-weight: 500;
     font-size: var(--fs-0);
     letter-spacing: -0.02em;
   }
@@ -550,7 +550,7 @@ const fastest = plans[0];
     justify-items: center;
     padding: 14px 6px 0;
     font-family: var(--font-display);
-    font-weight: 550;
+    font-weight: 500;
     font-size: var(--fs-xs);
     color: var(--ink-2);
     text-decoration: none;

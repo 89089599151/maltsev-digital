@@ -84,7 +84,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   .pk__row--featured {
     border-radius: var(--radius-lg);
     border-bottom-color: transparent;
-    background: var(--accent);
+    background: var(--accent-surface);
     color: var(--accent-ink);
   }
 
@@ -113,7 +113,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   }
 
   .pk__name {
-    font-weight: 340;
+    font-weight: 300;
     font-size: var(--fs-4);
     line-height: 1;
     letter-spacing: -0.05em;
@@ -121,7 +121,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
 
   .pk__types {
     font-family: var(--font-display);
-    font-weight: 550;
+    font-weight: 500;
     font-size: var(--fs-0);
   }
 
@@ -159,6 +159,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     font-size: var(--fs-3);
     letter-spacing: -0.045em;
     white-space: nowrap;
+    line-height: 1;
   }
 
   .pk__price span {
@@ -200,9 +201,10 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
 
   .pk__calc-t {
     font-family: var(--font-head);
-    font-weight: 450;
+    font-weight: 400;
     font-size: var(--fs-2);
     letter-spacing: -0.035em;
+    line-height: 1.2;
   }
 
   .pk__calc-d {
@@ -258,11 +260,11 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
 
     .pk__row--featured,
     .pk__row--premium {
-      border-radius: 22px;
+      border-radius: var(--radius);
     }
 
     .pk__calc {
-      border-radius: 22px;
+      border-radius: var(--radius);
     }
   }
 

@@ -14,8 +14,8 @@
   --surface-solid: #ffffff;
   --ink: #0a0b14;
   --muted: #5a5d70;
-  /* Вторичный текст на сценах (первый экран, кейс): темнее --muted ради контраста. */
-  --ink-2: #33364a;
+  /* Два уровня текста: чернила и второстепенный. --ink-2 оставлен как имя для старых стилей. */
+  --ink-2: var(--muted);
   --ink-hover: #23263a;
   --accent: #1a2ffb;
   /* Текст и иконки на синем — белые (7,5:1). */
@@ -23,6 +23,11 @@
   --accent-deep: #1020c8;
   --accent-hover: #3d4fff;
   --accent-soft: #dfe3ff;
+  /* Большие синие поверхности (рекомендуемый пакет, призыв в конце страницы): чуть светлее сверху
+     и с мягким бликом — сплошной электрик на большой площади на телефоне выглядит тёмным. */
+  --accent-surface:
+    radial-gradient(120% 80% at 15% 0%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(155deg, #3a54ff 0%, #1a2ffb 55%, #1828e8 100%);
   /* Синий текст на светлом и значимая синяя графика. */
   --accent-text: #1426d9;
   --accent-graphic: #1a2ffb;
@@ -32,6 +37,10 @@
   --on-accent-muted: #d6daff;
   /* Полупрозрачная — одинаково читается на фоне, поверхностях и сценах. */
   --line: rgba(10, 11, 20, 0.12);
+  /* Поля и варианты выбора: почти белые с тонкой линией, без серо-голубой заливки. */
+  --field: #f6f7fc;
+  --field-line: rgba(10, 11, 20, 0.1);
+  --field-line-hover: rgba(10, 11, 20, 0.22);
   /* «Сцена» под объектами и скриншотами. */
   --stage-1: #eceefa;
   --stage-2: #dde1f3;
@@ -74,13 +83,16 @@
   --fs-2: clamp(1.25rem, 1.1rem + 0.6vw, 1.5625rem); /* 20→25 — H3 */
   --fs-3: clamp(1.5rem, 1.2rem + 1vw, 1.9375rem); /* 24→31 — цены, названия */
   --fs-4: clamp(2rem, 1.1rem + 3vw, 3.0625rem); /* 32→49 — H2 */
-  --fs-5: clamp(2.5rem, 1rem + 4.6vw, 3.8125rem); /* 40→61 — крупный H2 */
+  --fs-5: clamp(2rem, 0.9rem + 3.6vw, 3.5rem); /* 32→56 — заголовок раздела */
   --fs-6: clamp(3rem, 1rem + 5.4vw, 6rem); /* 48→96 — дисплей */
+  /* Заголовок страницы: на шаг меньше главного заголовка главной (42→78), на шаг крупнее раздела. */
+  --fs-page: clamp(2.375rem, 0.9rem + 3.7vw, 4.25rem); /* 38→68 */
   --step-small: 0.9375rem; /* 15 — подписи полей, мелкий текст */
-  --step-body: clamp(1rem, 0.95rem + 0.35vw, 1.125rem);
+  /* Текст для чтения: 17 на телефоне (как основной текст iOS), 18 на компьютере. Подписи — 15. */
+  --step-body: clamp(1.0625rem, 1rem + 0.2vw, 1.125rem);
   --step-lead: var(--fs-1);
   --step-head: var(--fs-5);
-  --step-display: var(--fs-6);
+  --step-display: var(--fs-page);
 
   /* Базовая шкала: 4 px для деталей, 8 px для основных групп. */
   --space-1: 0.25rem;
@@ -100,7 +112,9 @@
   /* Контейнер страницы: ширина и боковые поля. */
   --page-max: 1560px;
   --page-pad: clamp(20px, 5vw, 88px);
-  --radius: 20px;
+  /* Три уровня скруглений: сцены и большие блоки — lg, карточки — base, поля и мелочи — sm.
+     Вложенный угол = внешний минус отступ: calc(var(--radius-lg) - 12px). */
+  --radius: 22px;
   --radius-sm: 12px;
   --radius-lg: 32px;
   --pad: clamp(var(--space-4), 2vw, var(--space-8));
@@ -204,7 +218,7 @@ h2,
 h3,
 h4 {
   font-family: var(--font-head);
-  font-weight: 560;
+  font-weight: 500;
   line-height: 1.04;
   letter-spacing: -0.03em;
   text-wrap: balance;
@@ -213,7 +227,7 @@ h4 {
 /* Крупные заголовки — тонкие, строчными: тихо и крупно, как в референсе. */
 h1,
 h2 {
-  font-weight: 360;
+  font-weight: 300;
   letter-spacing: -0.045em;
 }
 
@@ -221,6 +235,13 @@ p,
 li,
 dd {
   text-wrap: pretty;
+}
+
+/* Четыре насыщенности на весь сайт: 300 — крупные заголовки, 400 — текст, 500 — интерфейс,
+   600 — кнопки и выделение. Жирный по умолчанию (700) выбивается из шкалы. */
+strong,
+b {
+  font-weight: 600;
 }
 
 ::selection {
@@ -321,7 +342,7 @@ dd {
 }
 
 .tile--accent {
-  background: var(--accent);
+  background: var(--accent-surface);
   color: var(--accent-ink);
 }
 
@@ -350,7 +371,7 @@ dd {
 
 .display {
   font-family: var(--font-head);
-  font-weight: 340;
+  font-weight: 300;
   font-size: var(--step-display);
   line-height: 0.96;
   letter-spacing: -0.05em;
@@ -378,7 +399,7 @@ dd {
 
 .statement {
   font-family: var(--font-display);
-  font-weight: 560;
+  font-weight: 500;
   font-size: var(--fs-2);
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -457,7 +478,7 @@ dd {
   padding: 14px 24px;
   border-radius: 999px;
   font-family: var(--font-display);
-  font-weight: 550;
+  font-weight: 600;
   font-size: var(--fs-0);
   line-height: 1.1;
   letter-spacing: -0.01em;
@@ -618,6 +639,7 @@ a:is(:hover, :focus-visible) > .arrow {
 
 @media (max-width: 767px) {
   :root {
+    --radius-lg: 28px;
     --gap: var(--space-4);
     --margin: 16px;
     --page-pad: 16px;
@@ -717,7 +739,7 @@ html {
 
 /* Двухтонный заголовок: приглушённая часть фразы рядом с основной. */
 .tone-mute {
-  color: #7a7e92;
+  color: var(--muted);
 }
 
 /* Чип-пилюля: короткая подпись или счётчик. */
@@ -731,7 +753,7 @@ html {
   background: var(--ink);
   color: var(--bg);
   font-family: var(--font-display);
-  font-weight: 550;
+  font-weight: 500;
   font-size: var(--fs-xs);
   line-height: 1.2;
   letter-spacing: 0;

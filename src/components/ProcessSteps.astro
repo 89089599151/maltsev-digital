@@ -101,7 +101,7 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
   }
 
   .ps__text {
-    font-size: var(--fs-0);
+    font-size: var(--step-body);
     line-height: 1.55;
     color: var(--muted);
   }
@@ -109,7 +109,7 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
   .ps__you {
     display: grid;
     gap: 4px;
-    font-size: var(--fs-0);
+    font-size: var(--step-body);
     line-height: 1.5;
   }
 
@@ -138,7 +138,7 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
   }
 
   .ps--compact .ps__step:last-child {
-    background: var(--accent);
+    background: var(--accent-surface);
     color: var(--accent-ink);
   }
 
@@ -222,7 +222,7 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
 
     .ps--compact .ps__step {
       gap: 14px;
-      border-radius: 22px;
+      border-radius: var(--radius);
     }
 
     .ps--compact .ps__num {

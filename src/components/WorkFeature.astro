@@ -96,10 +96,10 @@ const caseUrl = url(`/portfolio/${project.id}/`);
   }
 
   .wf__name {
-    font-weight: 360;
+    font-weight: 300;
     font-size: var(--fs-5);
     line-height: 1.02;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.045em;
   }
 
   .wf__sum {
@@ -128,7 +128,7 @@ const caseUrl = url(`/portfolio/${project.id}/`);
     grid-column: 1;
     grid-row: 1;
     font-family: var(--font-head);
-    font-weight: 450;
+    font-weight: 400;
     font-size: var(--fs-1);
     line-height: 1.1;
     letter-spacing: -0.035em;
@@ -205,11 +205,11 @@ const caseUrl = url(`/portfolio/${project.id}/`);
 
   @media (max-width: 767px) {
     .wf__stage {
-      border-radius: 24px;
+      border-radius: var(--radius-lg);
     }
 
     .wf__visual {
-      border-radius: 16px;
+      border-radius: calc(var(--radius-lg) - 12px);
     }
 
     .wf__phone {

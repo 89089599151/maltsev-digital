@@ -37,7 +37,7 @@ const { id, title, text, action, more } = Astro.props;
     align-items: end;
     padding: clamp(28px, 4vw, 64px);
     border-radius: var(--radius-lg);
-    background: var(--accent);
+    background: var(--accent-surface);
     color: var(--accent-ink);
   }
 
@@ -81,7 +81,7 @@ const { id, title, text, action, more } = Astro.props;
     align-items: center;
     min-height: 44px;
     font-family: var(--font-display);
-    font-weight: 550;
+    font-weight: 500;
     color: inherit;
     text-underline-offset: 0.3em;
   }
@@ -98,7 +98,7 @@ const { id, title, text, action, more } = Astro.props;
 
   @media (max-width: 767px) {
     .cb {
-      border-radius: 24px;
+      border-radius: var(--radius-lg);
     }
   }
 </style>

@@ -140,7 +140,7 @@ const mail = emailUrl('Заявка на разработку сайта');
   }
 
   .ct__title {
-    font-size: clamp(2.5rem, 1rem + 4.4vw, 5.5rem);
+    font-size: var(--fs-page);
     line-height: 1;
     letter-spacing: -0.045em;
     max-width: 10ch;
@@ -208,7 +208,7 @@ const mail = emailUrl('Заявка на разработку сайта');
   /* Адрес почты не рвётся посреди слова: на узком экране кегль чуть меньше. */
   .ct__lv {
     font-family: var(--font-display);
-    font-weight: 560;
+    font-weight: 500;
     font-size: clamp(0.875rem, 3.7vw, 1.0625rem);
     overflow-wrap: anywhere;
   }
@@ -257,9 +257,10 @@ const mail = emailUrl('Заявка на разработку сайта');
 
   .ct__card-t {
     font-family: var(--font-head);
-    font-weight: 560;
+    font-weight: 500;
     font-size: var(--fs-2);
     letter-spacing: -0.03em;
+    line-height: 1.2;
   }
 
 
@@ -301,9 +302,9 @@ const mail = emailUrl('Заявка на разработку сайта');
     width: 100%;
     min-height: 52px;
     padding: 13px 16px;
-    border: 2px solid transparent;
+    border: 1.5px solid var(--field-line);
     border-radius: var(--radius-sm);
-    background: var(--surface-2);
+    background: var(--field);
     color: var(--ink);
     font: inherit;
     font-family: var(--font-display);
@@ -317,14 +318,15 @@ const mail = emailUrl('Заявка на разработку сайта');
 
   .ct__field input:hover,
   .ct__field textarea:hover {
-    background: var(--surface-3);
+    border-color: var(--field-line-hover);
   }
 
   .ct__field input:focus,
   .ct__field textarea:focus {
     outline: none;
     background: var(--surface-solid);
-    border-color: var(--ink);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
   }
 
   .ct__field input[aria-invalid='true'] {
@@ -407,7 +409,7 @@ const mail = emailUrl('Заявка на разработку сайта');
     gap: 6px;
     min-height: 44px;
     font-family: var(--font-display);
-    font-weight: 560;
+    font-weight: 500;
     text-decoration: none;
     border-bottom: 2px solid var(--accent);
     padding-bottom: 2px;
@@ -432,12 +434,12 @@ const mail = emailUrl('Заявка на разработку сайта');
 
   @media (max-width: 767px) {
     .ct__stage {
-      border-radius: 24px;
+      border-radius: var(--radius-lg);
     }
 
     .ct__card {
       padding: 20px;
-      border-radius: 16px;
+      border-radius: calc(var(--radius-lg) - 12px);
     }
   }
 
