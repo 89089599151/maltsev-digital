@@ -1,23 +1,17 @@
 ---
 /**
- * Знак бренда: «m» из двух плавных арок одной линией. Цвет — currentColor, размер задаёт родитель.
- * Тот же рисунок — в public/favicon.svg.
+ * «Авторский след» — выбранный знак Maltsev Digital.
+ * Векторный мастер один для шапки и экспортируемых иконок; цвет задаёт родитель.
  */
+import Fingerprint from '@/assets/brand/fingerprint.svg';
+
 interface Props {
   class?: string;
 }
 const { class: cls } = Astro.props;
 ---
 
-<svg class:list={['lm', cls]} viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
-  <path
-    d="M5 25V12.5a5.500 5.500 0 0 1 11 0V25M16 12.500a5.500 5.500 0 0 1 11 0V25"
-    stroke="currentColor"
-    stroke-width="4.200"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
-</svg>
+<Fingerprint class:list={['lm', cls]} aria-hidden="true" focusable="false" />
 
 <style>
   .lm {

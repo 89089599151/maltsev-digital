@@ -22,7 +22,7 @@ interface Props {
 const {
   title,
   description = site.seo.defaultDescription,
-  ogImage = '/og-white-blue.jpg',
+  ogImage = '/og-white-blue.jpg?v=fingerprint-v1',
   noindex = false,
   schema,
   bodyClass,
@@ -56,9 +56,9 @@ const orgSchema = {
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#f1f2fa" />
-    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
-    <link rel="icon" href={url("/icon-32.png")} sizes="32x32" type="image/png" />
-    <link rel="apple-touch-icon" href={url('/apple-touch-icon.png')} />
+    <link rel="icon" href={url('/favicon.svg?v=fingerprint-v1')} type="image/svg+xml" />
+    <link rel="icon" href={url('/icon-32.png?v=fingerprint-v1')} sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href={url('/apple-touch-icon.png?v=fingerprint-v1')} />
     <link rel="sitemap" href={url('/sitemap-index.xml')} />
 
     <meta property="og:type" content="website" />

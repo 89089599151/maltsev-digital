@@ -1,20 +1,20 @@
 ---
 /**
  * «Пакеты и цены» на главной: одна секция вместо отдельных «Что я делаю» и «Цены».
- * Три строки — название пакета, для кого, срок, цена «от», кнопка. Без карточек и картинок: строки
- * разделены линиями. У пакета свой цвет, тот же, что на странице услуг: START — без заливки,
- * BUSINESS (рекомендуемый) — синяя полоса, PREMIUM — тёмная. Данные — src/config/pricing.ts.
+ * Короткое пояснение к каждому пакету, срок и цена. На компьютере — ровные строки,
+ * на телефоне — отдельные карточки с теми же акцентами, что и на странице услуг:
+ * START — белый, BUSINESS — синий, PREMIUM — тёмный. Данные — src/config/pricing.ts.
  */
 import SectionHead from './SectionHead.astro';
 import Icon from './Icon.astro';
 import { plans, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
 
-/** Какие типы сайтов закрывает пакет. */
+/** Одно короткое пояснение вместо подзаголовка и повторяющего его абзаца. */
 const types: Record<string, string> = {
-  start: 'Лендинг, сайт специалиста',
-  business: 'Сайт компании, каталог',
-  premium: 'Индивидуальный проект',
+  start: 'Лендинг или сайт специалиста',
+  business: 'Сайт компании с разделами и каталогом',
+  premium: 'Авторский дизайн и нестандартная логика',
 };
 const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
 ---
@@ -35,17 +35,16 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
             <h3 class="pk__name">{p.name}</h3>
             <p class="pk__types">{p.types}</p>
           </div>
-          <div class="pk__body">
-            <p class="pk__for">{p.forWhom}</p>
-            <p class="pk__time">Срок: {p.timeline}</p>
-          </div>
-          <div class="pk__buy">
-            <p class="pk__price">
-              <span>от</span> {formatPrice(p.price)}
-            </p>
-            <a class:list={['btn', 'pk__cta', p.id === 'business' ? 'pk__cta--light' : p.id === 'premium' ? 'btn--accent' : 'btn--ink']} href={url(`/contacts/?plan=${p.id}`)}>
-              Заказать <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
-            </a>
+          <div class="pk__offer">
+            <p class="pk__time"><span>Срок</span> {p.timeline}</p>
+            <div class="pk__buy">
+              <p class="pk__price">
+                <span>от</span> {formatPrice(p.price)}
+              </p>
+              <a class:list={['btn', 'pk__cta', p.id === 'business' ? 'pk__cta--light' : p.id === 'premium' ? 'btn--accent' : 'btn--ink']} href={url(`/contacts/?plan=${p.id}`)} aria-label={`Заказать пакет ${p.name}`}>
+                Заказать <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+              </a>
+            </div>
           </div>
         </li>
       ))
@@ -68,8 +67,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
 
   .pk__row {
     display: grid;
-    /* Последняя колонка фиксированная: описания во всех строках начинаются на одной вертикали. */
-    grid-template-columns: minmax(0, 4fr) minmax(0, 4fr) 350px;
+    grid-template-columns: minmax(0, 1fr) 350px;
     gap: clamp(20px, 3vw, 48px);
     align-items: center;
     padding: clamp(24px, 2.6vw, 36px) clamp(16px, 2vw, 32px);
@@ -78,7 +76,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
 
   .pk__head {
     display: grid;
-    gap: 6px;
+    gap: 10px;
   }
 
   .pk__row--featured {
@@ -100,7 +98,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     color: var(--night-ink);
   }
 
-  .pk__row--premium .pk__for {
+  .pk__row--premium :is(.pk__types, .pk__time) {
     color: var(--night-muted);
   }
 
@@ -120,30 +118,30 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   }
 
   .pk__types {
-    font-family: var(--font-display);
-    font-weight: 500;
+    max-width: 38ch;
+    font-weight: 400;
     font-size: var(--fs-0);
-  }
-
-  .pk__body {
-    display: grid;
-    gap: 8px;
-  }
-
-  .pk__for {
-    max-width: 44ch;
-    line-height: 1.5;
+    line-height: 1.45;
     color: var(--muted);
   }
 
-  .pk__row--featured .pk__for {
+  .pk__offer {
+    display: grid;
+    gap: 16px;
+  }
+
+  .pk__row--featured :is(.pk__types, .pk__time) {
     color: var(--on-accent-muted);
   }
 
   .pk__time {
     font-size: var(--step-small);
-    font-weight: 600;
-    font-family: var(--font-display);
+    line-height: 1.4;
+    color: var(--muted);
+  }
+
+  .pk__time span {
+    margin-right: 6px;
   }
 
   .pk__buy {
@@ -228,10 +226,28 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   }
 
   @media (max-width: 1023px) {
+    .pk__list {
+      display: grid;
+      gap: 24px;
+      border-top: 0;
+    }
+
     .pk__row {
       grid-template-columns: minmax(0, 1fr);
-      gap: 16px 20px;
+      gap: 28px;
       align-items: start;
+      margin-top: 0;
+      padding: 28px 24px;
+      border-bottom: 0;
+      border-radius: var(--radius-lg);
+    }
+
+    .pk__row:not(.pk__row--featured):not(.pk__row--premium) {
+      background: var(--paper);
+    }
+
+    .pk__offer {
+      gap: 20px;
     }
 
     .pk__buy {
@@ -249,18 +265,27 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   }
 
   @media (max-width: 767px) {
-    .pk__row {
-      padding-inline: 16px;
+    .pk__name {
+      font-size: 2rem;
     }
 
     .pk__buy {
       flex-wrap: wrap;
-      gap: 12px 16px;
+      gap: 12px;
     }
 
-    .pk__row--featured,
-    .pk__row--premium {
-      border-radius: var(--radius);
+    .pk__price {
+      font-size: var(--fs-3);
+    }
+
+    .pk__cta {
+      min-height: 44px;
+      padding: 12px 16px;
+      font-size: var(--step-small);
+    }
+
+    .pk__cta .arrow {
+      display: none;
     }
 
     .pk__calc {
