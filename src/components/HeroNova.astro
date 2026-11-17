@@ -4,7 +4,9 @@
  * Слева одна колонка сверху вниз: заголовок, одна фраза о подходе, кнопка, внизу — два факта.
  * В центре — большой объект, справа — карточка с ценой (в ней раковина с жемчужиной) и квадраты контактов.
  * Под рамой — метки сетки и подсказка о прокрутке.
- * На телефоне: заголовок, текст, кнопка, целая стеклянная медуза, два крупных факта и карточка цены.
+ * На телефоне: заголовок, текст, кнопка, целая стеклянная медуза и под ней стеклянная пластина:
+ * два факта в строку без плашек, как характеристики на странице продукта, и цена с жемчужиной.
+ * Пластина заходит на щупальца — они просвечивают сквозь размытое стекло.
  * Квадраты контактов, подпись про срок ответа и подсказка о прокрутке там не показываются —
  * написать можно из острова внизу экрана.
  *
@@ -82,18 +84,47 @@ const fastest = plans[0];
       </div>
     </div>
 
-    <ul class="hn__stats">
-      <li class="hn__stat">
-        <p class="hn__stat-v"><span>от</span> 7</p>
-        <p class="hn__stat-l">рабочих дней до запуска</p>
-        <p class="hn__stat-t">Лендинг — за {fastest.timeline}. Дату называю до старта.</p>
-      </li>
-      <li class="hn__stat">
-        <p class="hn__stat-v">90+</p>
-        <p class="hn__stat-l">из 100 за скорость</p>
-        <p class="hn__stat-t">Оценка этого сайта в тесте скорости Google.</p>
-      </li>
-    </ul>
+    <!-- Факты и цена. На телефоне — одна стеклянная пластина поверх щупалец медузы,
+         на широком экране обёртка не участвует в раскладке. -->
+    <div class="hn__plate">
+      <ul class="hn__stats">
+        <li class="hn__stat">
+          <p class="hn__stat-v"><span>от</span> 7</p>
+          <p class="hn__stat-l">рабочих дней до запуска</p>
+          <p class="hn__stat-t">Лендинг — за {fastest.timeline}. Дату называю до старта.</p>
+        </li>
+        <li class="hn__stat">
+          <p class="hn__stat-v">90+</p>
+          <p class="hn__stat-l">из 100 за скорость</p>
+          <p class="hn__stat-t">Оценка этого сайта в тесте скорости Google.</p>
+        </li>
+      </ul>
+
+      <a class="hn__card lift" href={url('/#pricing')}>
+        <span class="hn__card-pic" aria-hidden="true">
+          {pearl ? (
+            <Image class="hn__card-pearl" src={pearl.src} alt="" widths={[240, 360, 520]} sizes="220px" loading="eager" />
+          ) : (
+            object && <Image src={object.src} alt="" widths={[320, 520]} sizes="260px" loading="eager" />
+          )}
+        </span>
+        <span class="hn__card-body">
+          <span class="hn__card-v"><span>от</span> {formatPrice(minPrice)}</span>
+          <span class="hn__card-l">сайт под ключ</span>
+          <svg class="hn__card-spark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 0c.7 6.9 4.9 11.3 12 12-7.1.7-11.3 5.1-12 12-.7-6.9-4.9-11.3-12-12C7.100 11.300 11.300 6.900 12 0Z" />
+          </svg>
+          <span class="hn__card-t">
+            Лендинг, сайт компании или индивидуальный проект.{!pricingConfirmed && ' Цены предварительные.'}
+          </span>
+          <span class="hn__card-who">
+            <Image src={avatar} alt="" width={36} height={36} loading="eager" />
+            <span>{site.brand.owner.value}<br /><i>делаю сам, без посредников</i></span>
+          </span>
+        </span>
+        <span class="hn__card-go" aria-hidden="true"><Icon name="arrow" /></span>
+      </a>
+    </div>
 
     <ul class="hn__social" aria-label="Написать напрямую">
       {
@@ -117,29 +148,6 @@ const fastest = plans[0];
       <li class="hn__social-l" aria-hidden="true">Написать<br />напрямую</li>
     </ul>
 
-    <a class="hn__card lift" href={url('/#pricing')}>
-      <span class="hn__card-pic" aria-hidden="true">
-        {pearl ? (
-          <Image class="hn__card-pearl" src={pearl.src} alt="" widths={[240, 360, 520]} sizes="220px" loading="eager" />
-        ) : (
-          object && <Image src={object.src} alt="" widths={[320, 520]} sizes="260px" loading="eager" />
-        )}
-      </span>
-      <span class="hn__card-body">
-        <span class="hn__card-v"><span>от</span> {formatPrice(minPrice)}</span>
-        <span class="hn__card-l">сайт под ключ</span>
-        <svg class="hn__card-spark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M12 0c.7 6.9 4.9 11.3 12 12-7.1.7-11.3 5.1-12 12-.7-6.9-4.9-11.3-12-12C7.100 11.300 11.300 6.900 12 0Z" />
-        </svg>
-        <span class="hn__card-t">
-          Лендинг, сайт компании или индивидуальный проект.{!pricingConfirmed && ' Цены предварительные.'}
-        </span>
-        <span class="hn__card-who">
-          <Image src={avatar} alt="" width={36} height={36} loading="eager" />
-          <span>{site.brand.owner.value}<br /><i>делаю сам, без посредников</i></span>
-        </span>
-      </span>
-    </a>
   </div>
 
   <a class="hn__scroll" href="#work">
@@ -667,9 +675,13 @@ const fastest = plans[0];
       display: none;
     }
 
-    /* Медуза покачивается вверх на 14px — запас сверху, чтобы купол не подходил к кнопке. */
+    /* Медуза покачивается вверх на 14px — запас сверху, чтобы купол не подходил к кнопке.
+       Она по центру сцены и чуть шире колонки текста: так крупнее, а под стекло уходят только
+       кончики щупалец. */
     .hn__object {
-      margin-block: 22px -6px;
+      width: calc(100% + 16px);
+      max-width: none;
+      margin: 22px -8px 0;
     }
 
     .hn__stat {
@@ -705,6 +717,171 @@ const fastest = plans[0];
     .hn__card-who img {
       width: 28px;
       height: 28px;
+    }
+  }
+
+  /* --- Стеклянная пластина: факты и цена одним предметом ---------------------
+     На телефоне пластина заходит на щупальца медузы, и они просвечивают сквозь размытое стекло.
+     Факты — как характеристики на странице продукта: крупные тонкие цифры без плашек, между
+     ними волосяная линия. Цена — строкой ниже, жемчужина в круглой оправе и стрелка к пакетам.
+     На широком экране обёртка не участвует в раскладке: там свои карточки. */
+  .hn__plate {
+    display: contents;
+  }
+
+  .hn__card-go {
+    display: none;
+  }
+
+  @media (max-width: 639px) {
+    .hn__plate {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      margin-top: -26px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.86) 60%);
+      -webkit-backdrop-filter: blur(18px) saturate(1.5);
+      backdrop-filter: blur(18px) saturate(1.5);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+        0 0 0 1px rgba(10, 11, 20, 0.06),
+        0 30px 60px -34px rgba(16, 32, 200, 0.45);
+      overflow: hidden;
+    }
+
+    .hn__plate .hn__stats {
+      gap: 0;
+    }
+
+    .hn__plate .hn__stat {
+      padding: 20px 18px 18px;
+      border-radius: 0;
+      background: none;
+      box-shadow: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+
+    .hn__plate .hn__stat + .hn__stat {
+      box-shadow: inset 1px 0 0 rgba(10, 11, 20, 0.08);
+    }
+
+    .hn__plate .hn__stat-v {
+      font-weight: 300;
+      font-size: 2.5rem;
+      letter-spacing: -0.055em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hn__plate .hn__stat-l {
+      margin-top: 8px;
+      font-family: var(--font-text);
+      font-weight: 400;
+      font-size: var(--step-small);
+      line-height: 1.35;
+      letter-spacing: 0;
+      color: var(--muted);
+    }
+
+    .hn__plate .hn__card {
+      grid-template-columns: 56px minmax(0, 1fr) 44px;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 14px 14px 16px;
+      border-radius: 0;
+      background: none;
+      box-shadow: inset 0 1px 0 rgba(10, 11, 20, 0.08);
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color var(--dur-fast) var(--ease-out);
+    }
+
+    .hn__plate .hn__card:hover {
+      translate: none;
+    }
+
+    .hn__plate .hn__card:active {
+      background: rgba(26, 47, 251, 0.05);
+    }
+
+    /* Жемчужина в круглой оправе с мягким синим свечением. */
+    .hn__plate .hn__card-pic {
+      width: 56px;
+      height: 56px;
+      min-height: 0;
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 4px rgba(26, 47, 251, 0.1),
+        0 8px 18px -6px rgba(16, 32, 200, 0.55);
+    }
+
+    .hn__plate .hn__card-pic img.hn__card-pearl {
+      padding: 4%;
+    }
+
+    .hn__plate .hn__card-body {
+      padding: 0;
+    }
+
+    .hn__plate .hn__card-v {
+      font-weight: 300;
+      font-size: clamp(1.25rem, 6.4vw, 1.75rem);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hn__plate .hn__card-l {
+      margin-top: 4px;
+      font-family: var(--font-text);
+      font-weight: 400;
+      font-size: var(--step-small);
+      letter-spacing: 0;
+      color: var(--muted);
+    }
+
+    .hn__plate .hn__card-who {
+      display: none;
+    }
+
+    .hn__card-go {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-size: 1.05rem;
+      transition: transform var(--dur) var(--ease-out);
+    }
+
+    .hn__card:hover .hn__card-go {
+      transform: rotate(-45deg);
+    }
+  }
+
+  /* Самые узкие телефоны: цена помещается в строку, стрелку заменяет сама строка. */
+  @media (max-width: 359px) {
+    .hn__plate .hn__card {
+      grid-template-columns: 48px minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .hn__plate .hn__card-pic {
+      width: 48px;
+      height: 48px;
+    }
+
+    .hn__card-go {
+      display: none;
+    }
+
+    .hn__plate .hn__stat {
+      padding-inline: 14px;
+    }
+
+    .hn__plate .hn__stat-v {
+      font-size: 2.125rem;
     }
   }
 
