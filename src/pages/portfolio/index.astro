@@ -1,66 +1,114 @@
 ---
 /**
- * «Работы». Тот же каркас, что у остальных страниц: первый экран PageHero (заголовок, текст, кнопки,
- * стеклянный объект справа — раковина наутилуса), ниже — карточка проекта, как в разделе «Работы»
- * на главной (WorkFeature: суть, факты, скриншоты на компьютере и телефоне), затем синий призыв.
- * Когда проектов станет больше, под карточкой появится сетка «Ещё проекты» с фильтром.
+ * «Работы». Первый экран устроен как у остальных страниц — белая сцена, слева заголовок и текст,
+ * справа визуал, — только визуал здесь живой: сам сайт на компьютере или телефоне, вид меняется
+ * переключателем. На телефоне экран проекта выходит за нижний край сцены и связывает её с фактами.
+ * Ниже — привычная раскладка сайта «заголовок слева — строки справа» и синий призыв.
  */
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '@/layouts/Base.astro';
-import PageHero from '@/components/PageHero.astro';
-import WorkFeature from '@/components/WorkFeature.astro';
+import BrowserShot from '@/components/BrowserShot.astro';
 import ProjectCard from '@/components/ProjectCard.astro';
 import CtaBand from '@/components/CtaBand.astro';
 import Icon from '@/components/Icon.astro';
-import { categories } from '@/config/portfolio';
-import { genImage } from '@/lib/gen';
+import { categories, categoryLabel } from '@/config/portfolio';
 import { url } from '@/lib/url';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const [featured, ...rest] = projects;
 const used = categories.filter((c) => rest.some((p) => p.data.category === c.id));
 const pattern = ['wide', 'normal', 'tall', 'normal', 'normal', 'wide', 'normal'] as const;
-// Раковина наутилуса: камеры — проекты, спираль — рост.
-const nautilus = genImage('works-nautilus');
+const desktop = featured?.data.responsive.desktop ?? featured?.data.cover;
+const mobile = featured?.data.responsive.mobile;
+const kind = featured
+  ? featured.data.isConcept
+    ? 'Концепт'
+    : featured.data.category === 'personal'
+      ? 'Личный проект'
+      : categoryLabel(featured.data.category)
+  : '';
 ---
 
 <Base
   title="Работы — портфолио веб-разработчика"
-  description="Проекты Maltsev Digital на компьютере и телефоне. Дизайн, разработка и решения — в подробном разборе."
+  description="Рассмотрите проекты Maltsev Digital на компьютере и телефоне. Дизайн, разработка и решения — в подробном разборе."
 >
-  <PageHero
-    id="pw-title"
-    title="Работы"
-    lead={featured
-      ? 'Первый проект — этот сайт: открытые цены, калькулятор и короткая заявка. В разборе — как он сделан и что получилось.'
-      : 'Готовлю проекты к публикации. Здесь будут их история и результат.'}
-  >
-    <Fragment slot="actions">
-      {featured && (
-        <div class="pw-actions">
-          <a class="btn btn--ink" href={url(`/portfolio/${featured.id}/`)}>
-            Смотреть кейс <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
-          </a>
-          <a class="btn btn--ghost" href={url('/contacts/')}>Обсудить проект</a>
+  <section class="pw" aria-labelledby="pw-title" data-project-viewer data-view="desktop">
+    <div class="pw__stage">
+      <span class="pw__bg" aria-hidden="true"></span>
+
+      <div class="pw__main">
+        <h1 id="pw-title" class="pw__title">Работы</h1>
+        <p class="pw__lead">
+          {featured
+            ? 'Первый проект — этот сайт. Посмотрите его на компьютере и телефоне, а в разборе — как он сделан.'
+            : 'Готовлю проекты к публикации. Здесь будут их история и результат.'}
+        </p>
+        {featured && desktop && (
+          <div class="pw__controls">
+            <p class="pw__caption">
+              <span>{featured.data.title}</span>
+              {kind}<span aria-hidden="true"> · </span>{featured.data.year}
+            </p>
+            {mobile && (
+              <div class="pw-switch" role="tablist" aria-label="Посмотреть сайт на устройстве" data-device-switch hidden>
+                <span class="pw-switch__thumb" aria-hidden="true"></span>
+                <button id="pw-tab-desktop" type="button" role="tab" aria-controls="pw-desktop" aria-selected="true" data-device="desktop">Компьютер</button>
+                <button id="pw-tab-phone" type="button" role="tab" aria-controls="pw-phone" aria-selected="false" tabindex="-1" data-device="phone">Телефон</button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {featured && desktop && (
+        <div class="pw__viewer">
+          <div class="pw__screens">
+            <div class="pw-screen pw-screen--desktop" id="pw-desktop" role={mobile ? 'tabpanel' : undefined} aria-labelledby={mobile ? 'pw-tab-desktop' : 'pw-project'} tabindex={mobile ? 0 : undefined} aria-hidden="false">
+              <BrowserShot src={desktop} alt={featured.data.coverAlt} widths={[640, 960, 1280, 1600]} sizes="(max-width: 1023px) 88vw, 46vw" loading="eager" />
+            </div>
+            {mobile && (
+              <div class="pw-screen pw-screen--phone" id="pw-phone" role="tabpanel" aria-labelledby="pw-tab-phone" tabindex="-1" aria-hidden="true">
+                <div class="pw-phone">
+                  <Image src={mobile} alt={`${featured.data.title}: первый экран на телефоне`} widths={[240, 376, 560, 752]} sizes="300px" loading="eager" />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
-    </Fragment>
-    {nautilus && (
-      <Image
-        class="pw-object"
-        src={nautilus.src}
-        alt=""
-        widths={[260, 420, 640, 900]}
-        sizes="(max-width: 767px) 70vw, (max-width: 1023px) 60vw, 34vw"
-        quality={80}
-        loading="eager"
-        fetchpriority="high"
-      />
-    )}
-  </PageHero>
+    </div>
+  </section>
 
-  {featured && <WorkFeature project={featured} head={false} />}
+  {featured && (
+    <section class="section--tight split pw-info" aria-labelledby="pw-project">
+      <div class="pw-info__main">
+        <h2 id="pw-project" class="head" data-split>{featured.data.title}</h2>
+        <p class="pw-info__sum" data-reveal>{featured.data.summary}</p>
+        <div class="pw-info__actions" data-reveal>
+          <a class="btn btn--ink" href={url(`/portfolio/${featured.id}/`)}>Смотреть кейс <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
+          <a class="btn btn--ghost" href={url('/contacts/')}>Обсудить проект</a>
+        </div>
+      </div>
+
+      <div class="pw-info__facts">
+        {featured.data.results.length > 0 && (
+          <ul class="rows" data-stagger>
+            {featured.data.results.map((r) => (
+              <li>
+                <strong class="rows__k">{r.value}</strong>
+                <span class="rows__v">{r.label}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        <ul class="pw-info__stack" aria-label="Технологии" data-reveal>
+          {featured.data.stack.map((item) => <li class="chip chip--line">{item}</li>)}
+        </ul>
+      </div>
+    </section>
+  )}
 
   {rest.length > 0 && (
     <section class="section pw-more" aria-labelledby="pw-more-title">
@@ -86,6 +134,43 @@ const nautilus = genImage('works-nautilus');
 </Base>
 
 <script>
+  const viewer = document.querySelector<HTMLElement>('[data-project-viewer]');
+  const switches = viewer?.querySelector<HTMLElement>('[data-device-switch]');
+  if (viewer && switches) {
+    const buttons = Array.from(switches.querySelectorAll<HTMLButtonElement>('[data-device]'));
+    const panels = Array.from(viewer.querySelectorAll<HTMLElement>('[role="tabpanel"]'));
+    const select = (device: string, keyboard = false) => {
+      if (keyboard) viewer.dataset.instant = '';
+      viewer.dataset.view = device;
+      for (const button of buttons) {
+        const active = button.dataset.device === device;
+        button.setAttribute('aria-selected', String(active));
+        button.tabIndex = active ? 0 : -1;
+      }
+      for (const panel of panels) {
+        const active = panel.id === `pw-${device}`;
+        panel.setAttribute('aria-hidden', String(!active));
+        panel.tabIndex = active ? 0 : -1;
+      }
+      if (keyboard) requestAnimationFrame(() => requestAnimationFrame(() => delete viewer.dataset.instant));
+    };
+    // На телефоне сайт сначала показан так, как его увидит посетитель с телефона.
+    select(matchMedia('(max-width: 639px)').matches ? 'phone' : 'desktop');
+    switches.hidden = false;
+    requestAnimationFrame(() => { viewer.dataset.ready = ''; });
+    for (const button of buttons) {
+      button.addEventListener('click', (event) => select(button.dataset.device ?? 'desktop', event.detail === 0));
+      button.addEventListener('keydown', (event) => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const index = buttons.indexOf(button);
+        const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + buttons.length) % buttons.length;
+        select(buttons[next].dataset.device ?? 'desktop', true);
+        buttons[next].focus({ preventScroll: true });
+      });
+    }
+  }
+
   const filters = document.querySelector<HTMLElement>('[data-filters]');
   const grid = document.querySelector<HTMLElement>('[data-grid]');
   const empty = document.querySelector<HTMLElement>('[data-filter-empty]');
@@ -104,18 +189,236 @@ const nautilus = genImage('works-nautilus');
 </script>
 
 <style>
-  .pw-actions {
+  /* --- Сцена первого экрана ---------------------------------------------- */
+
+  .pw {
+    margin-top: var(--margin);
+  }
+
+  /* Сцена и колонка с экраном — контейнеры: от их ширины считаются размеры экрана проекта. */
+  .pw__stage {
+    position: relative;
+    container-type: inline-size;
+    padding: 28px 22px 0;
+    isolation: isolate;
+  }
+
+  .pw__viewer {
+    container-type: inline-size;
+  }
+
+  /*
+   * Размеры экрана проекта. Окно браузера — во всю ширину колонки; телефон не ниже 480–500px.
+   * На узком экране экран выходит за нижний край белой сцены на 30% своей высоты.
+   */
+  .pw__bg,
+  .pw__screens {
+    --shot-w: min(100cqw, 960px);
+    --desk-h: calc(var(--shot-w) * 0.6316 + 21px);
+    --phone-h: 480px;
+    --view-h: var(--desk-h);
+    --bleed: calc(var(--view-h) * 0.3);
+  }
+
+  .pw[data-view='phone'] :is(.pw__bg, .pw__screens) {
+    --view-h: var(--phone-h);
+  }
+
+  /* Белая поверхность сцены — такая же, как у первых экранов остальных страниц. */
+  .pw__bg {
+    position: absolute;
+    z-index: -1;
+    inset: 0 0 var(--bleed);
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(50% 70% at 82% 40%, rgba(26, 47, 251, 0.1) 0%, rgba(26, 47, 251, 0) 70%),
+      var(--paper);
+  }
+
+  .pw__main {
+    display: grid;
+    gap: clamp(16px, 2vw, 24px);
+    justify-items: start;
+    padding-bottom: 28px;
+  }
+
+  .pw__title {
+    font-weight: 300;
+    font-size: var(--step-display);
+    line-height: 1;
+    letter-spacing: -0.055em;
+  }
+
+  .pw__lead {
+    max-width: 46ch;
+    font-size: var(--step-body);
+    line-height: 1.5;
+    letter-spacing: -0.015em;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .pw__controls {
+    display: grid;
+    gap: 14px;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .pw__caption {
+    font-size: var(--fs-xs);
+    line-height: 1.4;
+    color: var(--muted);
+  }
+
+  .pw__caption span:first-child {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: var(--fs-0);
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  /* --- Переключатель устройств: те же сегменты, что «Telegram | Почта» в заявке ----------- */
+
+  .pw-switch {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: min(280px, 100%);
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    background: var(--field);
+    box-shadow: inset 0 0 0 1px var(--field-line);
+  }
+
+  .pw-switch__thumb {
+    position: absolute;
+    inset: 4px auto 4px 4px;
+    width: calc((100% - 8px) / 2);
+    border-radius: 8px;
+    background: var(--paper);
+    box-shadow:
+      0 1px 2px rgba(10, 11, 20, 0.08),
+      0 4px 12px -4px rgba(10, 11, 20, 0.14);
+  }
+
+  .pw[data-view='phone'] .pw-switch__thumb {
+    transform: translateX(100%);
+  }
+
+  .pw-switch button {
+    position: relative;
+    z-index: 1;
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: transparent;
+    font-family: var(--font-display);
+    font-size: var(--step-small);
+    font-weight: 500;
+    color: var(--muted);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .pw-switch button[aria-selected='true'] {
+    color: var(--ink);
+  }
+
+  /* --- Экран проекта ------------------------------------------------------ */
+
+  .pw__screens {
+    position: relative;
+    height: var(--view-h);
+  }
+
+  .pw-screen {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    justify-items: center;
+    align-items: start;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(12px) scale(0.985);
+  }
+
+  .pw[data-view='desktop'] .pw-screen--desktop,
+  .pw[data-view='phone'] .pw-screen--phone {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .pw-screen--desktop :global(.bs) {
+    width: var(--shot-w);
+    box-shadow:
+      0 0 0 1px rgba(10, 11, 20, 0.08),
+      0 2px 4px rgba(10, 11, 20, 0.05),
+      0 48px 80px -36px rgba(16, 32, 200, 0.4);
+  }
+
+  .pw-phone {
+    height: 100%;
+    max-width: 100%;
+    aspect-ratio: 376 / 814;
+    padding: 4px;
+    border-radius: 30px;
+    background: var(--paper);
+    box-shadow:
+      0 0 0 1px rgba(10, 11, 20, 0.1),
+      0 2px 4px rgba(10, 11, 20, 0.05),
+      0 48px 80px -36px rgba(16, 32, 200, 0.42);
+    overflow: hidden;
+  }
+
+  .pw-phone img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 26px;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  /* --- Проект: название и действия слева, факты строками справа ------------ */
+
+  .pw-info__main {
+    display: grid;
+    gap: clamp(16px, 2vw, 24px);
+    justify-items: start;
+  }
+
+  .pw-info__sum {
+    max-width: 34ch;
+    font-size: var(--fs-2);
+    line-height: 1.25;
+    letter-spacing: -0.025em;
+    text-wrap: pretty;
+  }
+
+  .pw-info__actions {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+    margin-top: 4px;
   }
 
-  /* Объект справа в первом экране — из той же серии, что осьминог на «Услугах» и медуза на главной. */
-  .pw-object {
-    width: min(100%, 520px);
-    height: auto;
-    justify-self: center;
-    filter: drop-shadow(0 36px 36px rgba(26, 47, 251, 0.2));
+  .pw-info__facts {
+    display: grid;
+    gap: clamp(18px, 1.8vw, 24px);
+  }
+
+  .pw-info__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+    list-style: none;
   }
 
   /* --- Остальные проекты -------------------------------------------------- */
@@ -154,14 +457,112 @@ const nautilus = genImage('works-nautilus');
     color: var(--paper);
   }
 
-  @media (max-width: 767px) {
-    /* На телефоне две кнопки одной ширины, друг под другом. */
-    .pw-actions :global(.btn) {
-      flex: 1 1 100%;
+  /* --- Широкий экран: как первый экран остальных страниц — текст слева, визуал справа --------- */
+
+  @media (min-width: 1024px) {
+    .pw__stage {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: clamp(32px, 4vw, 64px);
+      align-items: center;
+      min-height: clamp(320px, 32vw, 480px);
+      padding: clamp(28px, 3.3vw, 52px);
     }
 
-    .pw-object {
-      width: min(70vw, 280px);
+    /* Экран целиком внутри сцены, а телефон той же высоты, что окно браузера: переключение
+       устройств не сдвигает страницу. */
+    .pw__bg,
+    .pw__screens {
+      --desk-h: calc(var(--shot-w) * 0.6316 + 29px);
+      --phone-h: var(--desk-h);
+      --bleed: 0px;
+    }
+
+    .pw__main {
+      padding-bottom: 0;
+    }
+
+    .pw-screen {
+      align-items: center;
+    }
+  }
+
+  /* --- Движение ----------------------------------------------------------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pw__main {
+      animation: pw-up 0.9s var(--ease-out) 0.05s backwards;
+    }
+
+    .pw__viewer {
+      animation: pw-up 1.1s var(--ease-out) 0.2s backwards;
+    }
+
+    /* Высота экрана и край сцены меняются вместе, когда на узком экране переключают устройство. */
+    .pw[data-ready] .pw__screens {
+      transition: height 420ms var(--ease-out);
+    }
+
+    .pw[data-ready] .pw__bg {
+      transition: bottom 420ms var(--ease-out);
+    }
+
+    .pw[data-ready] .pw-screen {
+      transition:
+        opacity 220ms ease,
+        transform 420ms var(--ease-out),
+        visibility 0s linear 220ms;
+    }
+
+    .pw[data-ready][data-view='desktop'] .pw-screen--desktop,
+    .pw[data-ready][data-view='phone'] .pw-screen--phone {
+      transition-delay: 0s;
+    }
+
+    .pw[data-ready] .pw-switch__thumb {
+      transition: transform 260ms var(--ease-out);
+    }
+
+    .pw[data-instant] :is(.pw__screens, .pw__bg, .pw-screen, .pw-switch__thumb) {
+      transition: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pw-screen {
+      transform: none;
+    }
+  }
+
+  @keyframes pw-up {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+  }
+
+  /* --- Узкие экраны ------------------------------------------------------- */
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .pw__stage {
+      padding: clamp(28px, 3.3vw, 52px) clamp(28px, 3.3vw, 52px) 0;
+    }
+
+    .pw__bg,
+    .pw__screens {
+      --desk-h: calc(var(--shot-w) * 0.6316 + 29px);
+      --phone-h: max(var(--desk-h), 500px);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .pw-info__actions {
+      display: grid;
+      width: 100%;
+    }
+
+    .pw-info__actions .btn {
+      width: 100%;
     }
 
     .pw-grid {
