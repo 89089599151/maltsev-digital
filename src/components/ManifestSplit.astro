@@ -1,290 +1,297 @@
 ---
-/**
- * Кто делает сайт и как: слева — рутина, которую берёт ИИ, справа — решения, которые остаются
- * за человеком. На главной первым в ряду стоит портрет автора со ссылкой на страницу «Обо мне»
- * (owner) — один блок вместо отдельных «манифеста» и «кто делает сайт».
- */
+/** Подход через результат для клиента: автор, три результата и реальный кейс. */
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
+import SectionHead from './SectionHead.astro';
 import { site } from '@/config/site';
 import { url } from '@/lib/url';
 import photo from '@/assets/photos/owner.webp';
 
 interface Props {
-  /** Показать карточку с портретом автора (на главной). */
   owner?: boolean;
 }
 const { owner = false } = Astro.props;
-
-const ai = [
-  'Черновики структуры и текстов',
-  'Варианты композиции и цвета',
-  'Рутинный код и поиск ошибок',
-  'Проверку на разных экранах',
-];
-const me = [
-  'Разбираюсь в вашем бизнесе и клиентах',
-  'Выбираю структуру и путь к заявке',
-  'Утверждаю дизайн и каждую деталь',
-  'Отвечаю за скорость и запуск',
+const outcomes = [
+  {
+    title: 'Структура под вашу задачу',
+    text: 'У страниц есть цель: объяснить услугу, показать работу или привести к обращению.',
+  },
+  {
+    title: 'Цельный дизайн на любом экране',
+    text: 'Продумываю тексты, изображения и управление вместе. Проверяю сайт на телефоне и компьютере.',
+  },
+  {
+    title: 'Готовый сайт остаётся у вас',
+    text: 'Публикую на вашем домене, передаю исходный код и доступы.',
+  },
 ];
 ---
 
 <section class="mf section" id="manifest" data-island-section="Подход" aria-labelledby="mf-title">
-  <div class="mf__head">
-    <h2 id="mf-title" class="mf__title" data-split><span class="tone-mute">ИИ ускоряет.</span><br />Решаю&nbsp;я.</h2>
-    <p class="mf__lead" data-reveal>
-      Рутину отдаю нейросетям. Время, которое это освобождает, уходит на структуру, дизайн и проверку.
-    </p>
-  </div>
+  <SectionHead
+    id="mf-title"
+    title="Лично веду ваш проект."
+    text="Проектирую, рисую и разрабатываю ваш сайт. Ключевые решения обсуждаю с вами и довожу до запуска."
+  />
 
-  <div class:list={['mf__grid', { 'mf__grid--owner': owner }]} data-stagger>
-    {
-      owner && (
-        <a class="mf__who lift" href={url('/about/')}>
+  <div class:list={['mf__body', { 'mf__body--owner': owner }]}>
+    {owner && (
+      <figure class="mf__author">
+        <div class="mf__portrait">
           <Image
             src={photo}
-            alt={`${site.brand.owner.value} на ночной площади под снегом смотрит вверх, на свет фонаря`}
-            widths={[360, 560, 800]}
-            sizes="(max-width: 767px) 92vw, (max-width: 1023px) 46vw, 30vw"
+            alt={`${site.brand.owner.value} смотрит на свет фонаря под снегом`}
+            widths={[240, 480, 720, 960]}
+            sizes="(max-width: 899px) 104px, 36vw"
             loading="lazy"
           />
-          <span class="mf__who-body">
-            <span class="mf__who-name">{site.brand.owner.value}</span>
-            <span class="mf__who-role">Дизайнер и разработчик. Веду проект сам — от разговора до запуска.</span>
-            <span class="mf__who-go">Обо мне <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></span>
-          </span>
-        </a>
-      )
-    }
+        </div>
+        <figcaption class="mf__caption">
+          <p class="mf__name">{site.brand.owner.value}</p>
+          <p class="mf__role">Дизайнер и разработчик</p>
+          <a class="mf__about" href={url('/about/')}>
+            Обо мне <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+          </a>
+        </figcaption>
+      </figure>
+    )}
 
-    <article class="mf__card mf__card--ai" aria-labelledby="mf-ai">
-      <h3 id="mf-ai" class="mf__card-title">Берёт ИИ</h3>
-      <ul class="mf__list">{ai.map((t) => <li>{t}</li>)}</ul>
-      <p class="mf__foot">Поэтому сроки — недели, а не месяцы</p>
-    </article>
+    <div class="mf__content">
+      <dl class="mf__outcomes">
+        {outcomes.map(({ title, text }) => (
+          <div class="mf__outcome">
+            <dt>{title}</dt>
+            <dd>{text}</dd>
+          </div>
+        ))}
+      </dl>
 
-    <article class="mf__card mf__card--me" aria-labelledby="mf-me">
-      <h3 id="mf-me" class="mf__card-title">Остаётся за мной</h3>
-      <ul class="mf__list">{me.map((t) => <li>{t}</li>)}</ul>
-      <p class="mf__foot">Вы говорите с тем, кто делает сайт</p>
-    </article>
+      <a class="mf__case" href={url('/portfolio/maltsev-digital/')}>
+        Как сделан этот сайт <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+      </a>
+
+      <p class="mf__tools">
+        ИИ помогает с черновиками, кодом и поиском ошибок. Я проверяю результат и принимаю решения.
+      </p>
+    </div>
   </div>
 </section>
 
 <style>
-  .mf__head {
+  .mf__body {
     display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: 24px clamp(24px, 4vw, 64px);
-    align-items: end;
-    margin-bottom: clamp(32px, 4vw, 56px);
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--paper);
   }
 
-  .mf__title {
-    font-size: var(--step-display);
-    line-height: 1;
-    letter-spacing: -0.05em;
+  .mf__body--owner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   }
 
-  .mf__lead {
-    max-width: 40ch;
-    padding-bottom: 0.4em;
-    font-size: var(--fs-2);
-    line-height: 1.35;
-    letter-spacing: -0.02em;
-  }
-
-  .mf__grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--gap);
-  }
-
-  .mf__grid--owner {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr) minmax(0, 6fr);
-  }
-
-  /* Портрет: фото во всю карточку, подпись — на затемнении снизу. */
-  .mf__who {
+  .mf__author {
     position: relative;
     display: grid;
     align-items: end;
+    min-width: 0;
     min-height: 420px;
-    border-radius: var(--radius-lg);
+    isolation: isolate;
     background: var(--night);
     color: var(--night-ink);
-    text-decoration: none;
-    overflow: hidden;
-    isolation: isolate;
   }
 
-  .mf__who img {
+  .mf__portrait {
     position: absolute;
     inset: 0;
     z-index: -1;
+  }
+
+  .mf__portrait img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 50% 28%;
-    transition: scale 900ms var(--ease-out);
+    object-position: 54% 50%;
   }
 
-  .mf__who:hover img {
-    scale: 1.04;
-  }
-
-  .mf__who-body {
+  .mf__caption {
     display: grid;
-    gap: 6px;
-    padding: clamp(20px, 2.4vw, 32px);
-    padding-top: 96px;
-    background: linear-gradient(180deg, rgba(10, 11, 20, 0) 0%, rgba(10, 11, 20, 0.86) 62%);
+    gap: 8px;
+    padding: 112px clamp(24px, 3vw, 40px) 32px;
+    background: linear-gradient(180deg, rgba(10, 11, 20, 0), rgba(10, 11, 20, .88) 66%);
   }
 
-  .mf__who-name {
-    font-family: var(--font-head);
+  .mf__name {
     font-weight: 400;
     font-size: var(--fs-3);
-    line-height: 1.05;
-    letter-spacing: -0.04em;
+    line-height: 1.15;
+    letter-spacing: -.035em;
   }
 
-  .mf__who-role {
-    max-width: 30ch;
+  .mf__role {
     font-size: var(--step-small);
     line-height: 1.4;
     color: var(--night-muted);
   }
 
-  .mf__who-go {
+  .mf__about,
+  .mf__case {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 10px;
-    font-family: var(--font-display);
+    justify-self: start;
+    gap: 12px;
+    min-height: 44px;
     font-weight: 500;
-    font-size: var(--step-small);
-  }
-
-  .mf__who-go .arrow {
-    transition: transform var(--dur-fast) var(--ease-out);
-  }
-
-  .mf__who:hover .mf__who-go .arrow {
-    transform: translateX(4px);
-  }
-
-  .mf__card {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(20px, 2vw, 28px);
-    padding: clamp(24px, 2.6vw, 40px);
-    border-radius: var(--radius-lg);
-  }
-
-  /* ИИ — белая карточка; решения человека — тёмная, рядом с тёмным портретом. */
-  .mf__card--ai {
-    background: var(--paper);
-  }
-
-  .mf__card--me {
-    background: var(--night);
-    color: var(--night-ink);
-  }
-
-  .mf__card-title {
-    font-weight: 300;
-    font-size: var(--fs-4);
-    line-height: 1.02;
-    letter-spacing: -0.045em;
-  }
-
-  .mf__list {
-    list-style: none;
-    padding: 0;
-    display: grid;
-  }
-
-  .mf__list li {
-    display: grid;
-    grid-template-columns: 8px 1fr;
-    gap: 14px;
-    align-items: baseline;
-    padding-block: 14px;
-    border-top: 1px solid var(--line);
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: var(--step-body);
+    font-size: var(--fs-0);
     line-height: 1.3;
+    text-decoration: none;
   }
 
-  .mf__list li::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--ink);
-    translate: 0 -1px;
+  .mf__about {
+    margin-top: 4px;
+    color: inherit;
   }
 
-  .mf__card--me .mf__list li {
-    border-color: rgba(241, 242, 250, 0.14);
+  .mf__about:focus-visible {
+    outline-color: var(--paper);
   }
 
-  .mf__card--me .mf__list li::before {
-    background: var(--accent-on-dark);
+  .mf__content {
+    min-width: 0;
+    padding: clamp(28px, 3.4vw, 48px);
   }
 
-  .mf__foot {
-    margin-top: auto;
-    align-self: flex-start;
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: var(--bg);
-    font-family: var(--font-display);
+  .mf__outcomes {
+    margin: 0;
+  }
+
+  .mf__outcome + .mf__outcome {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+
+  .mf__outcome dt {
+    max-width: 32ch;
     font-weight: 500;
-    font-size: var(--step-small);
+    font-size: var(--fs-2);
+    line-height: 1.25;
+    letter-spacing: -.025em;
+  }
+
+  .mf__outcome dd {
+    max-width: 56ch;
+    margin: 10px 0 0;
+    font-size: var(--step-body);
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .mf__case {
+    margin-top: 24px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--accent);
     color: var(--ink);
+    transition: color var(--dur-fast) var(--ease-out);
   }
 
-  .mf__card--me .mf__foot {
-    background: var(--accent);
-    color: var(--accent-ink);
+  .mf__case:hover {
+    color: var(--accent-text);
   }
 
-  @media (max-width: 1199px) {
-    .mf__grid--owner {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+  .mf__tools {
+    max-width: 64ch;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-size: var(--step-small);
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  @media (max-width: 899px) {
+    .mf__body--owner {
+      grid-template-columns: minmax(0, 1fr);
     }
 
-    .mf__grid--owner .mf__who {
-      grid-column: 1 / -1;
-      min-height: 360px;
+    .mf__author {
+      grid-template-columns: 104px minmax(0, 1fr);
+      align-items: center;
+      gap: 24px;
+      min-height: 0;
+      padding: 28px 28px 0;
+      background: none;
+      color: var(--ink);
+    }
+
+    .mf__portrait {
+      position: relative;
+      z-index: auto;
+      height: 132px;
+      overflow: hidden;
+      border-radius: var(--radius-sm);
+    }
+
+    .mf__caption {
+      gap: 4px;
+      padding: 0;
+      background: none;
+    }
+
+    .mf__name {
+      font-size: 1.5rem;
+    }
+
+    .mf__role {
+      color: var(--muted);
+    }
+
+    .mf__about {
+      margin-top: 0;
+      font-size: var(--step-small);
+    }
+
+    .mf__about:focus-visible {
+      outline-color: var(--accent);
     }
   }
 
-  @media (max-width: 1023px) {
-    .mf__head {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 767px) {
-    .mf__grid,
-    .mf__grid--owner {
-      grid-template-columns: 1fr;
-    }
-
-    .mf__card,
-    .mf__who {
+  @media (max-width: 599px) {
+    .mf__body {
       border-radius: var(--radius);
     }
+
+    .mf__author {
+      grid-template-columns: 88px minmax(0, 1fr);
+      gap: 18px;
+      padding: 24px 24px 0;
+    }
+
+    .mf__portrait {
+      height: 116px;
+    }
+
+    .mf__content {
+      padding: 28px 24px;
+    }
+
+    .mf__outcome dt {
+      font-size: 1.25rem;
+    }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .mf__who:hover img {
-      scale: none;
+  @media (max-width: 359px) {
+    .mf__author {
+      grid-template-columns: 76px minmax(0, 1fr);
+      gap: 16px;
+      padding-inline: 20px;
+    }
+
+    .mf__content {
+      padding-inline: 20px;
+    }
+
+    .mf__name {
+      font-size: 1.375rem;
     }
   }
 </style>
