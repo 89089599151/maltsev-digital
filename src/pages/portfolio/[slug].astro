@@ -208,6 +208,15 @@ const schema = {
   }
 
   /* Обложка: окно браузера на светлой подложке во всю ширину. */
+  /* Сюда прилетают скриншот и название из карточки проекта (case-shot, case-title). */
+  .pj-cover :global(.bs) {
+    view-transition-name: case-shot;
+  }
+
+  :global(#pj-title) {
+    view-transition-name: case-title;
+  }
+
   .pj-cover {
     padding: clamp(20px, 5vw, 72px) clamp(16px, 9vw, 150px);
     border-radius: var(--radius-lg);

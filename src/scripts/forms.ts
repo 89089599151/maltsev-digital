@@ -34,6 +34,45 @@ function showFieldError(el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectE
   const box = id ? document.getElementById(id) : null;
   el.setAttribute('aria-invalid', text ? 'true' : 'false');
   if (box) box.textContent = text;
+  // Состояние поля для оформления: заполнено верно — галочка, ошибка — красная рамка.
+  const filled = !(el instanceof HTMLInputElement && el.type === 'checkbox') && el.value.trim() !== '';
+  if (text) el.dataset.state = 'invalid';
+  else if (filled) el.dataset.state = 'valid';
+  else delete el.dataset.state;
+}
+
+const plural = (n: number, one: string, few: string, many: string) => {
+  const d = n % 10;
+  const h = n % 100;
+  if (d === 1 && h !== 11) return one;
+  if (d >= 2 && d <= 4 && (h < 12 || h > 14)) return few;
+  return many;
+};
+
+/**
+ * Живая подсказка у поля с минимальной длиной (подсказка с [data-count-hint] в aria-describedby):
+ * вместо правила «от 20 символов» — сколько осталось, а когда хватает — «Достаточно».
+ */
+function initCountHint(el: HTMLTextAreaElement | HTMLInputElement) {
+  const min = el.minLength;
+  if (!(min > 0)) return;
+  const hint = (el.getAttribute('aria-describedby') ?? '')
+    .split(/\s+/)
+    .map((id) => document.getElementById(id))
+    .find((node): node is HTMLElement => !!node && node.hasAttribute('data-count-hint'));
+  if (!hint) return;
+  const initial = hint.textContent ?? '';
+  const update = () => {
+    const length = el.value.trim().length;
+    hint.classList.toggle('is-done', length >= min);
+    if (!length) hint.textContent = initial;
+    else if (length < min) {
+      const left = min - length;
+      hint.textContent = `Ещё ${left} ${plural(left, 'символ', 'символа', 'символов')}`;
+    } else hint.textContent = 'Достаточно — можно отправлять';
+  };
+  el.addEventListener('input', update);
+  update();
 }
 
 type Field = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
@@ -44,7 +83,7 @@ function fieldLabel(el: Field): string {
   const group = el instanceof HTMLInputElement && el.type === 'radio' ? el.closest('fieldset')?.querySelector('legend') : null;
   const wrap = el.closest('label')?.querySelector('span');
   const raw = (byFor ?? group ?? wrap)?.textContent ?? el.name;
-  return raw.replace(/\s*\*\s*$/, '').replace(/\s*—\s*необязательно\s*$/, '').trim();
+  return raw.replace(/\s*\*\s*$/, '').replace(/\s*—\s*(необязательно|по желанию)\s*$/, '').trim();
 }
 
 /** Текст заявки из заполненных полей — для письма и для Telegram. */
@@ -95,6 +134,7 @@ export function initLeadForms(): void {
     };
 
     fields.forEach((el) => {
+      if (el instanceof HTMLTextAreaElement || el instanceof HTMLInputElement) initCountHint(el);
       const evt = el instanceof HTMLInputElement && el.type === 'checkbox' ? 'change' : 'blur';
       el.addEventListener(evt, () => {
         if (el.getAttribute('aria-invalid') === 'true' || el.value) showFieldError(el, fieldMessage(el));

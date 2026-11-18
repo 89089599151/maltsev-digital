@@ -343,7 +343,25 @@ const kind = featured
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translateY(12px) scale(0.985);
+    /* Контекстный переход: компьютер слева, телефон справа — экран уходит в сторону своей кнопки. */
+    transform: translateX(var(--away)) scale(0.97);
+  }
+
+  .pw-screen--desktop {
+    --away: -40px;
+  }
+
+  .pw-screen--phone {
+    --away: 40px;
+  }
+
+  /* Непрерывный переход в кейс: скриншот и название перелетают на страницу кейса. */
+  .pw[data-view='desktop'] .pw-screen--desktop :global(.bs) {
+    view-transition-name: case-shot;
+  }
+
+  #pw-project {
+    view-transition-name: case-title;
   }
 
   .pw[data-view='desktop'] .pw-screen--desktop,
@@ -509,9 +527,9 @@ const kind = featured
 
     .pw[data-ready] .pw-screen {
       transition:
-        opacity 220ms ease,
-        transform 420ms var(--ease-out),
-        visibility 0s linear 220ms;
+        opacity 260ms ease,
+        transform 520ms var(--ease-out),
+        visibility 0s linear 260ms;
     }
 
     .pw[data-ready][data-view='desktop'] .pw-screen--desktop,

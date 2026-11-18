@@ -8,7 +8,8 @@ import ContactIcon from './ContactIcon.astro';
 import ChannelSwitch from './ChannelSwitch.astro';
 import { site, telegramUrl, emailUrl } from '@/config/site';
 import { url } from '@/lib/url';
-import avatar from '@/assets/photos/owner-avatar.webp';
+// Портрет шире обычного аватара: голова, плечи и огни города, а не одно крупное лицо.
+import avatar from '@/assets/photos/owner-avatar-wide.webp';
 import Icon from './Icon.astro';
 
 const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.formspreeId}` : '';
@@ -70,21 +71,21 @@ const mail = emailUrl('Заявка на разработку сайта');
           <input type="hidden" name="source" value="Главная, блок контактов" />
           <div class="hp" aria-hidden="true"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></div>
 
-          <label class="ct__field">
-            <span class="ct__label">Ваше имя</span>
-            <input name="name" type="text" autocomplete="name" required minlength="2" data-error-id="ct-name-err" aria-describedby="ct-name-err" />
+          <label class="ct__field fl">
+            <span class="ct__label fl-label">Ваше имя</span>
+            <input name="name" type="text" autocomplete="name" required minlength="2" placeholder=" " data-error-id="ct-name-err" aria-describedby="ct-name-err" />
           </label>
           <span class="ct__err" id="ct-name-err"></span>
 
-          <label class="ct__field">
-            <span class="ct__label">Telegram, телефон или почта</span>
-            <input name="contact" type="text" required minlength="4" data-error-id="ct-contact-err" aria-describedby="ct-contact-err" />
+          <label class="ct__field fl">
+            <span class="ct__label fl-label">Как с вами связаться</span>
+            <input name="contact" type="text" required minlength="4" placeholder="Telegram, телефон или почта" data-error-id="ct-contact-err" aria-describedby="ct-contact-err" />
           </label>
           <span class="ct__err" id="ct-contact-err"></span>
 
-          <label class="ct__field">
-            <span class="ct__label">Коротко о задаче <span class="ct__opt">— необязательно</span></span>
-            <textarea name="message" rows="3"></textarea>
+          <label class="ct__field fl">
+            <span class="ct__label fl-label">Задача <span class="ct__opt">— по желанию</span></span>
+            <textarea name="message" rows="3" placeholder="Чем занимаетесь и какой сайт нужен"></textarea>
           </label>
 
           <label class="ct__consent">
@@ -286,12 +287,6 @@ const mail = emailUrl('Заявка на разработку сайта');
     gap: var(--space-2);
   }
 
-  .ct__label {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: var(--step-small);
-  }
-
   .ct__opt {
     font-weight: 400;
     color: var(--muted);
@@ -300,8 +295,8 @@ const mail = emailUrl('Заявка на разработку сайта');
   .ct__field input,
   .ct__field textarea {
     width: 100%;
-    min-height: 52px;
-    padding: 13px 16px;
+    min-height: 60px;
+    padding: 26px 16px 8px;
     border: 1.5px solid var(--field-line);
     border-radius: var(--radius-sm);
     background: var(--field);

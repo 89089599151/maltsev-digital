@@ -59,14 +59,14 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
           <div class="hp" aria-hidden="true"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></div>
 
           <div class="row row--2">
-            <div class="field">
-              <label for="f-name">Имя *</label>
-              <input id="f-name" name="name" type="text" autocomplete="name" required minlength="2" data-error-id="f-name-err" aria-describedby="f-name-err" />
+            <div class="field fl">
+              <label for="f-name" class="fl-label">Имя *</label>
+              <input id="f-name" name="name" type="text" autocomplete="name" required minlength="2" placeholder=" " data-error-id="f-name-err" aria-describedby="f-name-err" />
               <span class="field__err" id="f-name-err"></span>
             </div>
-            <div class="field">
-              <label for="f-contact">Telegram, телефон или почта *</label>
-              <input id="f-contact" name="contact" type="text" required minlength="4" placeholder="@username или +7…" data-error-id="f-contact-err" aria-describedby="f-contact-err" />
+            <div class="field fl">
+              <label for="f-contact" class="fl-label">Как с вами связаться *</label>
+              <input id="f-contact" name="contact" type="text" required minlength="4" placeholder="Telegram, телефон или почта" data-error-id="f-contact-err" aria-describedby="f-contact-err" />
               <span class="field__err" id="f-contact-err"></span>
             </div>
           </div>
@@ -109,10 +109,10 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
             </div>
           </fieldset>
 
-          <div class="field">
-            <label for="f-task">Опишите задачу *</label>
+          <div class="field fl">
+            <label for="f-task" class="fl-label">Опишите задачу *</label>
             <textarea id="f-task" name="message" rows="6" required minlength="20" data-error-id="f-task-err" aria-describedby="f-task-hint f-task-err" placeholder="Чем занимается бизнес, для кого сайт и что он должен делать. Если есть сайты, которые нравятся, — оставьте ссылки"></textarea>
-            <span class="field__hint" id="f-task-hint">Хотя бы пара предложений — от 20 символов.</span>
+            <span class="field__hint" id="f-task-hint" data-count-hint>Хотя бы пара предложений — от 20 символов.</span>
             <span class="field__err" id="f-task-err"></span>
           </div>
 
@@ -279,7 +279,6 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
     min-width: 0;
   }
 
-  .field > label,
   .group legend {
     font-family: var(--font-display);
     font-weight: 600;
@@ -295,8 +294,8 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
   textarea,
   select {
     width: 100%;
-    min-height: 54px;
-    padding: 14px 16px;
+    min-height: 60px;
+    padding: 26px 16px 8px;
     border: 1.5px solid var(--field-line);
     border-radius: var(--radius-sm);
     background: var(--field);
@@ -311,11 +310,6 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
   textarea {
     resize: vertical;
     line-height: 1.5;
-  }
-
-  input::placeholder,
-  textarea::placeholder {
-    color: var(--muted);
   }
 
   input[type='text']:hover,
@@ -340,6 +334,11 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
   .field__hint {
     font-size: var(--step-small);
     color: var(--muted);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  .field__hint.is-done {
+    color: var(--success);
   }
 
   .field__err {

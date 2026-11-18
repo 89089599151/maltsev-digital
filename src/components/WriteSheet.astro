@@ -104,15 +104,15 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
               <input type="hidden" name="estimate" value="" data-estimate-field />
               <div class="hp" aria-hidden="true"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></div>
 
-              <label class="ws__field">
-                <span class="ws__label">Ваше имя</span>
-                <input name="name" type="text" autocomplete="name" required minlength="2" data-error-id="ws-name-err" aria-describedby="ws-name-err" />
+              <label class="ws__field fl">
+                <span class="ws__label fl-label">Ваше имя</span>
+                <input name="name" type="text" autocomplete="name" required minlength="2" placeholder=" " data-error-id="ws-name-err" aria-describedby="ws-name-err" />
               </label>
               <span class="ws__err" id="ws-name-err"></span>
 
-              <label class="ws__field">
-                <span class="ws__label">Telegram, телефон или почта</span>
-                <input name="contact" type="text" required minlength="4" data-error-id="ws-contact-err" aria-describedby="ws-contact-err" />
+              <label class="ws__field fl">
+                <span class="ws__label fl-label">Как с вами связаться</span>
+                <input name="contact" type="text" required minlength="4" placeholder="Telegram, телефон или почта" data-error-id="ws-contact-err" aria-describedby="ws-contact-err" />
               </label>
               <span class="ws__err" id="ws-contact-err"></span>
 
@@ -392,16 +392,10 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     gap: 6px;
   }
 
-  .ws__label {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: var(--step-small);
-  }
-
   .ws__field input {
     width: 100%;
-    min-height: 52px;
-    padding: 13px 16px;
+    min-height: 60px;
+    padding: 26px 16px 8px;
     border: 1.5px solid var(--field-line);
     border-radius: var(--radius-sm);
     background: var(--field);
