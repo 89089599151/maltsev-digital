@@ -4,7 +4,8 @@
  * пакета рядом, у каждого свой стеклянный предмет. Предметы растут слева направо — один лист
  * (одна страница), стопка листов (сайт с разделами), линза (авторский проект): размер сайта видно
  * до того, как прочитаешь цифры. BUSINESS отмечен как рекомендуемый — синей кнопкой и свечением.
- * На телефоне линейка листается вбок, открывается на BUSINESS, соседние пакеты выглядывают по краям.
+ * На телефоне сверху переключатель, как в iOS, под ним один пакет на всю ширину. Пакеты листаются
+ * свайпом, подсветка в переключателе едет вслед за пальцем; открывается на BUSINESS.
  * Данные — src/config/pricing.ts, предметы — src/assets/gen/obj-*.png.
  */
 import { Image } from 'astro:assets';
@@ -31,6 +32,15 @@ const featured = lineup.findIndex((p) => p.id === 'business');
   </header>
 
   <div class="pk__stage" data-lineup data-start={featured}>
+    <div class="pk__seg" role="group" aria-label="Выбор пакета" data-lineup-seg hidden>
+      <span class="pk__seg-thumb" aria-hidden="true"></span>
+      {lineup.map((p, i) => (
+        <button type="button" aria-current={i === featured ? 'true' : undefined} data-lineup-dot={i}>
+          {p.name}
+        </button>
+      ))}
+    </div>
+
     <ul class="pk__list" data-lineup-track>
       {
         lineup.map((p) => (
@@ -58,12 +68,6 @@ const featured = lineup.findIndex((p) => p.id === 'business');
         ))
       }
     </ul>
-
-    <div class="pk__dots" role="group" aria-label="Пакеты" data-lineup-dots hidden>
-      {lineup.map((p, i) => (
-        <button type="button" aria-label={p.name} aria-current={i === featured ? 'true' : undefined} data-lineup-dot={i}></button>
-      ))}
-    </div>
   </div>
 
   <div class="pk__footer" data-reveal>
@@ -75,13 +79,14 @@ const featured = lineup.findIndex((p) => p.id === 'business');
 </section>
 
 <script>
-  // Телефон: линейка листается вбок, открывается на рекомендуемом пакете; точки показывают, какой в центре.
+  // Телефон: пакеты листаются вбок, открывается рекомендуемый. Переключатель сверху показывает, какой
+  // пакет на экране, а его подсветка движется вместе со свайпом.
   const stage = document.querySelector<HTMLElement>('[data-lineup]');
   const track = stage?.querySelector<HTMLElement>('[data-lineup-track]');
-  const dotsBox = stage?.querySelector<HTMLElement>('[data-lineup-dots]');
-  if (stage && track && dotsBox) {
+  const seg = stage?.querySelector<HTMLElement>('[data-lineup-seg]');
+  if (stage && track && seg) {
     const items = Array.from(track.querySelectorAll<HTMLElement>('[data-lineup-item]'));
-    const dots = Array.from(dotsBox.querySelectorAll<HTMLButtonElement>('[data-lineup-dot]'));
+    const dots = Array.from(seg.querySelectorAll<HTMLButtonElement>('[data-lineup-dot]'));
     const phone = window.matchMedia('(max-width: 767px)');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const scrollTo = (index: number, smooth: boolean) => {
@@ -105,6 +110,10 @@ const featured = lineup.findIndex((p) => p.id === 'business');
     };
     const mark = () => {
       const active = current();
+      const max = track.scrollWidth - track.clientWidth;
+      // Подсветка стоит между сегментами так же, как пакет между соседями: 0 — первый, 2 — третий.
+      const x = max > 0 ? (track.scrollLeft / max) * (items.length - 1) : active;
+      seg.style.setProperty('--seg-x', String(x));
       dots.forEach((dot, i) => dot.toggleAttribute('aria-current', i === active));
       items.forEach((item, i) => item.classList.toggle('is-current', i === active));
     };
@@ -119,7 +128,7 @@ const featured = lineup.findIndex((p) => p.id === 'business');
     }, { passive: true });
     dots.forEach((dot, i) => dot.addEventListener('click', () => scrollTo(i, true)));
     const setup = () => {
-      dotsBox.hidden = !phone.matches;
+      seg.hidden = !phone.matches;
       if (phone.matches) scrollTo(Number(stage.dataset.start) || 0, false);
       mark();
     };
@@ -314,39 +323,61 @@ const featured = lineup.findIndex((p) => p.id === 'business');
     text-underline-offset: 0.2em;
   }
 
-  .pk__dots {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 18px;
+  /* Переключатель пакетов на телефоне — сегменты, как в iOS: серая дорожка и белая плашка,
+     которая едет к выбранному пакету. Позицию плашки задаёт скрипт через --seg-x (0…2). */
+  .pk__seg {
+    --seg-pad: 3px;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0 16px 8px;
+    padding: var(--seg-pad);
+    border-radius: 999px;
+    background: var(--paper-2);
+    box-shadow: inset 0 0 0 1px rgba(10, 11, 20, 0.04);
   }
 
-  .pk__dots[hidden] {
+  .pk__seg[hidden] {
     display: none;
   }
 
-  .pk__dots button {
-    position: relative;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    background: none;
-  }
-
-  .pk__dots button::before {
-    content: '';
+  .pk__seg-thumb {
     position: absolute;
-    inset: 12px;
+    top: var(--seg-pad);
+    bottom: var(--seg-pad);
+    left: var(--seg-pad);
+    width: calc((100% - var(--seg-pad) * 2) / 3);
     border-radius: 999px;
-    background: var(--surface-3);
-    transition:
-      background-color var(--dur-fast) var(--ease-out),
-      inset var(--dur-fast) var(--ease-out);
+    background: var(--paper);
+    box-shadow:
+      0 0 0 0.5px rgba(10, 11, 20, 0.06),
+      0 3px 10px rgba(16, 32, 200, 0.12),
+      0 1px 2px rgba(10, 11, 20, 0.08);
+    transform: translateX(calc(var(--seg-x, 1) * 100%));
+    pointer-events: none;
   }
 
-  .pk__dots button[aria-current]::before {
-    inset: 12px 6px;
-    background: var(--accent);
+  .pk__seg button {
+    position: relative;
+    min-height: 40px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: none;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+    transition: color var(--dur-fast) var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pk__seg button[aria-current] {
+    color: var(--ink);
+  }
+
+  .pk__seg button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
   }
 
   .pk__footer {
@@ -387,18 +418,17 @@ const featured = lineup.findIndex((p) => p.id === 'business');
     }
   }
 
-  /* --- Телефон: линейка листается вбок ---------------------------------------- */
+  /* --- Телефон: переключатель сверху, один пакет на всю ширину ------------------ */
 
   @media (max-width: 767px) {
     .pk__stage {
-      padding: 24px 0 14px;
+      padding: 16px 0 28px;
     }
 
     .pk__list {
       grid-template-columns: none;
       grid-auto-flow: column;
-      grid-auto-columns: 74%;
-      padding-inline: 13%;
+      grid-auto-columns: 100%;
       overflow-x: auto;
       overscroll-behavior-x: contain;
       scroll-snap-type: x mandatory;
@@ -411,23 +441,16 @@ const featured = lineup.findIndex((p) => p.id === 'business');
 
     .pk__item {
       scroll-snap-align: center;
-      padding: 0 14px;
-      opacity: 0.55;
-      transform: scale(0.94);
-      transition:
-        opacity var(--dur) var(--ease-out),
-        transform var(--dur) var(--ease-out);
-    }
-
-    /* Без скрипта все пакеты видны одинаково ярко. */
-    .pk__item.is-current,
-    :global(html:not(.js)) .pk__item {
-      opacity: 1;
-      transform: none;
+      scroll-snap-stop: always;
+      padding: 0 24px;
     }
 
     .pk__item + .pk__item {
       box-shadow: none;
+    }
+
+    .pk__badge {
+      margin-top: 12px;
     }
 
     .pk__object {
@@ -445,8 +468,5 @@ const featured = lineup.findIndex((p) => p.id === 'business');
       transform: none;
     }
 
-    .pk__item {
-      transition: none;
-    }
   }
 </style>
