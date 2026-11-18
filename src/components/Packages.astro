@@ -1,301 +1,452 @@
 ---
 /**
- * «Пакеты и цены» на главной: одна секция вместо отдельных «Что я делаю» и «Цены».
- * Короткое пояснение к каждому пакету, срок и цена. На компьютере — ровные строки,
- * на телефоне — отдельные карточки с теми же акцентами, что и на странице услуг:
- * START — белый, BUSINESS — синий, PREMIUM — тёмный. Данные — src/config/pricing.ts.
+ * «Пакеты и цены» на главной — линейка, как витрина моделей у Apple: одна белая сцена, на ней три
+ * пакета рядом, у каждого свой стеклянный предмет. Предметы растут слева направо — один лист
+ * (одна страница), стопка листов (сайт с разделами), линза (авторский проект): размер сайта видно
+ * до того, как прочитаешь цифры. BUSINESS отмечен как рекомендуемый — синей кнопкой и свечением.
+ * На телефоне линейка листается вбок, открывается на BUSINESS, соседние пакеты выглядывают по краям.
+ * Данные — src/config/pricing.ts, предметы — src/assets/gen/obj-*.png.
  */
-import SectionHead from './SectionHead.astro';
+import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import { plans, formatPrice, pricingConfirmed } from '@/config/pricing';
+import { genImage } from '@/lib/gen';
 import { url } from '@/lib/url';
 
-/** Одно короткое пояснение вместо подзаголовка и повторяющего его абзаца. */
-const types: Record<string, string> = {
-  start: 'Лендинг или сайт специалиста',
-  business: 'Сайт компании с разделами и каталогом',
-  premium: 'Авторский дизайн и нестандартная логика',
+const meta: Record<string, { text: string; scope: string; object: string }> = {
+  start: { text: 'Лендинг или сайт специалиста', scope: 'Одна страница', object: 'obj-landing' },
+  business: { text: 'Сайт компании с разделами и каталогом', scope: 'До 8 страниц', object: 'obj-business' },
+  premium: { text: 'Авторский дизайн и нестандартная логика', scope: 'До 15 страниц', object: 'obj-personal' },
 };
-const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
+const lineup = plans.map((p) => ({ ...p, ...meta[p.id], img: genImage(meta[p.id].object) }));
+const featured = lineup.findIndex((p) => p.id === 'business');
 ---
 
 <section class="pk section" id="pricing" data-island-section="Пакеты" aria-labelledby="pk-title">
-  <SectionHead
-    id="pk-title"
-    title="Пакеты и цены"
-    text={`Три пакета для разных задач. Точную цену фиксирую до начала работы.${pricingConfirmed ? '' : ' Цены предварительные.'}`}
-    link={{ href: url('/services/'), label: 'Что входит и чего нет' }}
-  />
+  <header class="pk__intro">
+    <h2 id="pk-title" class="pk__title" data-split>Пакеты и цены</h2>
+    <p class="pk__lead" data-reveal>
+      От одной страницы до авторского проекта. Цену фиксирую в договоре до начала работы.{pricingConfirmed ? '' : ' Цены предварительные.'}
+    </p>
+  </header>
 
-  <ul class="pk__list" data-stagger>
-    {
-      rows.map((p) => (
-        <li class:list={['pk__row', { 'pk__row--featured': p.id === 'business', 'pk__row--premium': p.id === 'premium' }]}>
-          <div class="pk__head">
+  <div class="pk__stage" data-lineup data-start={featured}>
+    <ul class="pk__list" data-lineup-track>
+      {
+        lineup.map((p) => (
+          <li class:list={['pk__item', `pk__item--${p.id}`]} data-lineup-item>
+            {p.id === 'business' ? <p class="pk__badge">Рекомендую</p> : <p class="pk__badge pk__badge--empty" aria-hidden="true" />}
+            <div class="pk__object" aria-hidden="true">
+              {p.img && (
+                <Image src={p.img.src} alt="" widths={[200, 320, 480]} sizes="(max-width: 767px) 44vw, 220px" loading="lazy" />
+              )}
+            </div>
+            <p class="pk__scope">{p.scope}</p>
             <h3 class="pk__name">{p.name}</h3>
-            <p class="pk__types">{p.types}</p>
-          </div>
-          <div class="pk__offer">
-            <p class="pk__time"><span>Срок</span> {p.timeline}</p>
-            <div class="pk__buy">
-              <p class="pk__price">
-                <span>от</span> {formatPrice(p.price)}
-              </p>
-              <a class:list={['btn', 'pk__cta', p.id === 'business' ? 'pk__cta--light' : p.id === 'premium' ? 'btn--accent' : 'btn--ink']} href={url(`/contacts/?plan=${p.id}`)} aria-label={`Заказать пакет ${p.name}`}>
+            <p class="pk__text">{p.text}</p>
+            <p class="pk__price"><span>от</span> {formatPrice(p.price)}</p>
+            <p class="pk__time">Срок — {p.timeline}</p>
+            <div class="pk__actions">
+              <a class:list={['btn', 'pk__cta', p.id === 'business' ? 'btn--accent' : 'btn--ink']} href={url(`/contacts/?plan=${p.id}`)} aria-label={`Заказать пакет ${p.name}`}>
                 Заказать <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
               </a>
+              <a class="pk__more" href={url(`/services/#plan-${p.id}`)} aria-label={`Что входит в пакет ${p.name}`}>
+                Что входит
+              </a>
             </div>
-          </div>
-        </li>
-      ))
-    }
-  </ul>
+          </li>
+        ))
+      }
+    </ul>
 
-  <a class="pk__calc" href={url('/services/#calculator')} data-reveal>
-    <span class="pk__calc-t">Не знаете, какой пакет нужен?</span>
-    <span class="pk__calc-d">Калькулятор подберёт его по типу сайта и числу страниц.</span>
-    <span class="pk__calc-go" aria-hidden="true"><Icon name="arrow" /></span>
-  </a>
+    <div class="pk__dots" role="group" aria-label="Пакеты" data-lineup-dots hidden>
+      {lineup.map((p, i) => (
+        <button type="button" aria-label={p.name} aria-current={i === featured ? 'true' : undefined} data-lineup-dot={i}></button>
+      ))}
+    </div>
+  </div>
+
+  <div class="pk__footer" data-reveal>
+    <p class="pk__note">Не знаете, какой пакет нужен? Калькулятор подберёт его по типу сайта и числу страниц.</p>
+    <a class="pk__calc" href={url('/services/#calculator')}>
+      Рассчитать стоимость <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+    </a>
+  </div>
 </section>
 
+<script>
+  // Телефон: линейка листается вбок, открывается на рекомендуемом пакете; точки показывают, какой в центре.
+  const stage = document.querySelector<HTMLElement>('[data-lineup]');
+  const track = stage?.querySelector<HTMLElement>('[data-lineup-track]');
+  const dotsBox = stage?.querySelector<HTMLElement>('[data-lineup-dots]');
+  if (stage && track && dotsBox) {
+    const items = Array.from(track.querySelectorAll<HTMLElement>('[data-lineup-item]'));
+    const dots = Array.from(dotsBox.querySelectorAll<HTMLButtonElement>('[data-lineup-dot]'));
+    const phone = window.matchMedia('(max-width: 767px)');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const scrollTo = (index: number, smooth: boolean) => {
+      const item = items[index];
+      if (!item) return;
+      const left = item.offsetLeft - (track.clientWidth - item.offsetWidth) / 2;
+      track.scrollTo({ left, behavior: smooth && !reduced.matches ? 'smooth' : 'auto' });
+    };
+    const current = () => {
+      const middle = track.scrollLeft + track.clientWidth / 2;
+      let best = 0;
+      let distance = Infinity;
+      items.forEach((item, i) => {
+        const d = Math.abs(item.offsetLeft + item.offsetWidth / 2 - middle);
+        if (d < distance) {
+          distance = d;
+          best = i;
+        }
+      });
+      return best;
+    };
+    const mark = () => {
+      const active = current();
+      dots.forEach((dot, i) => dot.toggleAttribute('aria-current', i === active));
+      items.forEach((item, i) => item.classList.toggle('is-current', i === active));
+    };
+    let ticking = false;
+    track.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        mark();
+      });
+    }, { passive: true });
+    dots.forEach((dot, i) => dot.addEventListener('click', () => scrollTo(i, true)));
+    const setup = () => {
+      dotsBox.hidden = !phone.matches;
+      if (phone.matches) scrollTo(Number(stage.dataset.start) || 0, false);
+      mark();
+    };
+    phone.addEventListener('change', setup);
+    setup();
+  }
+</script>
+
 <style>
+  .pk__intro {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 16px clamp(24px, 4vw, 64px);
+    align-items: end;
+    margin-bottom: clamp(24px, 3vw, 40px);
+  }
+
+  .pk__title {
+    font-size: var(--fs-5);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+  }
+
+  .pk__lead {
+    max-width: 40ch;
+    color: var(--muted);
+  }
+
+  /* --- Сцена-линейка -------------------------------------------------------- */
+
+  .pk__stage {
+    position: relative;
+    padding: clamp(24px, 3vw, 48px) clamp(12px, 2vw, 32px) clamp(28px, 3vw, 44px);
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(34% 60% at 50% 30%, rgba(26, 47, 251, 0.1) 0%, rgba(26, 47, 251, 0) 70%),
+      var(--paper);
+    overflow: hidden;
+  }
+
   .pk__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     list-style: none;
     padding: 0;
-    border-top: 1px solid var(--line);
   }
 
-  .pk__row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 350px;
-    gap: clamp(20px, 3vw, 48px);
+  .pk__item {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: clamp(24px, 2.6vw, 36px) clamp(16px, 2vw, 32px);
-    border-bottom: 1px solid var(--line);
+    min-width: 0;
+    padding: 0 clamp(16px, 2vw, 36px);
+    text-align: center;
   }
 
-  .pk__head {
-    display: grid;
-    gap: 10px;
+  /* Волосяные линии между пакетами — как разделители в витрине, без отдельных карточек. */
+  .pk__item + .pk__item {
+    box-shadow: inset 1px 0 0 var(--line);
   }
 
-  .pk__row--featured {
-    border-radius: var(--radius-lg);
-    border-bottom-color: transparent;
-    background: var(--accent-surface);
-    color: var(--accent-ink);
+  .pk__badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    line-height: 1.2;
   }
 
-  .pk__row--featured :focus-visible {
-    outline-color: var(--paper);
+  .pk__badge--empty {
+    visibility: hidden;
   }
 
-  .pk__row--premium {
-    margin-top: 8px;
-    border-radius: var(--radius-lg);
-    border-bottom-color: transparent;
-    background: var(--night);
-    color: var(--night-ink);
+  /* Предметы растут слева направо: стоят на одной линии снизу, как модели на полке. */
+  .pk__object {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 100%;
+    height: clamp(150px, 15vw, 220px);
+    margin-top: clamp(8px, 1.4vw, 20px);
   }
 
-  .pk__row--premium :is(.pk__types, .pk__time) {
-    color: var(--night-muted);
+  .pk__object :global(img) {
+    width: auto;
+    height: var(--obj-h);
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 22px 24px rgba(26, 47, 251, 0.18));
+    transition: transform 700ms var(--ease-out);
   }
 
-  .pk__row--premium .pk__price {
-    color: var(--accent-on-dark);
+  .pk__item--start {
+    --obj-h: 64%;
   }
 
-  .pk__row:has(+ .pk__row--featured) {
-    border-bottom-color: transparent;
+  .pk__item--business {
+    --obj-h: 84%;
+  }
+
+  .pk__item--premium {
+    --obj-h: 100%;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pk__item:hover .pk__object :global(img) {
+      transform: translateY(-8px) scale(1.04);
+    }
+  }
+
+  .pk__scope {
+    margin-top: 18px;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--muted);
   }
 
   .pk__name {
+    margin-top: 6px;
     font-weight: 300;
-    font-size: var(--fs-4);
+    font-size: clamp(1.75rem, 0.9rem + 2.2vw, 3rem);
     line-height: 1;
     letter-spacing: -0.05em;
   }
 
-  .pk__types {
-    max-width: 38ch;
-    font-weight: 400;
-    font-size: var(--fs-0);
+  .pk__text {
+    max-width: 24ch;
+    min-height: 2.9em;
+    margin-top: 10px;
+    font-size: var(--step-small);
     line-height: 1.45;
     color: var(--muted);
   }
 
-  .pk__offer {
-    display: grid;
-    gap: 16px;
-  }
-
-  .pk__row--featured :is(.pk__types, .pk__time) {
-    color: var(--on-accent-muted);
-  }
-
-  .pk__time {
-    font-size: var(--step-small);
-    line-height: 1.4;
-    color: var(--muted);
-  }
-
-  .pk__time span {
-    margin-right: 6px;
-  }
-
-  .pk__buy {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: clamp(16px, 2vw, 28px);
-  }
-
   .pk__price {
+    margin-top: clamp(18px, 2vw, 28px);
     font-family: var(--font-head);
-    font-weight: 400;
-    font-size: var(--fs-3);
+    font-weight: 300;
+    font-size: clamp(1.75rem, 1rem + 1.6vw, 2.5rem);
+    line-height: 1;
     letter-spacing: -0.045em;
     white-space: nowrap;
-    line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
 
   .pk__price span {
-    font-size: 0.55em;
+    font-size: 0.5em;
     letter-spacing: 0;
   }
 
-  .pk__cta {
-    min-height: 52px;
+  .pk__item--business .pk__price {
+    color: var(--accent-text);
   }
 
-  /* Кнопка на синей полосе — белая, как в синей карточке BUSINESS на странице услуг. */
-  .pk__cta--light {
-    background: var(--paper);
-    color: var(--ink);
-  }
-
-  .pk__cta--light:is(:hover, :focus-visible) {
-    background: var(--bg);
-  }
-
-  .pk__calc {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 8px 28px;
-    align-items: center;
-    margin-top: clamp(24px, 3vw, 40px);
-    padding: clamp(22px, 2.4vw, 32px) clamp(24px, 3vw, 40px);
-    border-radius: var(--radius-lg);
-    background: var(--paper);
-    color: var(--ink);
-    text-decoration: none;
-    transition: background-color var(--dur-fast) var(--ease-out);
-  }
-
-  .pk__calc:hover {
-    background: var(--surface-solid);
-  }
-
-  .pk__calc-t {
-    font-family: var(--font-head);
-    font-weight: 400;
-    font-size: var(--fs-2);
-    letter-spacing: -0.035em;
-    line-height: 1.2;
-  }
-
-  .pk__calc-d {
+  .pk__time {
+    margin-top: 8px;
+    font-size: var(--step-small);
     color: var(--muted);
   }
 
-  .pk__calc-go {
+  .pk__actions {
     display: grid;
-    place-items: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: var(--accent-ink);
-    font-size: var(--fs-1);
-    transition: transform var(--dur) var(--ease-out);
+    justify-items: center;
+    gap: 6px;
+    margin-top: clamp(18px, 2vw, 26px);
   }
 
-  .pk__calc:hover .pk__calc-go {
-    transform: rotate(-45deg);
+  .pk__cta {
+    min-height: 48px;
+    padding-inline: 22px;
+  }
+
+  .pk__more {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 8px;
+    font-size: var(--step-small);
+    font-weight: 500;
+    color: var(--accent-text);
+    text-decoration: none;
+  }
+
+  .pk__more:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .pk__dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 18px;
+  }
+
+  .pk__dots[hidden] {
+    display: none;
+  }
+
+  .pk__dots button {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: none;
+  }
+
+  .pk__dots button::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border-radius: 999px;
+    background: var(--surface-3);
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      inset var(--dur-fast) var(--ease-out);
+  }
+
+  .pk__dots button[aria-current]::before {
+    inset: 12px 6px;
+    background: var(--accent);
+  }
+
+  .pk__footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 28px;
+    align-items: center;
+    margin-top: 24px;
+  }
+
+  .pk__note {
+    max-width: 52ch;
+    color: var(--muted);
+  }
+
+  .pk__calc {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    border-bottom: 1.5px solid var(--accent);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .pk__calc .arrow {
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .pk__calc:hover .arrow {
+    transform: translateX(4px);
   }
 
   @media (max-width: 1023px) {
-    .pk__list {
-      display: grid;
-      gap: 24px;
-      border-top: 0;
-    }
-
-    .pk__row {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 28px;
-      align-items: start;
-      margin-top: 0;
-      padding: 28px 24px;
-      border-bottom: 0;
-      border-radius: var(--radius-lg);
-    }
-
-    .pk__row:not(.pk__row--featured):not(.pk__row--premium) {
-      background: var(--paper);
-    }
-
-    .pk__offer {
-      gap: 20px;
-    }
-
-    .pk__buy {
-      justify-content: space-between;
-    }
-
-    .pk__calc {
-      grid-template-columns: minmax(0, 1fr) auto;
-    }
-
-    .pk__calc-go {
-      grid-row: 1 / 3;
-      grid-column: 2;
+    .pk__intro {
+      grid-template-columns: 1fr;
     }
   }
 
+  /* --- Телефон: линейка листается вбок ---------------------------------------- */
+
   @media (max-width: 767px) {
-    .pk__name {
-      font-size: 2rem;
+    .pk__stage {
+      padding: 24px 0 14px;
     }
 
-    .pk__buy {
-      flex-wrap: wrap;
-      gap: 12px;
+    .pk__list {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 74%;
+      padding-inline: 13%;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
     }
 
-    .pk__price {
-      font-size: var(--fs-3);
-    }
-
-    .pk__cta {
-      min-height: 44px;
-      padding: 12px 16px;
-      font-size: var(--step-small);
-    }
-
-    .pk__cta .arrow {
+    .pk__list::-webkit-scrollbar {
       display: none;
     }
 
-    .pk__calc {
-      border-radius: var(--radius);
+    .pk__item {
+      scroll-snap-align: center;
+      padding: 0 14px;
+      opacity: 0.55;
+      transform: scale(0.94);
+      transition:
+        opacity var(--dur) var(--ease-out),
+        transform var(--dur) var(--ease-out);
+    }
+
+    /* Без скрипта все пакеты видны одинаково ярко. */
+    .pk__item.is-current,
+    :global(html:not(.js)) .pk__item {
+      opacity: 1;
+      transform: none;
+    }
+
+    .pk__item + .pk__item {
+      box-shadow: none;
+    }
+
+    .pk__object {
+      height: 170px;
+    }
+
+    .pk__name {
+      font-size: 2.25rem;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .pk__calc:hover .pk__calc-go {
+    .pk__item:hover .pk__object :global(img),
+    .pk__calc:hover .arrow {
       transform: none;
+    }
+
+    .pk__item {
+      transition: none;
     }
   }
 </style>

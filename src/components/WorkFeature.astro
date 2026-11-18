@@ -1,186 +1,126 @@
 ---
 /**
- * Витрина кейса: слева — название, суть, три факта и вход в кейс; справа — настоящие скриншоты
- * в ровных рамках (десктоп и телефон) на светлой подложке. Без наклонов и декоративной графики:
- * показываем сам сайт.
- * На главной блок идёт с заголовком секции «Работы», на странице портфолио — без него.
+ * Витрина кейса на главной — одна карточка, как в App Store: крупно сам сайт (окно браузера и
+ * телефон на светлой подложке), под ним одна строка — что это, название, одна фраза и круглая
+ * стрелка. Вся карточка — ссылка на кейс. Цифры и подробности живут в самом кейсе.
+ * При переходе скриншот и название перелетают на свои места на странице кейса (case-shot, case-title).
  */
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import SectionHead from './SectionHead.astro';
 import BrowserShot from './BrowserShot.astro';
+import { categoryLabel } from '@/config/portfolio';
 import { url } from '@/lib/url';
 import Icon from './Icon.astro';
 
 interface Props {
   project: CollectionEntry<'projects'>;
-  /** false — без заголовка секции (на странице портфолио заголовок уже в первом экране). */
+  /** false — без заголовка секции. */
   head?: boolean;
 }
 
 const { project, head = true } = Astro.props;
-// Без заголовка секции название кейса становится заголовком второго уровня.
 const Name = head ? 'h3' : 'h2';
 const d = project.data;
 const desktop = d.responsive.desktop ?? d.cover;
 const mobile = d.responsive.mobile;
 const caseUrl = url(`/portfolio/${project.id}/`);
+const kind = d.isConcept ? 'Концепт' : d.category === 'personal' ? 'Личный проект' : categoryLabel(d.category);
 ---
 
 <section class="wf section" id="work" data-island-section={head ? 'Работы' : undefined} aria-labelledby={head ? 'wf-title' : 'wf-name'}>
-  {head && <SectionHead
-    id="wf-title"
-    title="Работы"
-    text="Первый кейс — этот сайт: от задачи и дизайна до запуска."
-    link={{ href: url('/portfolio/'), label: 'Все работы' }}
-  />}
+  {head && <SectionHead id="wf-title" title="Работы" link={{ href: url('/portfolio/'), label: 'Все работы' }} />}
 
-  <article class="wf__stage" aria-labelledby="wf-name" data-reveal>
-    <div class="wf__info">
-      <Name id="wf-name" class="wf__name">{d.title}</Name>
-      <p class="wf__sum">{d.summary}</p>
-      {
-        d.results.length > 0 && (
-          <dl class="wf__facts">
-            {d.results.slice(0, 3).map((r) => (
-              <div>
-                <dt>{r.short ?? r.label}</dt>
-                <dd>{r.value}</dd>
-              </div>
-            ))}
-          </dl>
-        )
-      }
-      <a class="btn btn--ink wf__cta" href={caseUrl}>
-        Смотреть кейс <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
-      </a>
-    </div>
-
-    <a class="wf__visual" href={caseUrl} aria-label={`Открыть кейс ${d.title}`} tabindex="-1">
+  <a class="wf__card" href={caseUrl} aria-labelledby="wf-name" data-reveal>
+    <span class="wf__visual">
       <BrowserShot
         class="wf__desktop"
         src={desktop}
         alt={d.coverAlt}
-        sizes="(max-width: 1023px) 86vw, 50vw"
+        sizes="(max-width: 1023px) 86vw, 64vw"
         loading={head ? 'lazy' : 'eager'}
       />
       {
         mobile && (
-          <div class="wf__phone">
+          <span class="wf__phone">
             <Image src={mobile} alt="" widths={[240, 376, 560]} sizes="(max-width: 1023px) 24vw, 13vw" loading={head ? 'lazy' : 'eager'} />
-          </div>
+          </span>
         )
       }
-    </a>
-  </article>
+    </span>
+
+    <span class="wf__caption">
+      <span class="wf__text">
+        <span class="wf__kind">Кейс · {kind} · {d.year}</span>
+        <Name id="wf-name" class="wf__name">{d.title}</Name>
+        <span class="wf__sum">{d.summary}</span>
+      </span>
+      <span class="wf__go" aria-hidden="true"><Icon name="arrow" /></span>
+    </span>
+  </a>
 </section>
 
 <style>
-  .wf__stage {
-    display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: clamp(24px, 3vw, 48px);
-    align-items: stretch;
-    padding: clamp(12px, 1.2vw, 18px);
-    padding-left: clamp(24px, 4vw, 64px);
-    border-radius: var(--radius-lg);
-    background: var(--paper);
-  }
-
-  .wf__info {
-    display: grid;
-    gap: clamp(16px, 1.6vw, 22px);
-    justify-items: start;
-    align-content: center;
-    padding-block: clamp(16px, 3vw, 48px);
+  /* Непрерывный переход в кейс: скриншот и название перелетают на страницу кейса. */
+  .wf__visual :global(.wf__desktop) {
+    view-transition-name: case-shot;
   }
 
   .wf__name {
-    font-weight: 300;
-    font-size: var(--fs-5);
-    line-height: 1.02;
-    letter-spacing: -0.045em;
+    view-transition-name: case-title;
   }
 
-  .wf__sum {
-    max-width: 36ch;
-    font-size: var(--step-body);
-    color: var(--ink-2);
-  }
-
-  /* Три факта списком под линиями: значение слева, пояснение справа. */
-  .wf__facts {
-    width: 100%;
-    max-width: 440px;
-    border-top: 1px solid var(--line);
-  }
-
-  .wf__facts div {
+  /* Одна карточка-ссылка: картинка сверху, подпись строкой снизу. */
+  .wf__card {
     display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-    gap: 16px;
-    align-items: baseline;
-    padding-block: 12px;
-    border-bottom: 1px solid var(--line);
+    padding: clamp(10px, 1vw, 14px);
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+    color: var(--ink);
+    text-decoration: none;
+    transition: box-shadow var(--dur) var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .wf__facts dd {
-    grid-column: 1;
-    grid-row: 1;
-    font-family: var(--font-head);
-    font-weight: 400;
-    font-size: var(--fs-1);
-    line-height: 1.1;
-    letter-spacing: -0.035em;
+  .wf__card:hover {
+    box-shadow: 0 40px 80px -48px rgba(16, 32, 200, 0.45);
   }
 
-  .wf__facts dt {
-    grid-column: 2;
-    font-size: var(--step-small);
-    line-height: 1.35;
-    color: var(--muted);
-  }
-
-  .wf__cta {
-    min-height: 56px;
-    margin-top: 6px;
-  }
-
-  /* Скриншоты: светлая подложка, окно браузера и телефон поверх его правого нижнего угла. */
+  /* Скриншоты: светлая подложка, окно браузера по центру и телефон у его правого края. */
   .wf__visual {
     position: relative;
     display: grid;
-    align-items: center;
-    padding: clamp(20px, 4vw, 56px) clamp(28px, 6vw, 88px) clamp(28px, 5vw, 72px) clamp(20px, 3.4vw, 48px);
-    border-radius: calc(var(--radius-lg) - 8px);
+    place-items: center;
+    padding: clamp(28px, 5vw, 72px) clamp(36px, 9vw, 160px) clamp(32px, 5vw, 80px);
+    border-radius: calc(var(--radius-lg) - 12px);
     background:
-      radial-gradient(60% 70% at 70% 40%, var(--stage-glow) 0%, rgba(255, 255, 255, 0) 70%),
+      radial-gradient(60% 70% at 50% 40%, var(--stage-glow) 0%, rgba(255, 255, 255, 0) 70%),
       linear-gradient(180deg, var(--stage-1), var(--stage-2));
     overflow: hidden;
   }
 
   .wf__visual :global(.wf__desktop) {
-    transition: scale 700ms var(--ease-out);
-  }
-
-  .wf__visual:hover :global(.wf__desktop) {
-    scale: 1.015;
+    width: 100%;
+    max-width: 880px;
+    transition: transform 900ms var(--ease-out);
   }
 
   .wf__phone {
     position: absolute;
-    right: clamp(12px, 2.4vw, 36px);
-    bottom: clamp(14px, 2.4vw, 36px);
-    width: 21%;
+    right: clamp(18px, 6vw, 120px);
+    bottom: clamp(14px, 2.6vw, 40px);
+    width: clamp(64px, 13vw, 180px);
     border-radius: 14px;
     background: var(--paper);
     box-shadow:
       0 0 0 1px rgba(10, 11, 20, 0.08),
       0 40px 70px -40px rgba(16, 32, 200, 0.45);
     overflow: hidden;
+    transition: transform 900ms var(--ease-out);
   }
 
-  .wf__phone img {
+  .wf__phone :global(img) {
+    display: block;
     width: 100%;
     height: auto;
     aspect-ratio: 376 / 814;
@@ -188,39 +128,120 @@ const caseUrl = url(`/portfolio/${project.id}/`);
     object-position: top;
   }
 
-  @media (max-width: 1023px) {
-    .wf__stage {
-      grid-template-columns: 1fr;
-      padding: clamp(10px, 1.6vw, 16px);
+  @media (hover: hover) and (pointer: fine) {
+    .wf__card:hover .wf__visual :global(.wf__desktop) {
+      transform: translateY(-6px);
     }
 
-    .wf__visual {
-      order: -1;
-    }
-
-    .wf__info {
-      padding: 8px clamp(8px, 2vw, 24px) 16px;
+    .wf__card:hover .wf__phone {
+      transform: translateY(-12px);
     }
   }
 
-  @media (max-width: 767px) {
-    .wf__stage {
-      border-radius: var(--radius-lg);
-    }
+  .wf__card:active {
+    transform: scale(0.99);
+  }
 
+  .wf__caption {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 16px 24px;
+    align-items: center;
+    padding: clamp(16px, 2vw, 24px) clamp(10px, 1.6vw, 22px) clamp(8px, 1vw, 12px);
+  }
+
+  .wf__text {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .wf__kind {
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  .wf__name {
+    font-weight: 300;
+    font-size: var(--fs-4);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+  }
+
+  .wf__sum {
+    max-width: 56ch;
+    font-size: var(--step-body);
+    color: var(--muted);
+  }
+
+  .wf__go {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: 1.15rem;
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .wf__card:hover .wf__go {
+    transform: rotate(-45deg);
+  }
+
+  @media (max-width: 767px) {
     .wf__visual {
-      border-radius: calc(var(--radius-lg) - 12px);
+      padding: 24px 28px 30px 20px;
     }
 
     .wf__phone {
-      width: 24%;
+      right: 12px;
+      bottom: 12px;
+      width: 25%;
       border-radius: 10px;
+    }
+
+    /* На телефоне стрелка стоит рядом с названием, а фраза занимает всю ширину карточки. */
+    .wf__caption {
+      grid-template-areas:
+        'kind go'
+        'name go'
+        'sum sum';
+      gap: 4px 16px;
+      padding: 16px 10px 8px;
+    }
+
+    .wf__text {
+      display: contents;
+    }
+
+    .wf__kind {
+      grid-area: kind;
+    }
+
+    .wf__name {
+      grid-area: name;
+    }
+
+    .wf__sum {
+      grid-area: sum;
+      margin-top: 4px;
+    }
+
+    .wf__go {
+      grid-area: go;
+      width: 44px;
+      height: 44px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .wf__visual:hover :global(.wf__desktop) {
-      scale: none;
+    .wf__card:hover :is(.wf__phone, .wf__go),
+    .wf__card:hover .wf__visual :global(.wf__desktop),
+    .wf__card:active {
+      transform: none;
     }
   }
 </style>

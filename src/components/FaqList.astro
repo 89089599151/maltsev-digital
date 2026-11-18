@@ -10,8 +10,10 @@ interface Props {
   headingLevel?: 'h2' | 'h3';
   /** Заголовок списка остаётся только для скринридеров — когда над списком уже есть заголовок страницы. */
   headingHidden?: boolean;
+  /** Открыть первый вопрос сразу. На главной — нет: там короткий список, все строки одинаковые. */
+  openFirst?: boolean;
 }
-const { items, heading = 'Частые вопросы', headingId = 'faq-title', group = 'faq', headingLevel = 'h2', headingHidden = false } = Astro.props;
+const { items, heading = 'Частые вопросы', headingId = 'faq-title', group = 'faq', headingLevel = 'h2', headingHidden = false, openFirst = true } = Astro.props;
 const H = headingLevel;
 ---
 
@@ -23,7 +25,7 @@ const H = headingLevel;
   <div class="faq__list" data-stagger>
     {
       items.map((item, i) => (
-        <details class="faq__item" name={group} open={i === 0 ? true : undefined}>
+        <details class="faq__item" name={group} open={openFirst && i === 0 ? true : undefined}>
           <summary>
             <span class="faq__q">{item.q}</span>
             <span class="faq__icon" aria-hidden="true">
@@ -35,6 +37,7 @@ const H = headingLevel;
         </details>
       ))
     }
+    <slot name="after" />
   </div>
 </section>
 
@@ -64,6 +67,52 @@ const H = headingLevel;
 
   .faq__item {
     border-bottom: 1px solid var(--line);
+  }
+
+  /* Строка-ссылка в конце короткого списка: «ещё N вопросов» — в том же ритме, что и вопросы. */
+  .faq__list :global(.faq__more) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 36px;
+    gap: 20px;
+    align-items: center;
+    min-height: 72px;
+    padding: 18px 0;
+    color: var(--accent-text);
+    text-decoration: none;
+  }
+
+  .faq__list :global(.faq__more-t) {
+    display: grid;
+    gap: 2px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-1);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+  }
+
+  .faq__list :global(.faq__more-t small) {
+    font-family: var(--font-text);
+    font-weight: 400;
+    font-size: var(--step-small);
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+
+  .faq__list :global(.faq__more-i) {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    justify-self: end;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--accent-ink);
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .faq__list :global(.faq__more:hover .faq__more-i) {
+    transform: translateX(4px);
   }
 
   .faq__side :global(.head) {
