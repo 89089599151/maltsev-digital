@@ -96,8 +96,9 @@ const mail = emailUrl('Заявка на разработку сайта');
 
           {!endpoint && <ChannelSwitch id="ct" />}
 
-          <button class="ct__submit" type="submit">
+          <button class="btn btn--accent ct__submit" type="submit">
             <span data-label>{endpoint ? 'Отправить заявку' : 'Отправить на почту'}</span>
+            <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
           </button>
           <p class="ct__status" data-status role="status" aria-live="polite"></p>
         </fieldset>
@@ -296,9 +297,9 @@ const mail = emailUrl('Заявка на разработку сайта');
   .ct__field textarea {
     width: 100%;
     min-height: 60px;
-    padding: 26px 16px 8px;
+    padding: 26px 22px 8px;
     border: 1.5px solid var(--field-line);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-pill);
     background: var(--field);
     color: var(--ink);
     font: inherit;
@@ -309,6 +310,7 @@ const mail = emailUrl('Заявка на разработку сайта');
   .ct__field textarea {
     resize: vertical;
     min-height: 92px;
+    border-radius: var(--radius-sm);
   }
 
   .ct__field input:hover,
@@ -356,24 +358,11 @@ const mail = emailUrl('Заявка на разработку сайта');
     accent-color: var(--accent);
   }
 
+  /* Та же кнопка, что в брифе на странице контактов: пилюля с подписью и стрелкой. */
   .ct__submit {
-    min-height: 58px;
+    width: 100%;
+    min-height: 56px;
     margin-top: 8px;
-    border-radius: var(--radius-sm);
-    background: var(--accent);
-    color: var(--accent-ink);
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: var(--step-body);
-    transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
-  }
-
-  .ct__submit:hover:not(:disabled) {
-    background: var(--accent-hover);
-  }
-
-  .ct__submit:active:not(:disabled) {
-    transform: scale(0.98);
   }
 
   .ct__submit:disabled {

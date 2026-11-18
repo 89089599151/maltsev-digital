@@ -97,7 +97,7 @@ const kind = featured
           <ul class="rows" data-stagger>
             {featured.data.results.map((r) => (
               <li>
-                <strong class="rows__k">{r.value}</strong>
+                <strong class="rows__k rows__k--metric">{r.value}</strong>
                 <span class="rows__v">{r.label}</span>
               </li>
             ))}
@@ -288,7 +288,7 @@ const kind = featured
     grid-template-columns: repeat(2, minmax(0, 1fr));
     width: min(280px, 100%);
     padding: 4px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-pill);
     background: var(--field);
     box-shadow: inset 0 0 0 1px var(--field-line);
   }
@@ -297,7 +297,7 @@ const kind = featured
     position: absolute;
     inset: 4px auto 4px 4px;
     width: calc((100% - 8px) / 2);
-    border-radius: 8px;
+    border-radius: var(--radius-pill);
     background: var(--paper);
     box-shadow:
       0 1px 2px rgba(10, 11, 20, 0.08),
@@ -313,7 +313,7 @@ const kind = featured
     z-index: 1;
     min-height: 44px;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: var(--radius-pill);
     background: transparent;
     font-family: var(--font-display);
     font-size: var(--step-small);

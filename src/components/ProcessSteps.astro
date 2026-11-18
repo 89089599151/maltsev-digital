@@ -1,8 +1,9 @@
 ---
 /**
  * «Как идёт работа».
- * На главной (compact) — четыре укрупнённых шага в ряд и ссылка на подробный процесс.
- * На странице услуг — все семь этапов списком: срок, что происходит и что нужно от вас.
+ * На главной (compact) — четыре этапа в ряд; у каждого подписано, какие из семи шагов в него входят,
+ * и ссылка на подробный процесс. На странице услуг — все семь шагов списком: срок, что происходит
+ * и что нужно от вас.
  * На телефоне секция короче: на главной четыре карточки листаются вбок, следующая выглядывает
  * из-за края; на странице услуг этапы сворачиваются в список, как вопросы, — открыт первый
  * (process-accordion.ts). Без скрипта все этапы открыты.
@@ -16,7 +17,7 @@ interface Props {
   compact?: boolean;
 }
 const { compact = false } = Astro.props;
-const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[] = compact ? stagesShort : stages;
+const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string; steps?: string })[] = compact ? stagesShort : stages;
 ---
 
 <section class:list={['ps section', compact ? 'ps--compact' : 'ps--full']} id="process" data-island-section="Этапы" aria-labelledby="ps-title">
@@ -24,8 +25,8 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
     id="ps-title"
     title="Как идёт работа"
     text={compact
-      ? 'От заявки до запуска — четыре шага. Каждый согласуем с вами.'
-      : 'Семь шагов. Срок пакета — от предоплаты до запуска: с четвёртого по седьмой.'}
+      ? 'От заявки до запуска — четыре этапа, в них семь шагов. Каждый согласуем с вами.'
+      : 'Семь шагов от заявки до запуска. Срок пакета считается от предоплаты до запуска — с четвёртого шага по седьмой.'}
     link={compact ? { href: url('/services/#process'), label: 'Все этапы подробно' } : { href: url('/contacts/'), label: 'Обсудить проект' }}
   />
 
@@ -35,6 +36,7 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
         <li class="ps__step">
           <span class="ps__num num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
           <div class="ps__head">
+            {s.steps && <p class="ps__steps">{s.steps}</p>}
             <h3 class="ps__name">
               <span data-ps-name>{s.name}</span>
               {!compact && <span class="ps__name-i" aria-hidden="true" hidden><Icon name="plus" /></span>}
@@ -98,6 +100,17 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
 
   .ps__dur {
     display: flex;
+  }
+
+  /* Какие шаги со страницы услуг входят в этап главной. */
+  .ps__steps {
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  .ps--compact .ps__step:last-child .ps__steps {
+    color: var(--on-accent-muted);
   }
 
   .ps__text {

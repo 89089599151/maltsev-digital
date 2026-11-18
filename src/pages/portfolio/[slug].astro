@@ -94,7 +94,7 @@ const schema = {
           <dl class="rows" data-stagger>
             {d.results.map((r) => (
               <div>
-                <dd class="rows__k pj-res">{r.value}</dd>
+                <dd class="rows__k rows__k--metric">{r.value}</dd>
                 <dt class="rows__v">{r.label}</dt>
               </div>
             ))}
@@ -230,13 +230,6 @@ const schema = {
     font-size: var(--fs-2);
     line-height: 1.35;
     letter-spacing: -0.02em;
-  }
-
-  .pj-res {
-    font-weight: 400;
-    font-size: var(--fs-3);
-    letter-spacing: -0.04em;
-    color: var(--accent-text);
   }
 
   .pj-notes {

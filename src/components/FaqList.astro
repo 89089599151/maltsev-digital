@@ -161,16 +161,21 @@ const H = headingLevel;
     border-radius: 50%;
     background: var(--paper);
     color: var(--ink);
-    transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+    transition:
+      background-color var(--dur) var(--ease-out),
+      color var(--dur) var(--ease-out),
+      rotate var(--dur) var(--ease-out);
   }
 
   summary:hover .faq__icon {
     background: var(--surface-2);
   }
 
+  /* Открытый вопрос: плюс поворачивается в крестик — так же, как у этапов и состава пакета. */
   .faq__item[open] .faq__icon {
     background: var(--accent);
     color: var(--accent-ink);
+    rotate: 45deg;
   }
 
   .faq__icon i {
@@ -186,10 +191,6 @@ const H = headingLevel;
 
   .faq__icon i:last-child {
     transform: rotate(90deg);
-  }
-
-  .faq__item[open] .faq__icon i:last-child {
-    transform: rotate(0deg);
   }
 
   .faq__a {
