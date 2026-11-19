@@ -1,11 +1,12 @@
 ---
 /**
  * «Как идёт работа».
- * На главной (compact) — четыре этапа линией времени на одной белой сцене и ссылка на все семь
- * шагов на странице услуг. На планшете и телефоне линия
- * листается вбок, следующий этап выглядывает справа. На странице услуг — все семь шагов списком: срок, что происходит и что нужно от вас;
- * на телефоне они сворачиваются, как вопросы, — открыт первый (process-accordion.ts). Без скрипта
- * все этапы открыты.
+ * На главной (compact) — четыре этапа в ряд; у каждого подписано, какие из семи шагов в него входят,
+ * и ссылка на подробный процесс. На странице услуг — все семь шагов списком: срок, что происходит
+ * и что нужно от вас.
+ * На телефоне секция короче: на главной четыре карточки листаются вбок, следующая выглядывает
+ * из-за края; на странице услуг этапы сворачиваются в список, как вопросы, — открыт первый
+ * (process-accordion.ts). Без скрипта все этапы открыты.
  */
 import Icon from './Icon.astro';
 import SectionHead from './SectionHead.astro';
@@ -16,7 +17,7 @@ interface Props {
   compact?: boolean;
 }
 const { compact = false } = Astro.props;
-const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[] = compact ? stagesShort : stages;
+const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string; steps?: string })[] = compact ? stagesShort : stages;
 ---
 
 <section class:list={['ps section', compact ? 'ps--compact' : 'ps--full']} id="process" data-island-section="Этапы" aria-labelledby="ps-title">
@@ -35,14 +36,9 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
     {
       list.map((s, i) => (
         <li class="ps__step">
-          {compact ? (
-            <p class="ps__mark">
-              <span class="ps__num num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-            </p>
-          ) : (
-            <span class="ps__num num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-          )}
+          <span class="ps__num num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
           <div class="ps__head">
+            {s.steps && <p class="ps__steps">{s.steps}</p>}
             <h3 class="ps__name">
               <span data-ps-name>{s.name}</span>
               {!compact && <span class="ps__name-i" aria-hidden="true" hidden><Icon name="plus" /></span>}
@@ -108,6 +104,17 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
     display: flex;
   }
 
+  /* Какие шаги со страницы услуг входят в этап главной. */
+  .ps__steps {
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  .ps--compact .ps__step:last-child .ps__steps {
+    color: var(--on-accent-muted);
+  }
+
   .ps__text {
     font-size: var(--step-body);
     line-height: 1.55;
@@ -129,94 +136,43 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
     color: var(--muted);
   }
 
-  /*
-   * Главная: четыре этапа на одной белой сцене — линия времени, а не четыре отдельные карточки.
-   * Точки этапов соединены тонкой линией; запуск, финал пути, отмечен синей точкой, без отдельной
-   * синей плашки (синий на главной остаётся за рекомендуемым пакетом и кнопками).
-   */
+  /* Главная: четыре карточки в ряд; запуск — финал пути — выделен синим. */
   .ps--compact .ps__list {
-    --ps-pad: clamp(28px, 3.3vw, 52px);
-    --ps-gap: clamp(24px, 2.6vw, 44px);
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0 var(--ps-gap);
-    padding: var(--ps-pad);
+    gap: var(--gap);
+  }
+
+  .ps--compact .ps__step {
+    display: grid;
+    align-content: start;
+    gap: 18px;
+    padding: clamp(20px, 1.8vw, 28px);
     border-radius: var(--radius-lg);
     background: var(--paper);
   }
 
-  .ps--compact .ps__step {
-    position: relative;
-    display: grid;
-    grid-template-rows: auto auto 1fr;
-    align-content: start;
-    gap: 14px;
-    padding-top: 32px;
+  .ps--compact .ps__step:last-child {
+    background: var(--accent-surface);
+    color: var(--accent-ink);
   }
 
-  /* Точка этапа. */
-  .ps--compact .ps__step::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    background: var(--paper);
-    box-shadow: inset 0 0 0 1.5px var(--accent);
+  .ps--compact .ps__step:last-child .ps__num {
+    color: var(--accent-ink);
   }
 
-  .ps--compact .ps__step:last-child::before {
-    background: var(--accent);
-    box-shadow: 0 0 0 5px var(--accent-soft);
+  .ps--compact .ps__step:last-child .ps__text {
+    color: var(--on-accent-muted);
   }
 
-  /* Отрезок линии от точки этапа до точки следующего. */
-  .ps--compact .ps__step:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    top: 5px;
-    left: 19px;
-    right: calc(8px - var(--ps-gap));
-    height: 1px;
-    background: var(--line);
+  .ps--compact .ps__step:last-child :global(.chip) {
+    color: var(--accent-ink);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
   }
 
-  /* Когда этапы доходят до экрана, точки по очереди появляются, а линия прорисовывается к следующей
-     точке — путь от заявки до запуска читается как движение. Уже видимое при загрузке не анимируется. */
-  @media (prefers-reduced-motion: no-preference) {
-    :global(.motion-ready) .ps--compact .ps__step.is-in:not(.is-static)::before {
-      animation: ps-dot var(--dur-spring) var(--ease-pop) calc(var(--i, 0) * 140ms + 120ms) backwards;
-    }
-
-    :global(.motion-ready) .ps--compact .ps__step.is-in:not(.is-static)::after {
-      transform-origin: left center;
-      animation: ps-line 700ms var(--ease-out) calc(var(--i, 0) * 140ms + 260ms) backwards;
-    }
-  }
-
-  @keyframes ps-dot {
-    from {
-      scale: 0;
-    }
-  }
-
-  @keyframes ps-line {
-    from {
-      scale: 0 1;
-    }
-  }
-
-  .ps__mark {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-  }
-
+  /* Единый небольшой отступ под номером сохраняет выравнивание названий без пустой полосы. */
   .ps--compact .ps__num {
-    font-size: var(--fs-3);
-    line-height: 1;
+    margin-bottom: clamp(20px, 2vw, 32px);
   }
 
   .ps--compact .ps__head {
@@ -238,31 +194,8 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
   }
 
   @media (max-width: 1023px) {
-    /* Уже компьютерной ширины линия времени листается вбок внутри сцены: следующий этап
-       выглядывает справа, страница не растёт в высоту. */
     .ps--compact .ps__list {
-      --ps-gap: 32px;
-      --ps-pad: clamp(22px, 4vw, 36px);
-      grid-template-columns: none;
-      grid-auto-flow: column;
-      grid-auto-columns: 44%;
-      overflow-x: auto;
-      overscroll-behavior-x: contain;
-      scroll-snap-type: x mandatory;
-      scroll-padding-inline: var(--ps-pad);
-      scrollbar-width: none;
-    }
-
-    .ps--compact .ps__list::-webkit-scrollbar {
-      display: none;
-    }
-
-    .ps--compact .ps__step {
-      scroll-snap-align: start;
-    }
-
-    .ps--compact .ps__num {
-      font-size: var(--fs-2);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .ps--full .ps__step {
@@ -280,9 +213,35 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string })[]
   }
 
   @media (max-width: 767px) {
+    /* Главная: карточки в ленту на всю ширину экрана, следующая выглядывает справа. */
     .ps--compact .ps__list {
-      grid-auto-columns: 80%;
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 78%;
+      margin-inline: calc(-1 * var(--page-pad));
+      padding: 2px var(--page-pad) 6px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--page-pad);
+      scrollbar-width: none;
+    }
+
+    .ps--compact .ps__list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ps--compact .ps__step {
+      scroll-snap-align: start;
+    }
+
+    .ps--compact .ps__step {
+      gap: 14px;
       border-radius: var(--radius);
+    }
+
+    .ps--compact .ps__num {
+      margin-bottom: 12px;
     }
 
     .ps--full .ps__step {
