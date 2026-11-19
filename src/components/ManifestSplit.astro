@@ -1,5 +1,9 @@
 ---
-/** Подход через результат для клиента: автор, три результата и реальный кейс. */
+/**
+ * «Лично веду ваш проект»: тёмная фотопанель с именем и три результата для клиента со ссылкой на кейс.
+ * На компьютере — фото слева, результаты с описаниями справа. На телефоне — фото сверху во всю
+ * ширину, результаты одними заголовками, без описаний и сноски: блок остаётся коротким.
+ */
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import SectionHead from './SectionHead.astro';
@@ -28,11 +32,7 @@ const outcomes = [
 ---
 
 <section class="mf section" id="manifest" data-island-section="Подход" aria-labelledby="mf-title">
-  <SectionHead
-    id="mf-title"
-    title="Лично веду ваш проект"
-    text="Проектирую, рисую и разрабатываю ваш сайт. Ключевые решения обсуждаю с вами и довожу до запуска."
-  />
+  <SectionHead id="mf-title" title="Лично веду ваш проект" />
 
   <div class:list={['mf__body', { 'mf__body--owner': owner }]}>
     {owner && (
@@ -41,8 +41,8 @@ const outcomes = [
           <Image
             src={photo}
             alt={`${site.brand.owner.value} смотрит на свет фонаря под снегом`}
-            widths={[240, 480, 720, 960]}
-            sizes="(max-width: 899px) 104px, 36vw"
+            widths={[480, 720, 960, 1280, 1600]}
+            sizes="(max-width: 899px) 100vw, 58vw"
             loading="lazy"
           />
         </div>
@@ -208,50 +208,60 @@ const outcomes = [
     color: var(--muted);
   }
 
+  /* Телефон и планшет: та же тёмная фотопанель с именем, что на компьютере, — сверху во всю
+     ширину. Под ней три результата строками с тонкими линиями (только заголовки) и ссылка на кейс.
+     Описания и сноска про ИИ остаются на компьютере: на узком экране блок не растягивается. */
   @media (max-width: 899px) {
     .mf__body--owner {
       grid-template-columns: minmax(0, 1fr);
     }
 
     .mf__author {
-      grid-template-columns: 104px minmax(0, 1fr);
-      align-items: center;
-      gap: 24px;
-      min-height: 0;
-      padding: 28px 28px 0;
-      background: none;
-      color: var(--ink);
+      min-height: clamp(250px, 66vw, 380px);
     }
 
-    .mf__portrait {
-      position: relative;
-      z-index: auto;
-      height: 132px;
-      overflow: hidden;
-      border-radius: var(--radius-sm);
+    /* Кадр смещён к лицу: на широкой панели снимок обрезается сверху и снизу. */
+    .mf__portrait img {
+      object-position: 62% 28%;
     }
 
     .mf__caption {
       gap: 4px;
-      padding: 0;
-      background: none;
+      padding: 88px 24px 18px;
     }
 
     .mf__name {
       font-size: 1.5rem;
     }
 
-    .mf__role {
-      color: var(--muted);
-    }
-
     .mf__about {
       margin-top: 0;
-      font-size: var(--step-small);
     }
 
-    .mf__about:focus-visible {
-      outline-color: var(--accent);
+    .mf__content {
+      padding: 6px 24px 22px;
+    }
+
+    .mf__outcome {
+      padding-block: 16px;
+    }
+
+    .mf__outcome + .mf__outcome {
+      margin-top: 0;
+      padding-top: 16px;
+    }
+
+    .mf__outcome dt {
+      font-size: 1.125rem;
+    }
+
+    .mf__outcome dd,
+    .mf__tools {
+      display: none;
+    }
+
+    .mf__case {
+      margin-top: 6px;
     }
   }
 
@@ -259,33 +269,10 @@ const outcomes = [
     .mf__body {
       border-radius: var(--radius);
     }
-
-    .mf__author {
-      grid-template-columns: 88px minmax(0, 1fr);
-      gap: 18px;
-      padding: 24px 24px 0;
-    }
-
-    .mf__portrait {
-      height: 116px;
-    }
-
-    .mf__content {
-      padding: 28px 24px;
-    }
-
-    .mf__outcome dt {
-      font-size: 1.25rem;
-    }
   }
 
   @media (max-width: 359px) {
-    .mf__author {
-      grid-template-columns: 76px minmax(0, 1fr);
-      gap: 16px;
-      padding-inline: 20px;
-    }
-
+    .mf__caption,
     .mf__content {
       padding-inline: 20px;
     }

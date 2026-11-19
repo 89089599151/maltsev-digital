@@ -1,11 +1,16 @@
 ---
 /**
  * «Пакеты и цены» на главной: одна секция вместо отдельных «Что я делаю» и «Цены».
- * Короткое пояснение к каждому пакету, срок и цена. На компьютере — три равные карточки,
- * на телефоне — отдельные карточки с теми же акцентами, что и на странице услуг:
+ * Короткое пояснение к каждому пакету, срок и цена; цвета — как на странице услуг:
  * START — белый, BUSINESS — синий, PREMIUM — тёмный. Данные — src/config/pricing.ts.
+ *
+ * На компьютере одна карточка «большая»: шире соседей, крупнее и с тремя пунктами состава.
+ * По умолчанию это рекомендуемый BUSINESS; если курсор задержался на другой карточке (или на ней
+ * фокус с клавиатуры), большой становится она, а BUSINESS — обычной. Курсор ушёл — большим снова BUSINESS.
+ * На телефоне и планшете карточки идут друг под другом, как раньше, без смены размера.
  */
 import Icon from './Icon.astro';
+import SectionHead from './SectionHead.astro';
 import { plans, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
 
@@ -19,20 +24,29 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
 ---
 
 <section class="pk section" id="pricing" data-island-section="Пакеты" aria-labelledby="pk-title">
-  <header class="pk__intro">
-    <h2 id="pk-title" class="pk__title" data-split>Пакеты и цены</h2>
-    <a class="pk__details" href={url('/services/')} data-reveal>
-      Состав пакетов <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
-    </a>
-  </header>
+  {/* Одна ссылка раздела — в заголовке: на странице услуг и состав пакетов, и калькулятор. */}
+  <SectionHead id="pk-title" title="Пакеты и цены" link={{ href: url('/services/'), label: 'Состав и калькулятор', short: 'Подробнее' }} />
 
   <ul class="pk__list" data-stagger>
     {
       rows.map((p) => (
-        <li class:list={['pk__row', { 'pk__row--featured': p.id === 'business', 'pk__row--premium': p.id === 'premium' }]}>
+        <li class:list={['pk__row', `pk__row--${p.id}`, { 'pk__row--featured': p.id === 'business' }]}>
+          {/* Строка метки раскрывается у большой карточки; у START и PREMIUM она пустая того же
+              размера — большая карточка одной высоты, какой бы она ни была. */}
+          <div class="pk__flag" aria-hidden={p.id === 'business' ? undefined : 'true'}>
+            <p class:list={['pk__badge', { 'pk__badge--ghost': p.id !== 'business' }]}>Рекомендую</p>
+          </div>
           <div class="pk__head">
             <h3 class="pk__name">{p.name}</h3>
             <p class="pk__types">{p.types}</p>
+            {/* Пункты состава видны у большой карточки (только на компьютере). */}
+            <div class="pk__more">
+              <ul class="pk__points">
+                {p.highlights.slice(0, 3).map((item) => (
+                  <li><Icon name="check" /><span>{item}</span></li>
+                ))}
+              </ul>
+            </div>
           </div>
           <div class="pk__offer">
             <p class="pk__time"><span>Срок</span> {p.timeline}</p>
@@ -51,53 +65,37 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   </ul>
 
   <div class="pk__footer" data-reveal>
-    <p class="pk__text">Точную цену фиксирую до начала работы.{pricingConfirmed ? '' : ' Цены предварительные.'}</p>
-    <a class="pk__calc" href={url('/services/#calculator')}>
-      Рассчитать стоимость <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
-    </a>
+    {/* Гарантии из «Условий» на странице услуг — рядом с ценами, где решают, платить ли. */}
+    <ul class="pk__terms" aria-label="Условия">
+      <li><Icon name="check" /><span>Цена и срок в договоре{pricingConfirmed ? '' : ', цены предварительные'}</span></li>
+      <li><Icon name="check" /><span>Возврат за невыполненные этапы</span></li>
+      <li><Icon name="check" /><span>14 дней исправляю ошибки бесплатно</span></li>
+    </ul>
   </div>
 </section>
 
 <style>
-  .pk__intro {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px 28px;
-    margin-bottom: clamp(24px, 3vw, 40px);
-  }
-
-  .pk__title {
-    font-size: var(--fs-5);
-    line-height: 1.02;
-    letter-spacing: -0.045em;
-  }
-
-  .pk__text {
-    max-width: 46ch;
+  /* Три гарантии — по колонке под каждой карточкой пакета: последняя строка раздела. */
+  .pk__terms {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px var(--gap);
+    padding: 0;
+    list-style: none;
+    font-size: var(--step-small);
     color: var(--muted);
   }
 
-  .pk__details,
-  .pk__calc {
-    display: inline-flex;
-    align-items: center;
+  .pk__terms li {
+    display: flex;
+    align-items: flex-start;
     gap: 8px;
-    min-height: 44px;
-    border-bottom: 1.5px solid var(--accent);
-    font-weight: 500;
-    text-decoration: none;
   }
 
-  .pk__details .arrow,
-  .pk__calc .arrow {
-    transition: transform var(--dur-fast) var(--ease-out);
-  }
-
-  .pk__details:hover .arrow,
-  .pk__calc:hover .arrow {
-    transform: translateX(4px);
+  .pk__terms :global(.icon) {
+    flex: none;
+    margin-top: 0.2em;
+    color: var(--accent-text);
   }
 
   .pk__list {
@@ -214,19 +212,16 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   }
 
   .pk__footer {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 12px 28px;
-    align-items: center;
     margin-top: 24px;
   }
 
-  @media (min-width: 1024px) and (max-width: 1279px) {
-    .pk__price {
-      font-size: var(--fs-3);
+  @media (max-width: 1023px) {
+    .pk__terms {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
+
+
 
   @media (max-width: 1023px) {
     .pk__list {
@@ -283,10 +278,196 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .pk__details:hover .arrow,
-    .pk__calc:hover .arrow {
-      transform: none;
+  /* Метка и пункты состава нужны только «большой» карточке на компьютере. */
+  .pk__flag,
+  .pk__more {
+    display: none;
+  }
+
+  /* --- Компьютер: большая карточка и смена при наведении -------------------- */
+
+  @media (min-width: 1024px) {
+    /* Большая колонка в 1,24 раза шире соседних; карточки выровнены по центру, большая выступает
+       сверху и снизу. Ширина колонок и размеры внутри меняются пружиной; возврат к исходному
+       виду ждёт 140 мс — пока курсор пересекает зазор между карточками, ничего не дёргается. */
+    .pk__list {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.24fr) minmax(0, 1fr);
+      align-items: center;
+      transition: grid-template-columns 720ms var(--ease-spring) 140ms;
+    }
+
+    .pk__row {
+      --pk-price-small: var(--fs-4);
+      --pk-name: var(--fs-4);
+      --pk-price: var(--pk-price-small);
+      --pk-pad: clamp(24px, 2.4vw, 36px);
+      --pk-more: 0fr;
+      --pk-more-o: 0;
+      --pk-shadow: 0 0 0 transparent;
+      --pk-big-shadow: 0 34px 60px -34px rgba(10, 11, 20, 0.35);
+      position: relative;
+      padding-block: var(--pk-pad);
+      box-shadow: var(--pk-shadow);
+      transition:
+        padding 720ms var(--ease-spring) 140ms,
+        box-shadow 720ms var(--ease-out) 140ms;
+    }
+
+    .pk__row--business {
+      --pk-big-shadow: 0 40px 70px -30px rgba(16, 32, 200, 0.45);
+    }
+
+    .pk__row--premium {
+      --pk-big-shadow: 0 40px 70px -32px rgba(10, 11, 20, 0.55);
+    }
+
+    .pk__name {
+      font-size: var(--pk-name);
+      transition: font-size 720ms var(--ease-spring) 140ms;
+    }
+
+    .pk__price {
+      font-size: var(--pk-price);
+      transition: font-size 720ms var(--ease-spring) 140ms;
+    }
+
+    /* Описание — две строки у всех карточек: высота не скачет, когда меняется ширина. */
+    .pk__types {
+      min-height: 2.9em;
+    }
+
+    .pk__flag {
+      display: grid;
+      grid-template-rows: var(--pk-more);
+      opacity: var(--pk-more-o);
+      margin-bottom: -32px;
+      transition:
+        grid-template-rows 720ms var(--ease-spring) 140ms,
+        opacity 420ms var(--ease-out) 140ms;
+    }
+
+    .pk__badge {
+      justify-self: start;
+      min-height: 0;
+      overflow: hidden;
+      margin-bottom: 32px;
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.18);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32);
+      font-size: var(--fs-xs);
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .pk__badge--ghost {
+      visibility: hidden;
+    }
+
+    /* Пункты состава раскрываются по высоте (0fr → 1fr) и проявляются. */
+    .pk__more {
+      display: grid;
+      grid-template-rows: var(--pk-more);
+      opacity: var(--pk-more-o);
+      transition:
+        grid-template-rows 720ms var(--ease-spring) 140ms,
+        opacity 420ms var(--ease-out) 140ms;
+    }
+
+    .pk__points {
+      display: grid;
+      gap: 10px;
+      min-height: 0;
+      overflow: hidden;
+      padding: 14px 0 0;
+      list-style: none;
+      font-size: var(--step-small);
+      line-height: 1.35;
+    }
+
+    .pk__points li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      white-space: nowrap;
+    }
+
+    .pk__points :global(.icon) {
+      flex: none;
+      margin-top: 0.15em;
+      color: var(--accent-text);
+    }
+
+    .pk__row--business .pk__points :global(.icon) {
+      color: var(--accent-ink);
+    }
+
+    .pk__row--premium .pk__points :global(.icon) {
+      color: var(--accent-on-dark);
+    }
+
+    /* Большая карточка: по умолчанию — рекомендуемая. */
+    .pk__row--featured {
+      --pk-name: clamp(2.75rem, 1rem + 3.2vw, 4rem);
+      --pk-price: clamp(2.5rem, 1rem + 2.6vw, 3.75rem);
+      --pk-pad: clamp(32px, 3vw, 44px);
+      --pk-more: 1fr;
+      --pk-more-o: 1;
+      --pk-shadow: var(--pk-big-shadow);
     }
   }
+
+  /* Узкий компьютер: у обычных карточек цена на шаг меньше. */
+  @media (min-width: 1024px) and (max-width: 1279px) {
+    .pk__row {
+      --pk-price-small: var(--fs-3);
+    }
+  }
+
+  @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+    /* Курсор (или фокус) на другой карточке: она становится большой, BUSINESS — обычной.
+       Курсор должен задержаться на карточке --pk-intent: если мышь просто проходит мимо,
+       переход не успевает начаться и ничего не дёргается. Фокус с клавиатуры — сразу. */
+    .pk__list {
+      --pk-intent: 380ms;
+    }
+
+    .pk__list:has(> .pk__row:focus-within) {
+      --pk-intent: 0s;
+    }
+
+    .pk__list:has(> .pk__row:nth-child(1):is(:hover, :focus-within)) {
+      grid-template-columns: minmax(0, 1.24fr) minmax(0, 1fr) minmax(0, 1fr);
+      transition-delay: var(--pk-intent);
+    }
+
+    .pk__list:has(> .pk__row:nth-child(3):is(:hover, :focus-within)) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.24fr);
+      transition-delay: var(--pk-intent);
+    }
+
+    .pk__row:is(:hover, :focus-within) {
+      --pk-name: clamp(2.75rem, 1rem + 3.2vw, 4rem);
+      --pk-price: clamp(2.5rem, 1rem + 2.6vw, 3.75rem);
+      --pk-pad: clamp(32px, 3vw, 44px);
+      --pk-more: 1fr;
+      --pk-more-o: 1;
+      --pk-shadow: var(--pk-big-shadow);
+    }
+
+    .pk__list:has(> .pk__row:is(:hover, :focus-within)) .pk__row--featured:not(:hover, :focus-within) {
+      --pk-name: var(--fs-4);
+      --pk-price: var(--pk-price-small);
+      --pk-pad: clamp(24px, 2.4vw, 36px);
+      --pk-more: 0fr;
+      --pk-more-o: 0;
+      --pk-shadow: 0 0 0 transparent;
+    }
+
+    /* Только то, что меняет размер: кнопки внутри отвечают на наведение без задержки. */
+    .pk__list:has(> .pk__row:is(:hover, :focus-within)) :is(.pk__row, .pk__name, .pk__price, .pk__flag, .pk__more) {
+      transition-delay: var(--pk-intent);
+    }
+  }
+
 </style>

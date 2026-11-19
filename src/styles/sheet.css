@@ -54,7 +54,7 @@
   width: 36px;
   height: 4px;
   margin-block: 2px 4px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--surface-3);
   flex: none;
 }

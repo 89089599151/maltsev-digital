@@ -64,6 +64,7 @@ const hints = {
 
   /* Переключатель-сегменты, как в iOS: дорожка и белая «таблетка» у выбранного варианта. */
   .chs__track {
+    position: relative;
     clear: both;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -114,6 +115,38 @@ const hints = {
     box-shadow:
       0 1px 2px rgba(10, 11, 20, 0.08),
       0 4px 12px -4px rgba(10, 11, 20, 0.14);
+  }
+
+  /* Где браузер понимает :has(), «таблетка» — отдельный слой, который переезжает к выбранному
+     варианту пружиной; сами варианты становятся прозрачными. */
+  @supports selector(:has(*)) {
+    .chs__track::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 4px;
+      width: calc((100% - 12px) / 2);
+      border-radius: var(--radius-pill);
+      background: var(--paper);
+      box-shadow:
+        0 1px 2px rgba(10, 11, 20, 0.08),
+        0 4px 12px -4px rgba(10, 11, 20, 0.14);
+      transition: transform var(--dur-spring) var(--ease-spring);
+    }
+
+    .chs__track:has(.chs__opt:nth-child(2) input:checked)::before {
+      transform: translateX(calc(100% + 4px));
+    }
+
+    .chs__opt span {
+      position: relative;
+    }
+
+    .chs__opt input:checked + span {
+      background: none;
+      box-shadow: none;
+    }
   }
 
   .chs__opt input:focus-visible + span {

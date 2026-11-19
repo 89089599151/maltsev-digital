@@ -10,7 +10,8 @@ import Icon from './Icon.astro';
 import { plans, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
 
-const scopes: Record<string, string> = { start: 'Одна страница', business: 'До 8 страниц', premium: 'До 15 страниц' };
+// Объём — в строке «Объём», поэтому первый пункт списка (он о том же) в карточке не повторяется.
+const scopes: Record<string, string> = { start: 'Одна страница, до 8 блоков', business: 'До 8 страниц', premium: 'До 15 страниц' };
 ---
 
 <section class="pl section" id="plans" data-island-section="Пакеты" aria-labelledby="detail-title">
@@ -37,7 +38,7 @@ const scopes: Record<string, string> = { start: 'Одна страница', bus
           </dl>
 
           <ul class="pl__list">
-            {p.highlights.map((item) => (
+            {p.highlights.slice(1).map((item) => (
               <li><Icon name="check" /><span>{item}</span></li>
             ))}
             <li class="pl__need"><Icon name="minus" /><span>Тексты и фото — от вас</span></li>
@@ -143,6 +144,7 @@ const scopes: Record<string, string> = { start: 'Одна страница', bus
 
   .pl__facts div {
     display: grid;
+    align-content: start;
     gap: 2px;
   }
 

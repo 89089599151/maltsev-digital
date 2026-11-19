@@ -70,6 +70,9 @@ const H = headingLevel;
   }
 
   /* Строка-ссылка в конце короткого списка: «ещё N вопросов» — в том же ритме, что и вопросы. */
+  /* «Ещё N вопросов» — последняя строка того же списка: шрифт и цвет как у вопросов, подпись
+     серым, справа такой же белый кружок, только со стрелкой. При наведении текст синеет,
+     кружок заливается синим, стрелка подаётся вперёд. */
   .faq__list :global(.faq__more) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 36px;
@@ -77,18 +80,20 @@ const H = headingLevel;
     align-items: center;
     min-height: 72px;
     padding: 18px 0;
-    color: var(--accent-text);
+    color: var(--ink);
     text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .faq__list :global(.faq__more-t) {
     display: grid;
-    gap: 2px;
+    gap: 4px;
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 500;
     font-size: var(--fs-1);
     line-height: 1.25;
     letter-spacing: -0.015em;
+    transition: color var(--dur-fast) var(--ease-out);
   }
 
   .faq__list :global(.faq__more-t small) {
@@ -106,13 +111,32 @@ const H = headingLevel;
     height: 36px;
     justify-self: end;
     border-radius: 50%;
-    background: var(--accent);
-    color: var(--accent-ink);
-    transition: transform var(--dur) var(--ease-out);
+    background: var(--paper);
+    color: var(--ink);
+    transition:
+      background-color var(--dur) var(--ease-out),
+      color var(--dur) var(--ease-out);
   }
 
-  .faq__list :global(.faq__more:hover .faq__more-i) {
-    transform: translateX(4px);
+  .faq__list :global(.faq__more-i .icon) {
+    transition: translate var(--dur-spring) var(--ease-spring);
+  }
+
+  .faq__list :global(.faq__more:is(:hover, :focus-visible) .faq__more-t) {
+    color: var(--accent-text);
+  }
+
+  .faq__list :global(.faq__more:is(:hover, :focus-visible) .faq__more-i) {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .faq__list :global(.faq__more:is(:hover, :focus-visible) .faq__more-i .icon) {
+    translate: 3px 0;
+  }
+
+  .faq__list :global(.faq__more:active .faq__more-i) {
+    scale: 0.92;
   }
 
   .faq__side :global(.head) {
@@ -145,9 +169,10 @@ const H = headingLevel;
     color: var(--accent-text);
   }
 
+  /* Вопрос — как заголовки других списков сайта: 500, а не жирный 600. */
   .faq__q {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 500;
     font-size: var(--fs-1);
     line-height: 1.25;
     letter-spacing: -0.015em;
@@ -164,7 +189,7 @@ const H = headingLevel;
     transition:
       background-color var(--dur) var(--ease-out),
       color var(--dur) var(--ease-out),
-      rotate var(--dur) var(--ease-out);
+      rotate var(--dur-spring) var(--ease-spring);
   }
 
   summary:hover .faq__icon {

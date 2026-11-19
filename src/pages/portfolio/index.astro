@@ -81,6 +81,22 @@ const kind = featured
     </div>
   </section>
 
+  {/*
+    Вид для телефона и переключатель выставляются до первой отрисовки, а не модулем после загрузки:
+    иначе экран проекта вырастает на глазах и сдвигает всё ниже (CLS). Остальное настраивает модуль.
+  */}
+  {featured && desktop && mobile && (
+    <script is:inline>
+      (function () {
+        var viewer = document.querySelector('[data-project-viewer]');
+        if (!viewer) return;
+        if (window.matchMedia('(max-width: 639px)').matches) viewer.dataset.view = 'phone';
+        var switches = viewer.querySelector('[data-device-switch]');
+        if (switches) switches.hidden = false;
+      })();
+    </script>
+  )}
+
   {featured && (
     <section class="section--tight split pw-info" aria-labelledby="pw-project">
       <div class="pw-info__main">
@@ -465,7 +481,7 @@ const kind = featured
   .filters button {
     min-height: 44px;
     padding: 10px 18px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--paper);
     color: var(--ink);
   }
@@ -538,7 +554,7 @@ const kind = featured
     }
 
     .pw[data-ready] .pw-switch__thumb {
-      transition: transform 260ms var(--ease-out);
+      transition: transform var(--dur-spring) var(--ease-spring);
     }
 
     .pw[data-instant] :is(.pw__screens, .pw__bg, .pw-screen, .pw-switch__thumb) {

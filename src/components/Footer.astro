@@ -206,6 +206,8 @@ const columns = [
     display: grid;
     gap: 2px;
     min-width: 0;
+    min-height: 44px;
+    align-content: center;
     color: inherit;
     text-decoration: none;
   }
@@ -305,7 +307,9 @@ const columns = [
   }
 
   .ftr__word {
-    display: block;
+    display: flex;
+    align-items: center;
+    min-height: 44px;
     margin-top: 28px;
     font-family: var(--font-head);
     font-weight: 400;

@@ -1,8 +1,11 @@
 ---
 /**
- * Витрина кейса на главной — одна карточка, как в App Store: крупно сам сайт (окно браузера и
- * телефон на светлой подложке), под ним одна строка — что это, название, одна фраза и круглая
- * стрелка. Вся карточка — ссылка на кейс. Цифры и подробности живут в самом кейсе.
+ * Витрина кейса на главной: две отдельные части, а не одна карточка «со всем сразу».
+ * Сверху — сцена со скриншотами (окно браузера и телефон на светлой подложке), она ведёт в кейс.
+ * Под ней, прямо на фоне страницы, — подпись: что это и когда, название (оно и есть ссылка на кейс)
+ * и одна фраза. Как и остальные разделы, витрина заканчивается содержимым; ссылка раздела
+ * «Все работы» — в заголовке. На телефоне в сцене только окно браузера, без наложенного телефона,
+ * название проекта мельче заголовков разделов.
  * При переходе скриншот и название перелетают на свои места на странице кейса (case-shot, case-title).
  */
 import { Image } from 'astro:assets';
@@ -11,7 +14,6 @@ import SectionHead from './SectionHead.astro';
 import BrowserShot from './BrowserShot.astro';
 import { categoryLabel } from '@/config/portfolio';
 import { url } from '@/lib/url';
-import Icon from './Icon.astro';
 
 interface Props {
   project: CollectionEntry<'projects'>;
@@ -31,12 +33,13 @@ const kind = d.isConcept ? 'Концепт' : d.category === 'personal' ? 'Ли�
 <section class="wf section" id="work" data-island-section={head ? 'Работы' : undefined} aria-labelledby={head ? 'wf-title' : 'wf-name'}>
   {head && <SectionHead id="wf-title" title="Работы" link={{ href: url('/portfolio/'), label: 'Все работы' }} />}
 
-  <a class="wf__card" href={caseUrl} aria-labelledby="wf-name" data-reveal>
-    <span class="wf__visual">
+  <div class="wf__item" data-reveal>
+    {/* Сцена — та же ссылка, что «Смотреть кейс», поэтому для клавиатуры и читалок её нет. */}
+    <a class="wf__visual" href={caseUrl} tabindex="-1" aria-hidden="true">
       <BrowserShot
         class="wf__desktop"
         src={desktop}
-        alt={d.coverAlt}
+        alt=""
         sizes="(max-width: 1023px) 86vw, 64vw"
         loading={head ? 'lazy' : 'eager'}
       />
@@ -47,17 +50,16 @@ const kind = d.isConcept ? 'Концепт' : d.category === 'personal' ? 'Ли�
           </span>
         )
       }
-    </span>
+    </a>
 
-    <span class="wf__caption">
-      <span class="wf__text">
-        <span class="wf__kind">Кейс · {kind} · {d.year}</span>
-        <Name id="wf-name" class="wf__name">{d.title}</Name>
-        <span class="wf__sum">{d.summary}</span>
-      </span>
-      <span class="wf__go" aria-hidden="true"><Icon name="arrow" /></span>
-    </span>
-  </a>
+    <div class="wf__caption">
+      <div class="wf__text">
+        <p class="wf__kind">{kind}, {d.year}</p>
+        <Name id="wf-name" class="wf__name"><a class="wf__link" href={caseUrl}>{d.title}</a></Name>
+      </div>
+      <p class="wf__sum">{d.summary}</p>
+    </div>
+  </div>
 </section>
 
 <style>
@@ -70,33 +72,18 @@ const kind = d.isConcept ? 'Концепт' : d.category === 'personal' ? 'Ли�
     view-transition-name: case-title;
   }
 
-  /* Одна карточка-ссылка: картинка сверху, подпись строкой снизу. */
-  .wf__card {
-    display: grid;
-    padding: clamp(10px, 1vw, 14px);
-    border-radius: var(--radius-lg);
-    background: var(--paper);
-    color: var(--ink);
-    text-decoration: none;
-    transition: box-shadow var(--dur) var(--ease-out);
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .wf__card:hover {
-    box-shadow: 0 40px 80px -48px rgba(16, 32, 200, 0.45);
-  }
-
-  /* Скриншоты: светлая подложка, окно браузера по центру и телефон у его правого края. */
+  /* Сцена со скриншотами: светлая подложка, окно браузера по центру, телефон у его правого края. */
   .wf__visual {
     position: relative;
     display: grid;
     place-items: center;
     padding: clamp(28px, 5vw, 72px) clamp(36px, 9vw, 160px) clamp(32px, 5vw, 80px);
-    border-radius: calc(var(--radius-lg) - 12px);
+    border-radius: var(--radius-lg);
     background:
       radial-gradient(60% 70% at 50% 40%, var(--stage-glow) 0%, rgba(255, 255, 255, 0) 70%),
       linear-gradient(180deg, var(--stage-1), var(--stage-2));
     overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .wf__visual :global(.wf__desktop) {
@@ -128,37 +115,35 @@ const kind = d.isConcept ? 'Концепт' : d.category === 'personal' ? 'Ли�
     object-position: top;
   }
 
+  /* Наведение на сцену или на ссылку — скриншоты чуть приподнимаются. */
   @media (hover: hover) and (pointer: fine) {
-    .wf__card:hover .wf__visual :global(.wf__desktop) {
+    .wf__item:has(:is(.wf__visual, .wf__link):hover) .wf__visual :global(.wf__desktop) {
       transform: translateY(-6px);
     }
 
-    .wf__card:hover .wf__phone {
+    .wf__item:has(:is(.wf__visual, .wf__link):hover) .wf__phone {
       transform: translateY(-12px);
     }
   }
 
-  .wf__card:active {
-    transform: scale(0.99);
-  }
-
+  /* Подпись на фоне страницы: слева что это и название, справа фраза и ссылка. */
   .wf__caption {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 16px 24px;
-    align-items: center;
-    padding: clamp(16px, 2vw, 24px) clamp(10px, 1.6vw, 22px) clamp(8px, 1vw, 12px);
+    /* Та же сетка 7:5, что у заголовков разделов: фраза стоит по одной вертикали с их ссылками. */
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 16px clamp(24px, 4vw, 64px);
+    align-items: end;
+    padding-top: clamp(20px, 2.4vw, 32px);
   }
 
   .wf__text {
     display: grid;
-    gap: 6px;
+    gap: 8px;
     min-width: 0;
   }
 
   .wf__kind {
-    font-size: var(--fs-xs);
-    font-weight: 500;
+    font-size: var(--step-small);
     color: var(--muted);
   }
 
@@ -170,77 +155,56 @@ const kind = d.isConcept ? 'Концепт' : d.category === 'personal' ? 'Ли�
   }
 
   .wf__sum {
-    max-width: 56ch;
+    max-width: 52ch;
     font-size: var(--step-body);
+    line-height: 1.5;
     color: var(--muted);
   }
 
-  .wf__go {
-    display: grid;
-    place-items: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: var(--accent-ink);
-    font-size: 1.15rem;
-    transition: transform var(--dur) var(--ease-out);
+  /* Название — ссылка на кейс: без подчёркивания, при наведении синеет, как вопросы и пункты меню. */
+  .wf__link {
+    color: inherit;
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
   }
 
-  .wf__card:hover .wf__go {
-    transform: rotate(-45deg);
+  .wf__link:is(:hover, :focus-visible),
+  .wf__item:has(.wf__visual:hover) .wf__link {
+    color: var(--accent-text);
   }
 
   @media (max-width: 767px) {
     .wf__visual {
-      padding: 24px 28px 30px 20px;
+      padding: 22px 18px 24px;
     }
 
+    /* На узкой сцене телефон поверх окна браузера превращается в кашу — оставляем одно окно. */
     .wf__phone {
-      right: 12px;
-      bottom: 12px;
-      width: 25%;
-      border-radius: 10px;
+      display: none;
     }
 
-    /* На телефоне стрелка стоит рядом с названием, а фраза занимает всю ширину карточки. */
     .wf__caption {
-      grid-template-areas:
-        'kind go'
-        'name go'
-        'sum sum';
-      gap: 4px 16px;
-      padding: 16px 10px 8px;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+      padding-top: 18px;
     }
 
     .wf__text {
-      display: contents;
+      gap: 4px;
     }
 
-    .wf__kind {
-      grid-area: kind;
-    }
-
+    /* Название проекта на шаг мельче заголовка раздела — подпись не читается как новый раздел. */
     .wf__name {
-      grid-area: name;
+      font-weight: 400;
+      font-size: var(--fs-3);
+      letter-spacing: -0.035em;
     }
 
-    .wf__sum {
-      grid-area: sum;
-      margin-top: 4px;
-    }
 
-    .wf__go {
-      grid-area: go;
-      width: 44px;
-      height: 44px;
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .wf__card:hover :is(.wf__phone, .wf__go),
-    .wf__card:hover .wf__visual :global(.wf__desktop),
-    .wf__card:active {
+    .wf__item:has(:is(.wf__visual, .wf__link):hover) :is(.wf__phone, .wf__visual :global(.wf__desktop)) {
       transform: none;
     }
   }

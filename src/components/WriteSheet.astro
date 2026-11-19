@@ -112,7 +112,7 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
 
               <label class="ws__field fl">
                 <span class="ws__label fl-label">Как с вами связаться</span>
-                <input name="contact" type="text" required minlength="4" placeholder="Telegram, телефон или почта" data-error-id="ws-contact-err" aria-describedby="ws-contact-err" />
+                <input name="contact" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" required minlength="4" placeholder="Telegram, телефон или почта" data-error-id="ws-contact-err" aria-describedby="ws-contact-err" />
               </label>
               <span class="ws__err" id="ws-contact-err"></span>
 
@@ -342,7 +342,7 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
     min-width: 0;
     min-height: 56px;
     padding: 12px 20px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--ink);
     color: var(--bg);
     font-family: var(--font-display);
@@ -441,15 +441,15 @@ const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.f
   }
 
   .ws__consent input {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     flex: none;
     accent-color: var(--accent);
   }
 
   .ws__submit {
     min-height: 56px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--accent);
     color: var(--accent-ink);
     font-family: var(--font-display);

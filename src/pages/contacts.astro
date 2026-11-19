@@ -66,7 +66,7 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
             </div>
             <div class="field fl">
               <label for="f-contact" class="fl-label">Как с вами связаться *</label>
-              <input id="f-contact" name="contact" type="text" required minlength="4" placeholder="Telegram, телефон или почта" data-error-id="f-contact-err" aria-describedby="f-contact-err" />
+              <input id="f-contact" name="contact" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" required minlength="4" placeholder="Telegram, телефон или почта" data-error-id="f-contact-err" aria-describedby="f-contact-err" />
               <span class="field__err" id="f-contact-err"></span>
             </div>
           </div>
@@ -382,7 +382,7 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
     display: block;
     min-height: 44px;
     padding: 11px 16px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--field);
     box-shadow: inset 0 0 0 1px var(--field-line);
     font-family: var(--font-display);
@@ -393,6 +393,12 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
 
   .pick:hover span {
     box-shadow: inset 0 0 0 1px var(--field-line-hover);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pick input:checked + span {
+      animation: choice-pop var(--dur-spring) var(--ease-pop);
+    }
   }
 
   .pick input:checked + span {
@@ -434,10 +440,10 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
   }
 
   .consent input {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     flex: none;
-    margin-top: 2px;
+    margin-top: 1px;
     accent-color: var(--accent);
   }
 
@@ -482,6 +488,12 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
       grid-column: 1 / -1;
       position: static;
     }
+
+    /* Без второй колонки бриф — главное на странице — идёт сразу после первого экрана,
+       а «Что будет после заявки» — под ним, как ответ на вопрос «а дальше что». */
+    .ct__form-wrap {
+      order: -1;
+    }
   }
 
   @media (max-width: 767px) {
@@ -494,8 +506,9 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
       grid-template-columns: 1fr;
     }
 
+    /* Флакон меньше: на телефоне он не должен отодвигать бриф за второй экран. */
     .ct-object {
-      width: min(62vw, 240px);
+      width: min(40vw, 160px);
     }
 
     .ct-direct :global(.cl.cl--tile) {

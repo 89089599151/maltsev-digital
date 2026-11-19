@@ -33,8 +33,9 @@
   --accent-graphic: #1a2ffb;
   /* Синий на тёмных плашках: основной там не читается. */
   --accent-on-dark: #8d99ff;
-  /* Приглушённый текст на синем и тонкие разделители. */
-  --on-accent-muted: #d6daff;
+  /* Приглушённый текст на синем и тонкие разделители: не ниже 4,5:1 даже на самом светлом краю
+     синей заливки (#3a54ff). */
+  --on-accent-muted: #ebedff;
   /* Полупрозрачная — одинаково читается на фоне, поверхностях и сценах. */
   --line: rgba(10, 11, 20, 0.12);
   /* Поля и варианты выбора: почти белые с тонкой линией, без серо-голубой заливки. */
@@ -126,14 +127,29 @@
   /* На главной (широкий экран) шапка лежит внутри сцены первого экрана — отступ от её верхнего края. */
   --hdr-inset: clamp(14px, 1.4vw, 24px);
 
-  /* Движение. */
+  /* Движение. Три вида:
+     появление и смена страниц — плавное торможение (--ease-out);
+     ответ на действие (нажатие, выбор, переключатель) — пружина с еле заметным перелётом (--ease-spring);
+     маленькая отметка «готово» (точка, галочка, выбранный вариант) — живая пружина (--ease-pop).
+     Пружины посчитаны как затухающие колебания и записаны в linear(); браузеры без linear()
+     берут обычное торможение. */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: var(--ease-out);
+  --ease-pop: var(--ease-out);
   --dur-fast: 180ms;
   --dur: 450ms;
+  --dur-spring: 560ms;
   --dur-slow: 900ms;
 
   color-scheme: light;
+}
+
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring: linear(0, 0.054, 0.177, 0.328, 0.48, 0.618, 0.734, 0.826, 0.896, 0.946, 0.98, 1.001, 1.013, 1.019, 1.02, 1.019, 1.016, 1.013, 1.01, 1.007, 1.005, 1.003, 1.002, 1.001, 1);
+    --ease-pop: linear(0, 0.066, 0.226, 0.43, 0.639, 0.826, 0.974, 1.077, 1.138, 1.162, 1.158, 1.136, 1.104, 1.07, 1.038, 1.011, 0.992, 0.98, 0.974, 0.974, 0.976, 0.981, 0.987, 0.992, 0.997, 1, 1.003, 1.004, 1.004, 1.003, 1.002, 1.001, 1);
+  }
 }
 
 @media (min-width: 1024px) {
@@ -479,7 +495,7 @@ b {
   gap: 14px;
   min-height: 52px;
   padding: 14px 24px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-family: var(--font-display);
   font-weight: 600;
   font-size: var(--fs-0);
@@ -487,15 +503,18 @@ b {
   letter-spacing: -0.01em;
   text-decoration: none;
   transition:
-    transform var(--dur-fast) var(--ease-out),
+    transform var(--dur-spring) var(--ease-spring),
     background-color var(--dur-fast) var(--ease-out),
     box-shadow var(--dur-fast) var(--ease-out),
     color var(--dur-fast) var(--ease-out);
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Нажатие — быстро вниз, отпускание — пружиной обратно (переход из .btn). */
 .btn:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
+  transition-duration: 90ms;
+  transition-timing-function: var(--ease-out);
 }
 
 .btn--accent {
@@ -626,10 +645,42 @@ a:is(:hover, :focus-visible) > .arrow {
   navigation: auto;
 }
 
-::view-transition-old(root),
+/* Старая страница быстро гаснет, новая поднимается на 14px и проявляется. Шапка (site-header)
+   и нижний остров (site-island) в смене не участвуют — стоят на месте, как панели приложения;
+   тёмная плашка текущего пункта меню (nav-current) переезжает к новому пункту. */
+/* Новая страница начинает появляться, когда старая почти погасла, — без «двойной экспозиции». */
+::view-transition-old(root) {
+  animation: vt-page-out 160ms ease-in both;
+}
+
 ::view-transition-new(root) {
-  animation-duration: 320ms;
-  animation-timing-function: var(--ease-out);
+  animation: vt-page-in 480ms var(--ease-out) 110ms both;
+}
+
+/* На главной шапка стоит ниже, чем на остальных страницах: шапка и плашка пункта меню едут
+   вместе одной пружиной, иначе плашка отстаёт от строки меню. */
+::view-transition-group(nav-current),
+::view-transition-group(site-header) {
+  animation-duration: var(--dur-spring);
+  animation-timing-function: var(--ease-spring);
+}
+
+::view-transition-group(site-island) {
+  animation-duration: 0s;
+}
+
+@keyframes vt-page-out {
+  to {
+    opacity: 0;
+    transform: scale(0.992);
+  }
+}
+
+@keyframes vt-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -711,7 +762,7 @@ html {
 
 ::-webkit-scrollbar-thumb {
   border: 3px solid transparent;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(10, 11, 20, 0.3) padding-box;
 }
 
@@ -795,7 +846,7 @@ html {
   gap: 8px;
   min-height: 30px;
   padding: 4px 12px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--ink);
   color: var(--bg);
   font-family: var(--font-display);
@@ -877,6 +928,55 @@ html {
   background-repeat: no-repeat;
   background-position: right 20px center;
   background-size: 18px;
+}
+
+/* Галочка у верно заполненного поля появляется пружиной, а не возникает сразу. */
+@media (prefers-reduced-motion: no-preference) {
+  .fl input[data-state='valid']:not(:focus) {
+    animation: check-pop var(--dur-spring) var(--ease-pop);
+  }
+
+  /* Отправили с ошибкой — первое неверное поле коротко качнётся, как поле пароля в iOS
+     (класс ставит forms.ts и снимает по окончании). */
+  .is-shake {
+    animation: field-shake 420ms var(--ease-out);
+  }
+}
+
+@keyframes check-pop {
+  from {
+    background-size: 0;
+  }
+}
+
+@keyframes field-shake {
+  0%,
+  100% {
+    translate: 0;
+  }
+
+  20% {
+    translate: -7px 0;
+  }
+
+  40% {
+    translate: 6px 0;
+  }
+
+  60% {
+    translate: -4px 0;
+  }
+
+  80% {
+    translate: 2px 0;
+  }
+}
+
+/* Выбранный вариант (чип, плитка пакета, тип сайта в калькуляторе) отвечает лёгким толчком. */
+@keyframes choice-pop {
+  from {
+    scale: 0.94;
+  }
 }
 
 /* Ошибка под полем — со значком, а не одной красной строкой. */

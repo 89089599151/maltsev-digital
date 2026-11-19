@@ -79,7 +79,7 @@ const mail = emailUrl('Заявка на разработку сайта');
 
           <label class="ct__field fl">
             <span class="ct__label fl-label">Как с вами связаться</span>
-            <input name="contact" type="text" required minlength="4" placeholder="Telegram, телефон или почта" data-error-id="ct-contact-err" aria-describedby="ct-contact-err" />
+            <input name="contact" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" required minlength="4" placeholder="Telegram, телефон или почта" data-error-id="ct-contact-err" aria-describedby="ct-contact-err" />
           </label>
           <span class="ct__err" id="ct-contact-err"></span>
 
@@ -352,8 +352,8 @@ const mail = emailUrl('Заявка на разработку сайта');
   }
 
   .ct__consent input {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     flex: none;
     accent-color: var(--accent);
   }

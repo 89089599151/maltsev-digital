@@ -146,6 +146,12 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
     transform: translateY(-110%);
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .hdr {
+      transition: none;
+    }
+  }
+
   :global(.js) .hdr:not(.is-scrolled) {
     background: none;
   }
@@ -157,7 +163,10 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
     }
   }
 
+  /* При смене страницы строка шапки не гаснет вместе со страницей, а переезжает на своё место
+     (на главной она ниже) — одинакового размера на всех страницах, без двойного изображения. */
   .hdr__row {
+    view-transition-name: site-header;
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
@@ -204,7 +213,7 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
     display: flex;
     gap: 2px;
     padding: 5px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: rgba(255, 255, 255, 0.7);
     box-shadow: inset 0 0 0 1px var(--line);
     backdrop-filter: blur(14px);
@@ -213,7 +222,7 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
   .hdr__nav a {
     display: block;
     padding: 10px 18px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     font-family: var(--font-display);
     font-weight: 500;
     font-size: var(--step-small);
@@ -230,9 +239,11 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
     color: var(--ink);
   }
 
+  /* Тёмная плашка текущего раздела при переходе переезжает к новому пункту, как в сегментах iOS. */
   .hdr__nav a[aria-current='page'] {
     background: var(--ink);
     color: var(--bg);
+    view-transition-name: nav-current;
   }
 
   .hdr__cta {
@@ -335,7 +346,7 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
     min-height: 56px;
     padding: 12px 20px;
     white-space: nowrap;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--accent);
     color: var(--accent-ink);
     font-family: var(--font-display);
@@ -388,7 +399,7 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
       margin-inline: auto;
       padding: 6px;
       border: 1px solid rgba(10, 11, 20, 0.08);
-      border-radius: 999px;
+      border-radius: var(--radius-pill);
       background: rgba(255, 255, 255, 0.94);
       -webkit-backdrop-filter: blur(18px);
       backdrop-filter: blur(18px);
@@ -419,7 +430,7 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
       min-width: 48px;
       height: 48px;
       padding: 0 15px;
-      border-radius: 999px;
+      border-radius: var(--radius-pill);
       font-family: var(--font-display);
       font-size: var(--step-small);
       line-height: 1.2;
@@ -541,7 +552,7 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
       align-items: center;
       min-height: 44px;
       padding: 8px 12px;
-      border-radius: 999px;
+      border-radius: var(--radius-pill);
       background: var(--paper);
       font-size: var(--fs-xs);
       text-decoration: none;

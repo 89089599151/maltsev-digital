@@ -1,74 +1,94 @@
 ---
 import Icon from './Icon.astro';
 /**
- * Заголовок секции: крупный тонкий заголовок слева, пояснение и действие справа.
- * Один компонент для всех секций — одинаковый ритм и иерархия.
+ * Заголовок секции — одно правило для всех разделов сайта:
+ *  - название слева, единственная ссылка раздела справа — в одну строку на любой ширине;
+ *  - пояснение (если есть): на компьютере справа над ссылкой, на телефоне и планшете — под строкой.
+ * Раздел заканчивается своим содержимым, поэтому ссылка «подробнее» живёт здесь, а не после блока.
+ * У длинной ссылки есть короткая подпись (link.short) для узких экранов, чтобы строка не переносилась.
  */
 interface Props {
   id: string;
   title: string;
   text?: string;
-  link?: { href: string; label: string };
-  /** Тёмная секция — светлый текст. */
+  link?: { href: string; label: string; short?: string };
+  /** Тёмная секция — светлый текст. */
   invert?: boolean;
 }
 const { id, title, text, link, invert = false } = Astro.props;
 ---
 
-<div class:list={['sh', { 'sh--invert': invert }]}>
+<div class:list={['sh', { 'sh--invert': invert, 'sh--text': !!text, 'sh--link': !!link }]}>
   <h2 id={id} class="sh__title" data-split>{title}</h2>
+  {text && <p class="sh__text" data-reveal>{text}</p>}
   {
-    (text || link) && (
-      <div class="sh__side" data-reveal>
-        {text && <p class="sh__text">{text}</p>}
-        {link && (
-          <a class="sh__link" href={link.href}>
-            {link.label} <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
-          </a>
-        )}
-      </div>
+    link && (
+      <a class="sh__link" href={link.href} aria-label={link.short ? link.label : undefined} data-reveal>
+        <span class="sh__long">{link.label}</span>
+        {link.short && <span class="sh__short" aria-hidden="true">{link.short}</span>}
+        <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+      </a>
     )
   }
 </div>
 
 <style>
+  /* Компьютер: название слева, справа — пояснение и под ним ссылка, всё прижато к низу названия. */
   .sh {
     display: grid;
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: 24px clamp(24px, 4vw, 64px);
+    grid-template-areas:
+      'title text'
+      'title link';
+    gap: 14px clamp(24px, 4vw, 64px);
     align-items: end;
     margin-bottom: clamp(24px, 3vw, 40px);
   }
 
+  .sh:not(.sh--text) {
+    grid-template-areas: 'title link';
+  }
+
+  .sh:not(.sh--link) {
+    grid-template-areas: 'title text';
+  }
+
+  .sh:not(.sh--text, .sh--link) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'title';
+  }
+
   .sh__title {
+    grid-area: title;
     font-size: var(--fs-5);
     line-height: 1.02;
     letter-spacing: -0.045em;
     max-width: 16ch;
   }
 
-  .sh__side {
-    display: grid;
-    gap: 14px;
-    justify-items: start;
-    padding-bottom: 0.3em;
-  }
-
   .sh__text {
+    grid-area: text;
     max-width: 46ch;
     font-size: var(--step-body);
     color: var(--ink-2);
   }
 
   .sh__link {
+    grid-area: link;
+    justify-self: start;
     display: inline-flex;
     align-items: center;
     gap: 8px;
     min-height: 44px;
     font-family: var(--font-display);
     font-weight: 500;
+    white-space: nowrap;
     text-decoration: none;
     border-bottom: 1.5px solid var(--accent);
+  }
+
+  .sh__short {
+    display: none;
   }
 
   .sh__link .arrow {
@@ -91,15 +111,48 @@ const { id, title, text, link, invert = false } = Astro.props;
     color: var(--night-ink);
   }
 
+  /* Телефон и планшет: название и ссылка в одной строке, пояснение — под ней на всю ширину. */
   @media (max-width: 1023px) {
-    .sh {
-      grid-template-columns: 1fr;
-      row-gap: 18px;
+    .sh,
+    .sh:not(.sh--text) {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        'title link'
+        'text text';
+      gap: 14px 12px;
+      align-items: center;
     }
 
-    .sh__side {
-      gap: 12px;
-      padding-bottom: 0;
+    .sh__title {
+      max-width: none;
+    }
+
+    .sh:not(.sh--link) {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'title'
+        'text';
+    }
+
+    .sh__link {
+      justify-self: end;
+      gap: 6px;
+      font-size: var(--step-small);
+    }
+
+    .sh__link:has(.sh__short) .sh__long {
+      display: none;
+    }
+
+    .sh__short {
+      display: inline;
+    }
+  }
+
+  /* Маленькие телефоны: заголовок на 2px мельче — «Как идёт работа» и ссылка остаются в одной строке. */
+  @media (max-width: 379px) {
+    .sh__title {
+      font-size: 1.875rem;
     }
   }
 </style>

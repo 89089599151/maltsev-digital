@@ -77,6 +77,15 @@ function initCountHint(el: HTMLTextAreaElement | HTMLInputElement) {
 
 type Field = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
+/** Короткое покачивание неверного поля при отправке (стили — global.css, .is-shake). */
+function shake(el: HTMLElement) {
+  const target = el.closest<HTMLElement>('.fl, label') ?? el;
+  target.classList.remove('is-shake');
+  void target.offsetWidth; // перезапуск анимации при повторной отправке
+  target.classList.add('is-shake');
+  target.addEventListener('animationend', () => target.classList.remove('is-shake'), { once: true });
+}
+
 /** Подпись поля для письма: <label for>, обёртка-<label> или <legend> группы. */
 function fieldLabel(el: Field): string {
   const byFor = el.id ? document.querySelector<HTMLLabelElement>(`label[for="${el.id}"]`) : null;
@@ -126,6 +135,7 @@ export function initLeadForms(): void {
         if (msg && !firstInvalid) firstInvalid = el;
       }
       if (firstInvalid) {
+        shake(firstInvalid);
         firstInvalid.focus();
         if (status) status.textContent = 'Проверьте отмеченные поля.';
         return false;
@@ -174,14 +184,17 @@ export function initLeadForms(): void {
         if (!tgUrl) return;
         const body = `${subject}
 ${composeBrief(form, fields)}`;
+        // Копирование запускается и чат открывается в одном обработчике нажатия, без ожидания:
+        // Safari блокирует window.open, вызванный после await, как всплывающее окно.
+        const copying = navigator.clipboard?.writeText(body);
+        window.open(tgUrl, '_blank', 'noopener');
         let copied = false;
         try {
-          await navigator.clipboard.writeText(body);
-          copied = true;
+          await copying;
+          copied = Boolean(copying);
         } catch {
-          /* буфер обмена недоступен — откроем чат без текста */
+          /* буфер обмена недоступен — чат уже открыт, текст опишут сами */
         }
-        window.open(tgUrl, '_blank', 'noopener');
         if (status)
           status.textContent = copied
             ? 'Текст заявки скопирован. Вставьте его в открывшийся чат и отправьте.'
