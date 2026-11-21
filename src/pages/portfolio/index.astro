@@ -11,7 +11,6 @@ import Base from '@/layouts/Base.astro';
 import BrowserShot from '@/components/BrowserShot.astro';
 import ProjectCard from '@/components/ProjectCard.astro';
 import CtaBand from '@/components/CtaBand.astro';
-import Icon from '@/components/Icon.astro';
 import { categories, categoryLabel } from '@/config/portfolio';
 import { url } from '@/lib/url';
 
@@ -49,7 +48,7 @@ const kind = featured
           <div class="pw__controls">
             <p class="pw__caption">
               <span>{featured.data.title}</span>
-              {kind}<span aria-hidden="true"> · </span>{featured.data.year}
+              {kind}, {featured.data.year}
             </p>
             {mobile && (
               <div class="pw-switch" role="tablist" aria-label="Посмотреть сайт на устройстве" data-device-switch hidden>
@@ -100,17 +99,17 @@ const kind = featured
   {featured && (
     <section class="section--tight split pw-info" aria-labelledby="pw-project">
       <div class="pw-info__main">
-        <h2 id="pw-project" class="head" data-split>{featured.data.title}</h2>
-        <p class="pw-info__sum" data-reveal>{featured.data.summary}</p>
-        <div class="pw-info__actions" data-reveal>
-          <a class="btn btn--ink" href={url(`/portfolio/${featured.id}/`)}>Смотреть кейс <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
+        <h2 id="pw-project" class="head">{featured.data.title}</h2>
+        <p class="pw-info__sum">{featured.data.summary}</p>
+        <div class="pw-info__actions">
+          <a class="btn btn--ink" href={url(`/portfolio/${featured.id}/`)}>Смотреть кейс</a>
           <a class="btn btn--ghost" href={url('/contacts/')}>Обсудить проект</a>
         </div>
       </div>
 
       <div class="pw-info__facts">
         {featured.data.results.length > 0 && (
-          <ul class="rows" data-stagger>
+          <ul class="rows">
             {featured.data.results.map((r) => (
               <li>
                 <strong class="rows__k rows__k--metric">{r.value}</strong>
@@ -119,7 +118,7 @@ const kind = featured
             ))}
           </ul>
         )}
-        <ul class="pw-info__stack" aria-label="Технологии" data-reveal>
+        <ul class="pw-info__stack" aria-label="Технологии">
           {featured.data.stack.map((item) => <li class="chip chip--line">{item}</li>)}
         </ul>
       </div>
@@ -128,7 +127,7 @@ const kind = featured
 
   {rest.length > 0 && (
     <section class="section pw-more" aria-labelledby="pw-more-title">
-      <h2 id="pw-more-title" class="head" data-split>Ещё проекты</h2>
+      <h2 id="pw-more-title" class="head">Ещё проекты</h2>
       {used.length > 1 && (
         <div class="filters" role="group" aria-label="Фильтр по категориям" data-filters>
           <button type="button" aria-pressed="true" data-filter="all">Все</button>
@@ -523,13 +522,10 @@ const kind = featured
 
   /* --- Движение ----------------------------------------------------------- */
 
+  /* Текст стоит на месте, просмотрщик со скриншотами мягко проявляется. */
   @media (prefers-reduced-motion: no-preference) {
-    .pw__main {
-      animation: pw-up 0.9s var(--ease-out) 0.05s backwards;
-    }
-
     .pw__viewer {
-      animation: pw-up 1.1s var(--ease-out) 0.2s backwards;
+      animation: pw-up 0.6s var(--ease-out) 0.1s backwards;
     }
 
     /* Высота экрана и край сцены меняются вместе, когда на узком экране переключают устройство. */
@@ -571,7 +567,6 @@ const kind = featured
   @keyframes pw-up {
     from {
       opacity: 0;
-      transform: translateY(18px);
     }
   }
 

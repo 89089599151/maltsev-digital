@@ -19,10 +19,10 @@ const H = headingLevel;
 
 <section class="faq" aria-labelledby={headingId}>
   <div class="faq__side">
-    {headingHidden ? <H id={headingId} class="sr-only">{heading}</H> : <H id={headingId} class="head" data-split>{heading}</H>}
+    {headingHidden ? <H id={headingId} class="sr-only">{heading}</H> : <H id={headingId} class="head">{heading}</H>}
     <slot name="side" />
   </div>
-  <div class="faq__list" data-stagger>
+  <div class="faq__list">
     {
       items.map((item, i) => (
         <details class="faq__item" name={group} open={openFirst && i === 0 ? true : undefined}>
@@ -72,7 +72,7 @@ const H = headingLevel;
   /* Строка-ссылка в конце короткого списка: «ещё N вопросов» — в том же ритме, что и вопросы. */
   /* «Ещё N вопросов» — последняя строка того же списка: шрифт и цвет как у вопросов, подпись
      серым, справа такой же белый кружок, только со стрелкой. При наведении текст синеет,
-     кружок заливается синим, стрелка подаётся вперёд. */
+     кружок темнеет, как у открытого вопроса, стрелка подаётся вперёд. */
   .faq__list :global(.faq__more) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 36px;
@@ -127,12 +127,14 @@ const H = headingLevel;
   }
 
   .faq__list :global(.faq__more:is(:hover, :focus-visible) .faq__more-i) {
-    background: var(--accent);
-    color: var(--accent-ink);
+    background: var(--ink);
+    color: var(--paper);
   }
 
-  .faq__list :global(.faq__more:is(:hover, :focus-visible) .faq__more-i .icon) {
-    translate: 3px 0;
+  @media (hover: hover) and (pointer: fine) {
+    .faq__list :global(.faq__more:is(:hover, :focus-visible) .faq__more-i .icon) {
+      translate: 3px 0;
+    }
   }
 
   .faq__list :global(.faq__more:active .faq__more-i) {
@@ -198,8 +200,8 @@ const H = headingLevel;
 
   /* Открытый вопрос: плюс поворачивается в крестик — так же, как у этапов и состава пакета. */
   .faq__item[open] .faq__icon {
-    background: var(--accent);
-    color: var(--accent-ink);
+    background: var(--ink);
+    color: var(--paper);
     rotate: 45deg;
   }
 

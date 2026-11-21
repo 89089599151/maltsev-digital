@@ -8,22 +8,20 @@ import ChannelSwitch from '@/components/ChannelSwitch.astro';
 import { site, telegramUrl } from '@/config/site';
 import { plans, formatPrice } from '@/config/pricing';
 import { url } from '@/lib/url';
-import Icon from '@/components/Icon.astro';
 
 const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.formspreeId}` : '';
 // Стеклянная бутылка с посланием: «напишите мне».
 const bottle = genImage('contacts-bottle');
-const projectTypes = ['Лендинг', 'Сайт компании', 'Каталог или магазин', 'Сайт специалиста', 'Редизайн существующего сайта', 'Другое'];
 ---
 
 <Base
   title="Контакты и заявка на разработку сайта"
-  description="Оставьте заявку на разработку сайта: тип проекта, пакет и описание задачи. Или напишите напрямую в Telegram или на почту."
+  description="Оставьте заявку на разработку сайта: пакет и пара слов о задаче. Или напишите напрямую в Telegram или на почту."
 >
   <PageHero
     id="ct-title"
     title="Обсудим ваш сайт"
-    lead={`Напишите напрямую или заполните короткий бриф. Отвечу ${site.contacts.responseTime.value} — ${site.contacts.hours}.`}
+    lead={`Напишите в Telegram или на почту либо оставьте заявку ниже. Отвечу ${site.contacts.responseTime.value} — ${site.contacts.hours}.`}
   >
     <Fragment slot="actions">
       <div class="ct-direct">
@@ -47,8 +45,8 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
     </section>
 
     <section class="ct__form-wrap tile" aria-labelledby="brief-title">
-      <h2 id="brief-title" class="ct__form-title">Бриф</h2>
-      <p class="ct__form-sub muted">Три обязательных поля — со звёздочкой.</p>
+      <h2 id="brief-title" class="ct__form-title">Заявка</h2>
+      <p class="ct__form-sub muted">Обязательны имя, контакт и пара слов о задаче.</p>
 
       <form class="brief" data-lead-form data-endpoint={endpoint} data-mailto={endpoint ? undefined : site.contacts.email.value} data-telegram={endpoint ? undefined : (telegramUrl() ?? undefined)} method="post" action={endpoint || undefined} novalidate>
         <fieldset class="brief__set">
@@ -70,20 +68,6 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
               <span class="field__err" id="f-contact-err"></span>
             </div>
           </div>
-
-          <fieldset class="field group">
-            <legend>Тип проекта</legend>
-            <div class="pills">
-              {
-                projectTypes.map((t, i) => (
-                  <label class="pick">
-                    <input type="radio" name="project_type" value={t} checked={i === 0} />
-                    <span>{t}</span>
-                  </label>
-                ))
-              }
-            </div>
-          </fieldset>
 
           <fieldset class="field group">
             <legend>Пакет</legend>
@@ -111,7 +95,7 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
 
           <div class="field fl">
             <label for="f-task" class="fl-label">Опишите задачу *</label>
-            <textarea id="f-task" name="message" rows="6" required minlength="20" data-error-id="f-task-err" aria-describedby="f-task-hint f-task-err" placeholder="Чем занимается бизнес, для кого сайт и что он должен делать. Если есть сайты, которые нравятся, — оставьте ссылки"></textarea>
+            <textarea id="f-task" name="message" rows="6" required minlength="20" data-error-id="f-task-err" aria-describedby="f-task-hint f-task-err" placeholder="Чем занимаетесь, какой сайт нужен, новый или редизайн. Ссылки на сайты, которые нравятся"></textarea>
             <span class="field__hint" id="f-task-hint" data-count-hint>Хотя бы пара предложений — от 20 символов.</span>
             <span class="field__err" id="f-task-err"></span>
           </div>
@@ -130,17 +114,17 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
           <div class="brief__submit">
             <button class="btn btn--accent" type="submit">
               <span data-label>{endpoint ? 'Отправить заявку' : 'Отправить на почту'}</span>
-              <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
             </button>
             <p class="brief__status" data-status role="status" aria-live="polite"></p>
+            <p class="brief__note">Заявка ни к чему не обязывает. Работу начинаем после договора и предоплаты.</p>
           </div>
         </fieldset>
       </form>
 
       <div class="brief__success" data-success hidden tabindex="-1">
         <p class="head-sm">Заявка отправлена.</p>
-        <p>Спасибо! Я прочитаю бриф и свяжусь с вами {site.contacts.responseTime.value}. Если вопрос срочный — напишите напрямую.</p>
-        <a class="btn btn--ghost" href={url('/portfolio/')}>Пока посмотреть работы <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
+        <p>Спасибо! Я прочитаю заявку и свяжусь с вами {site.contacts.responseTime.value}. Если вопрос срочный — напишите напрямую.</p>
+        <a class="btn btn--ghost" href={url('/portfolio/')}>Пока посмотреть работы</a>
       </div>
     </section>
   </div>
@@ -187,7 +171,7 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
     width: min(100%, 480px);
     height: auto;
     justify-self: center;
-    filter: drop-shadow(0 30px 32px rgba(26, 47, 251, 0.18));
+    filter: var(--object-shadow);
   }
 
   /* Слева — три шага после заявки (прилипают при прокрутке длинной формы), справа — сама форма. */
@@ -228,7 +212,7 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
     font-family: var(--font-head);
     font-size: var(--fs-1);
     letter-spacing: -0.04em;
-    color: var(--accent-text);
+    color: var(--muted);
   }
 
   .ct__steps strong {
@@ -245,7 +229,6 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
   .ct__form-sub {
     margin-top: 8px;
   }
-
 
   .brief {
     margin-top: 28px;
@@ -281,7 +264,7 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
 
   .group legend {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 500;
     font-size: var(--fs-0);
     padding: 0;
   }
@@ -345,7 +328,7 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
   .field__err {
     font-family: var(--font-display);
     font-size: var(--step-small);
-    font-weight: 600;
+    font-weight: 500;
     color: var(--danger);
   }
 
@@ -353,16 +336,10 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
     display: none;
   }
 
-  .pills,
-  .plans-pick {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
   .plans-pick {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
   }
 
   .pick {
@@ -420,7 +397,7 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
   }
 
   .pick--plan b {
-    font-weight: 600;
+    font-weight: 500;
     font-size: var(--step-body);
   }
 
@@ -458,8 +435,18 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
   }
 
   .brief__status {
-    font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 500;
+  }
+
+  .brief__status:empty {
+    display: none;
+  }
+
+  /* Сразу под кнопкой: на телефоне список «Что будет после заявки» стоит ниже формы. */
+  .brief__note {
+    max-width: 52ch;
+    font-size: var(--step-small);
+    color: var(--muted);
   }
 
   .brief__success {
@@ -469,12 +456,7 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
     justify-items: start;
     padding: var(--pad);
     border-radius: var(--radius);
-    background: var(--accent);
-    color: var(--accent-ink);
-  }
-
-  .brief__success .btn--ghost {
-    background: var(--surface-solid);
+    background: var(--accent-soft);
     color: var(--ink);
   }
 
@@ -518,20 +500,6 @@ const projectTypes = ['Лендинг', 'Сайт компании', 'Катал
 
     .plans-pick {
       grid-template-columns: 1fr 1fr;
-    }
-
-    .pills {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .pills .pick span {
-      display: grid;
-      align-items: center;
-      height: 100%;
-      padding-block: 10px;
-      border-radius: var(--radius-sm);
-      line-height: 1.25;
     }
 
     .brief__submit .btn {

@@ -14,6 +14,7 @@ const nav = [
   { href: '/faq/', label: 'Вопросы' },
 ];
 const current = Astro.url.pathname;
+const onHome = isActive(current, '/');
 const onContacts = isActive(current, '/contacts/');
 // На странице контактов переходим к брифу, сохраняя уже заполненные поля.
 const contactHref = onContacts ? url('/contacts/#brief-title') : url('/contacts/');
@@ -43,8 +44,8 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
         }
       </ul>
     </nav>
-    <a class="hdr__cta btn btn--accent" href={url('/contacts/')}>
-      Обсудить проект <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+    <a class="hdr__cta btn btn--accent" href={contactHref} aria-current={onContacts ? 'page' : undefined}>
+      Обсудить проект
     </a>
   </div>
 
@@ -55,10 +56,13 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
   </noscript>
 </header>
 
-<!-- Остров: навигация телефона под большим пальцем. Кнопка меню появляется после запуска скрипта.
-     Подписи меняет island.ts: раздел страницы под взглядом читателя и расчёт из калькулятора. -->
-<div class="isl" data-island>
-  <button class="isl__menu" type="button" aria-label={menuAria} aria-haspopup="dialog" aria-controls="site-menu" aria-expanded="false" data-menu-open hidden>
+<!-- Остров: навигация телефона под большим пальцем. Кнопка меню видна, когда работает скрипт
+     (без него меню не открыть — остаётся «Написать»). Подписи меняет island.ts: раздел страницы
+     под взглядом читателя и расчёт из калькулятора.
+     На главной остров сначала спрятан (is-held): на первом экране он лёг бы на цифры под заголовком.
+     Он выезжает, как только читатель чуть прокрутит страницу и цифры уйдут из нижней зоны экрана. -->
+<div class:list={['isl', { 'is-held': onHome }]} data-island>
+  <button class="isl__menu" type="button" aria-label={menuAria} aria-haspopup="dialog" aria-controls="site-menu" aria-expanded="false" data-menu-open>
     <Icon name="menu" />
     <span class="isl__fold"><span class="isl__label" data-island-menu-label>{menuLabel}</span></span>
   </button>
@@ -187,11 +191,6 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
     width: 32px;
     height: 32px;
     color: var(--accent);
-    transition: transform var(--dur) var(--ease-out);
-  }
-
-  .hdr__brand:hover :global(.hdr__mark) {
-    transform: rotate(-8deg) scale(1.08);
   }
 
   .hdr__name {
@@ -207,21 +206,23 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
     font-weight: 500;
   }
 
-  /* Плашка-навигация: контурная пилюля, активный раздел — тёмная пилюля внутри. */
+  /* Плашка-навигация: белая пилюля с тонкой линией, активный раздел — тёмная пилюля внутри.
+     Пункты и кнопка справа одной высоты — 44px: строка шапки ровная. */
   .hdr__nav ul {
     list-style: none;
     display: flex;
     gap: 2px;
-    padding: 5px;
+    padding: 4px;
     border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--paper);
     box-shadow: inset 0 0 0 1px var(--line);
-    backdrop-filter: blur(14px);
   }
 
   .hdr__nav a {
-    display: block;
-    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 18px;
     border-radius: var(--radius-pill);
     font-family: var(--font-display);
     font-weight: 500;
@@ -248,7 +249,8 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
 
   .hdr__cta {
     justify-self: end;
-    min-height: 50px;
+    min-height: 44px;
+    padding-block: 10px;
     white-space: nowrap;
   }
 
@@ -400,14 +402,26 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
       padding: 6px;
       border: 1px solid rgba(10, 11, 20, 0.08);
       border-radius: var(--radius-pill);
-      background: rgba(255, 255, 255, 0.94);
-      -webkit-backdrop-filter: blur(18px);
-      backdrop-filter: blur(18px);
-      box-shadow:
-        0 2px 6px rgba(10, 11, 20, 0.06),
-        0 16px 36px -12px rgba(30, 40, 100, 0.3);
+      background: var(--paper);
+      box-shadow: var(--shadow-2);
       /* При переходе между страницами остров остаётся на месте, меняется только подпись. */
       view-transition-name: site-island;
+    }
+
+    /* Без скрипта меню не открыть — кнопку не показываем. Со скриптом она видна с первого кадра,
+       и остров не меняет ширину после загрузки. */
+    :global(html:not(.js)) .isl__menu {
+      display: none;
+    }
+
+    /* Главная: остров ждёт, пока цифры первого экрана уйдут из нижней зоны (island.ts).
+       Без скрипта он виден сразу. */
+    :global(html.js) .isl.is-held {
+      transform: translateY(calc(100% + 32px));
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      view-transition-name: none;
     }
 
     /* Пока открыто меню, остров «стал» карточкой. */
@@ -567,7 +581,8 @@ const menuAria = section ? `Меню сайта. Сейчас открыт ра�
         visibility 0s;
     }
 
-    .isl.is-away {
+    .isl.is-away,
+    .isl.is-held {
       transition:
         transform var(--dur) var(--ease-out),
         opacity var(--dur-fast) var(--ease-out),

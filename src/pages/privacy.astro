@@ -1,11 +1,12 @@
 ---
 import Base from '@/layouts/Base.astro';
 import PageHero from '@/components/PageHero.astro';
-import { site } from '@/config/site';
+import { site, emailUrl } from '@/config/site';
 import { url } from '@/lib/url';
 
 const { operatorName, operatorStatus, policyDate } = site.legal;
 const email = site.contacts.email;
+const operatorEmail = emailUrl();
 // Без имени оператора политика не публикуется в поиске; статус (самозанятый/ИП) выводится, когда подтверждён.
 const draft = !operatorName.confirmed;
 const status = operatorStatus.confirmed && operatorStatus.value ? `, ${operatorStatus.value}` : '';
@@ -26,7 +27,7 @@ const viaFormspree = Boolean(site.forms.formspreeId);
       <h2>1. Кто обрабатывает данные</h2>
       <p>
         Оператор персональных данных — {operatorName.value}{status} (далее — «Оператор»).
-        Связаться по вопросам обработки данных можно по электронной почте {email.confirmed ? email.value : '[адрес будет указан]'}.
+        Связаться по вопросам обработки данных можно по электронной почте {operatorEmail ? <a href={operatorEmail}>{email.value}</a> : '[адрес будет указан]'}.
       </p>
 
       <h2>2. Какие данные собираются</h2>

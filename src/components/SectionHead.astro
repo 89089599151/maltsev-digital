@@ -19,11 +19,11 @@ const { id, title, text, link, invert = false } = Astro.props;
 ---
 
 <div class:list={['sh', { 'sh--invert': invert, 'sh--text': !!text, 'sh--link': !!link }]}>
-  <h2 id={id} class="sh__title" data-split>{title}</h2>
-  {text && <p class="sh__text" data-reveal>{text}</p>}
+  <h2 id={id} class="sh__title">{title}</h2>
+  {text && <p class="sh__text">{text}</p>}
   {
     link && (
-      <a class="sh__link" href={link.href} aria-label={link.short ? link.label : undefined} data-reveal>
+      <a class="sh__link" href={link.href} aria-label={link.short ? link.label : undefined}>
         <span class="sh__long">{link.label}</span>
         {link.short && <span class="sh__short" aria-hidden="true">{link.short}</span>}
         <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
@@ -73,6 +73,8 @@ const { id, title, text, link, invert = false } = Astro.props;
     color: var(--ink-2);
   }
 
+  /* Ссылка раздела — текст со стрелкой, без синей черты: при наведении синеет и подчёркивается.
+     Без пояснения стоит у правого края, как на телефоне; с пояснением — под ним. */
   .sh__link {
     grid-area: link;
     justify-self: start;
@@ -84,19 +86,25 @@ const { id, title, text, link, invert = false } = Astro.props;
     font-weight: 500;
     white-space: nowrap;
     text-decoration: none;
-    border-bottom: 1.5px solid var(--accent);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  .sh:not(.sh--text) .sh__link {
+    justify-self: end;
+  }
+
+  .sh__link:is(:hover, :focus-visible) {
+    color: var(--accent-text);
+  }
+
+  .sh__link:is(:hover, :focus-visible) :is(.sh__long, .sh__short) {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
   }
 
   .sh__short {
     display: none;
-  }
-
-  .sh__link .arrow {
-    transition: transform var(--dur-fast) var(--ease-out);
-  }
-
-  .sh__link:hover .arrow {
-    transform: translateX(4px);
   }
 
   .sh--invert .sh__title {
@@ -107,7 +115,8 @@ const { id, title, text, link, invert = false } = Astro.props;
     color: var(--night-muted);
   }
 
-  .sh--invert .sh__link {
+  .sh--invert .sh__link,
+  .sh--invert .sh__link:is(:hover, :focus-visible) {
     color: var(--night-ink);
   }
 

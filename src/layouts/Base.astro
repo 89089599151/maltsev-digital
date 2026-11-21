@@ -7,6 +7,8 @@ import Footer from '@/components/Footer.astro';
 import PreviewBanner from '@/components/PreviewBanner.astro';
 import { site } from '@/config/site';
 import { url } from '@/lib/url';
+import onestCyrillic from '@/assets/fonts/onest-cyrillic-wght-normal.woff2?url';
+import onestLatin from '@/assets/fonts/onest-latin-wght-normal.woff2?url';
 
 interface Props {
   title?: string;
@@ -51,6 +53,8 @@ const orgSchema = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preload" href={onestCyrillic} as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href={onestLatin} as="font" type="font/woff2" crossorigin="anonymous" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />

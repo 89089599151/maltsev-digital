@@ -19,9 +19,8 @@ interface EstConfig {
 const fmt = (n: number) => new Intl.NumberFormat('ru-RU').format(n) + ' ₽';
 
 /**
- * Калькулятор на странице услуг. Тип сайта и страницы — в форме [data-estimator];
- * дополнительные работы — кнопки [data-addon] в списке «Дополнительно» под калькулятором.
- * Без скрипта кнопки скрыты, а список остаётся обычным прайсом.
+ * Калькулятор на странице услуг. Тип сайта, страницы и дополнительные работы (кнопки [data-addon])
+ * — в одной форме [data-estimator]. Без скрипта кнопки скрыты, а список работ остаётся обычным прайсом.
  */
 export function initEstimator(): void {
   const form = document.querySelector<HTMLFormElement>('[data-estimator]');
@@ -37,9 +36,7 @@ export function initEstimator(): void {
   const outTime = form.querySelector<HTMLElement>('[data-out-time]')!;
   const outExtra = form.querySelector<HTMLElement>('[data-out-extra]')!;
   const outLink = form.querySelector<HTMLAnchorElement>('[data-out-link]')!;
-  const mirror = document.querySelector<HTMLElement>('[data-out-mirror]');
-  const mirrorSum = document.querySelector<HTMLElement>('[data-out-mirror-sum]');
-  const toggles = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-addon]'));
+  const toggles = Array.from(form.querySelectorAll<HTMLButtonElement>('button[data-addon]'));
   const steps = Array.from(form.querySelectorAll<HTMLButtonElement>('button[data-step]'));
   const chosen = new Set<string>();
   // Расчёт уходит в остров и лист «Написать» только после того, как посетитель сам что-то поменял.
@@ -108,7 +105,6 @@ export function initEstimator(): void {
     if (extraPages) notes.push(`Сверх пакета: ${extraPages} стр. × ${fmt(cfg.extraPagePrice)}`);
     if (names.length) notes.push(`Добавлено: ${names.join(', ')}`);
     outExtra.textContent = notes.join('. ');
-    if (mirrorSum) mirrorSum.textContent = `${fmt(sum)} · ${plan.name}`;
 
     const params = new URLSearchParams({ plan: plan.id, pages: String(pages), sum: String(sum) });
     if (ids.length) params.set('addons', ids.join(','));
@@ -161,6 +157,5 @@ export function initEstimator(): void {
       outSum.classList.add('is-bumped');
     });
   }
-  if (mirror) mirror.hidden = false;
   calc();
 }

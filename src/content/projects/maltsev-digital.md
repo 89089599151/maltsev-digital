@@ -6,8 +6,8 @@ isConcept: false
 year: 2026
 order: 1
 featured: true
-cover: ../../assets/case/home-desktop.png
-coverAlt: Первый экран сайта Maltsev Digital на десктопе
+cover: ../../assets/case/services-desktop.png
+coverAlt: Страница «Услуги и цены» Maltsev Digital со стеклянным осьминогом и ссылками на пакеты и калькулятор
 task: >-
   Сделать сайт, который сам доказывает качество работы. С первого экрана понятно, что предлагается
   и сколько стоит; есть калькулятор, удобная заявка и быстрая загрузка на любом устройстве. Весь путь
@@ -17,19 +17,19 @@ designNotes:
   - Перед началом изучено 20 сайтов студий — что у них удобно, а что мешает.
   - Четыре визуальных направления — тёмное, светлое стекло, тёплый ретрофутуризм и белое с синим. Осталось последнее.
   - Один шрифт на весь сайт — тонкие крупные заголовки и плотный текст, без декоративных начертаний.
-  - Движение без библиотек — первый экран собирается на CSS, блоки появляются один раз при прокрутке.
+  - Плавные переходы между страницами и отклик кнопок. При прокрутке мягко проявляются изображения.
   - Калькулятор стоимости передаёт расчёт прямо в форму заявки.
 gallery:
-  - src: ../../assets/case/services-desktop.png
-    alt: Страница «Услуги и цены»
-    caption: Пакеты и калькулятор стоимости
-  - src: ../../assets/case/portfolio-desktop.png
-    alt: Страница «Работы» с витриной этого кейса
-    caption: Страница «Работы»
+  - src: ../../assets/case/pricing-desktop.png
+    alt: Три пакета на главной странице с ценами, сроками и кратким составом BUSINESS
+    caption: Пакеты на главной
+  - src: ../../assets/case/calculator-desktop.png
+    alt: Калькулятор с выбором типа сайта, числа страниц и дополнительных работ
+    caption: Расчёт стоимости сайта
 responsive:
-  desktop: ../../assets/case/home-desktop.png
-  tablet: ../../assets/case/home-tablet.png
-  mobile: ../../assets/case/home-mobile.png
+  desktop: ../../assets/case/services-desktop.png
+  tablet: ../../assets/case/about-tablet.png
+  mobile: ../../assets/case/faq-mobile.png
 results:
   - value: '90+ из 100'
     label: скорость по оценке Google Lighthouse — на телефоне и компьютере

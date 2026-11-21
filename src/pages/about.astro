@@ -1,7 +1,7 @@
 ---
 /**
- * «Обо мне»: кто делает сайт и почему один, как устроена работа с ИИ, принципы,
- * честная оговорка о портфолио и инструменты. Те же блоки и поверхности, что на остальных страницах.
+ * «Обо мне»: кто делает сайт и почему один, три принципа, честная оговорка о портфолио и инструменты.
+ * Все блоки — обычные разделы сайта: заголовок слева, текст или строки под линиями справа.
  */
 import { Image } from 'astro:assets';
 import Base from '@/layouts/Base.astro';
@@ -13,11 +13,9 @@ import { url } from '@/lib/url';
 import owner from '@/assets/photos/owner.webp';
 
 const principles = [
-  { t: 'Честность вместо витрины', d: 'Только то, что можно проверить. Без выдуманных отзывов, логотипов и цифр.' },
+  { t: 'Только проверяемые факты', d: 'Без выдуманных отзывов, логотипов и цифр.' },
   { t: 'Цена до старта', d: 'Состав работ и сумма фиксируются письменно до начала.' },
-  { t: 'Сайт ваш', d: 'Код, домен и доступы передаются вам. Без привязки к конструктору.' },
-  { t: 'Скорость — часть дизайна', d: 'Проверяю скорость на каждом этапе: пользоваться сайтом должно быть удобно.' },
-  { t: 'Понятный язык', d: 'Объясняю решения без жаргона, чтобы вы понимали, за что платите.' },
+  { t: 'Быстрая загрузка', d: 'Проверяю скорость на телефоне на каждом этапе, цель — 90+ в тесте Google.' },
 ];
 
 const tools = [
@@ -39,9 +37,9 @@ const tools = [
     <Fragment slot="actions">
       <div class="ab-actions">
         <a class="btn btn--ink" href={url('/contacts/')}>
-          Обсудить проект <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+          Обсудить проект
         </a>
-        <a class="btn btn--ghost" href={url('/portfolio/')}>Смотреть кейс</a>
+        <a class="btn btn--ghost" href={url('/portfolio/maltsev-digital/')}>Смотреть кейс</a>
       </div>
     </Fragment>
     <Image
@@ -56,24 +54,23 @@ const tools = [
   </PageHero>
 
   <section class="section split" data-island-section="Почему один" aria-labelledby="ab-why">
-    <h2 id="ab-why" class="head" data-split>Почему один</h2>
-    <div class="ab-prose" data-stagger>
+    <h2 id="ab-why" class="head">Почему один</h2>
+    <div class="ab-prose">
       <p class="ab-prose__lead">Один человек помнит всю историю проекта.</p>
       <p>
         В агентстве между вами и тем, кто делает сайт, стоят менеджер, дизайнер, верстальщик и тестировщик.
         Каждый передаёт задачу следующему, и часть смысла теряется по дороге.
       </p>
       <p>
-        Я веду проект сам и могу объяснить, почему каждое решение выглядит и работает именно так. Рутину
-        берут на себя ИИ-инструменты — поэтому индивидуальный сайт занимает недели, а не месяцы.
+        Я веду проект сам и могу объяснить каждое решение. Лендинг занимает 7–10 рабочих дней,
+        индивидуальный проект — 5–7 недель.
       </p>
     </div>
   </section>
 
-
   <section class="section split" data-island-section="Принципы" aria-labelledby="ab-principles">
-    <h2 id="ab-principles" class="head" data-split>Принципы</h2>
-    <ul class="rows" data-stagger>
+    <h2 id="ab-principles" class="head">Принципы</h2>
+    <ul class="rows">
       {
         principles.map((p) => (
           <li>
@@ -85,32 +82,32 @@ const tools = [
     </ul>
   </section>
 
-  <section class="section ab-pair" aria-label="О портфолио и инструментах">
-    <article class="ab-card" aria-labelledby="ab-honest" data-reveal>
-      <h2 id="ab-honest" class="ab-card__title">Чего здесь пока нет</h2>
+  <section class="section split" data-island-section="Портфолио" aria-labelledby="ab-honest">
+    <h2 id="ab-honest" class="head">Чего здесь пока нет</h2>
+    <div class="ab-prose">
       <p>
         Отзывов, логотипов клиентов и больших цифр. Я не стану их выдумывать: каждый новый проект появится
         с разбором и ссылкой на живой сайт.
       </p>
       <p>А пока судите по этому сайту — он сделан так же, как будет сделан ваш.</p>
-      <a class="ab-card__link" href={url('/portfolio/maltsev-digital/')}>
+      <a class="ab-link" href={url('/portfolio/maltsev-digital/')}>
         Как сделан этот сайт <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
       </a>
-    </article>
+    </div>
+  </section>
 
-    <article class="ab-card" aria-labelledby="ab-tools" data-reveal style="--i:1">
-      <h2 id="ab-tools" class="ab-card__title">Инструменты</h2>
-      <dl class="ab-tools">
-        {
-          tools.map((t) => (
-            <div>
-              <dt>{t.name}</dt>
-              <dd>{t.list}</dd>
-            </div>
-          ))
-        }
-      </dl>
-    </article>
+  <section class="section split" data-island-section="Инструменты" aria-labelledby="ab-tools">
+    <h2 id="ab-tools" class="head">Инструменты</h2>
+    <dl class="rows">
+      {
+        tools.map((t) => (
+          <div>
+            <dt class="rows__k">{t.name}</dt>
+            <dd class="rows__v">{t.list}</dd>
+          </div>
+        ))
+      }
+    </dl>
   </section>
 
   <CtaBand
@@ -150,6 +147,7 @@ const tools = [
   .ab-prose {
     display: grid;
     gap: 1em;
+    justify-items: start;
     max-width: 60ch;
     color: var(--ink-2);
   }
@@ -161,88 +159,27 @@ const tools = [
     color: var(--ink);
   }
 
-  .ab-pair {
-    display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: var(--gap);
-  }
-
-  .ab-card {
-    display: grid;
-    gap: 16px;
-    align-content: start;
-    justify-items: start;
-    padding: clamp(24px, 3vw, 44px);
-    border-radius: var(--radius-lg);
-    background: var(--paper);
-  }
-
-  .ab-card__title {
-    margin-bottom: 8px;
-    font-size: var(--fs-4);
-    line-height: 1.02;
-    letter-spacing: -0.045em;
-  }
-
-  .ab-card p {
-    max-width: 52ch;
-    color: var(--ink-2);
-  }
-
-  .ab-card__link {
+  /* Ссылка — как ссылки разделов: текст со стрелкой, при наведении синеет. */
+  .ab-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     min-height: 44px;
-    margin-top: 4px;
-    font-family: var(--font-display);
     font-weight: 500;
+    color: var(--ink);
     text-decoration: none;
-    border-bottom: 1.5px solid var(--accent);
+    transition: color var(--dur-fast) var(--ease-out);
   }
 
-  .ab-card__link .arrow {
-    transition: transform var(--dur-fast) var(--ease-out);
-  }
-
-  .ab-tools {
-    width: 100%;
-    border-top: 1px solid var(--line);
-  }
-
-  .ab-tools div {
-    display: grid;
-    gap: 2px;
-    padding-block: 14px;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .ab-tools dt {
-    font-size: var(--fs-xs);
-    color: var(--muted);
-  }
-
-  .ab-tools dd {
-    font-family: var(--font-display);
-    font-weight: 500;
-    line-height: 1.35;
+  .ab-link:is(:hover, :focus-visible) {
+    color: var(--accent-text);
   }
 
   @media (max-width: 1023px) {
-    .ab-pair {
-      grid-template-columns: 1fr;
-    }
-
     .ab-photo {
       justify-self: start;
       max-width: 520px;
       aspect-ratio: 4 / 3;
-    }
-  }
-
-  @media (max-width: 767px) {
-    .ab-card {
-      border-radius: var(--radius-lg);
     }
   }
 </style>

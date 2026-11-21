@@ -49,7 +49,7 @@ const schema = {
 };
 ---
 
-<Base title={isSelf ? 'Кейс: этот сайт, сделанный с ИИ' : `${d.title} — ${d.isConcept ? 'концепт' : 'проект'}`} description={d.summary} schema={schema}>
+<Base title={isSelf ? 'Кейс: сайт Maltsev Digital' : `${d.title} — ${d.isConcept ? 'концепт' : 'проект'}`} description={d.summary} schema={schema}>
   <article>
     <PageHero
       id="pj-title"
@@ -59,18 +59,18 @@ const schema = {
       compact
     >
       <dl class="pj-facts">
-        <div><dt>Тип</dt><dd>{d.isConcept ? 'Концепт' : categoryLabel(d.category)}</dd></div>
+        <div><dt>Тип</dt><dd>{d.isConcept ? 'Концепт' : d.category === 'personal' ? 'Личный проект' : categoryLabel(d.category)}</dd></div>
         <div><dt>Год</dt><dd>{d.year}</dd></div>
         <div><dt>Технологии</dt><dd>{d.stack.join(', ')}</dd></div>
       </dl>
       {
         d.liveUrl ? (
           <a class="btn btn--accent pj-live" href={d.liveUrl} target="_blank" rel="noopener">
-            Открыть сайт <span class="arrow" aria-hidden="true"><Icon name="arrow-ne" /></span>
+            Открыть сайт
           </a>
         ) : isSelf ? (
           <a class="btn btn--ink pj-live" href={url('/')}>
-            Открыть главную <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+            Открыть главную
           </a>
         ) : (
           <p class="pj-live pj-live--off">Живая версия недоступна</p>
@@ -83,15 +83,15 @@ const schema = {
     </figure>
 
     <section class="section split" data-island-section="Задача" aria-labelledby="task-title">
-      <h2 id="task-title" class="head" data-split>Задача</h2>
-      <p class="pj-lead" data-reveal>{d.task}</p>
+      <h2 id="task-title" class="head">Задача</h2>
+      <p class="pj-lead">{d.task}</p>
     </section>
 
     {
       d.results.length > 0 && (
         <section class="section split" data-island-section="Результат" aria-labelledby="res-title">
-          <h2 id="res-title" class="head" data-split>Результат</h2>
-          <dl class="rows" data-stagger>
+          <h2 id="res-title" class="head">Результат</h2>
+          <dl class="rows">
             {d.results.map((r) => (
               <div>
                 <dd class="rows__k rows__k--metric">{r.value}</dd>
@@ -106,8 +106,8 @@ const schema = {
     {
       d.designNotes.length > 0 && (
         <section class="section split" data-island-section="Решения" aria-labelledby="design-title">
-          <h2 id="design-title" class="head" data-split>Решения</h2>
-          <ul class="pj-notes" data-stagger>
+          <h2 id="design-title" class="head">Решения</h2>
+          <ul class="pj-notes">
             {d.designNotes.map((n) => <li>{n}</li>)}
           </ul>
         </section>
@@ -117,9 +117,9 @@ const schema = {
     {
       (d.gallery.length > 0 || devices.length > 0) && (
         <section class="section" data-island-section="Экраны" aria-labelledby="gal-title">
-          <h2 id="gal-title" class="head pj-screens-title" data-split>Экраны</h2>
+          <h2 id="gal-title" class="head pj-screens-title">Экраны</h2>
           {d.gallery.length > 0 && (
-            <div class="pj-gallery" data-stagger>
+            <div class="pj-gallery" data-reveal>
               {d.gallery.map((g) => (
                 <figure class="pj-shot">
                   <BrowserShot src={g.src} alt={g.alt} widths={[600, 1000, 1600]} sizes="(max-width: 767px) 86vw, 42vw" />
@@ -129,7 +129,7 @@ const schema = {
             </div>
           )}
           {devices.length > 0 && (
-            <div class="pj-devices" data-stagger>
+            <div class="pj-devices" data-reveal>
               {devices.map((dv) => (
                 <figure class={`pj-device pj-device--${dv.key}`}>
                   <div class="pj-device__frame">
@@ -145,8 +145,8 @@ const schema = {
     }
 
     <section class="section split pj-story" data-island-section="Как сделано" aria-labelledby="story-title">
-      <h2 id="story-title" class="head" data-split>Как это сделано</h2>
-      <div class="prose" data-reveal>
+      <h2 id="story-title" class="head">Как это сделано</h2>
+      <div class="prose">
         <Content />
       </div>
     </section>

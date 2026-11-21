@@ -32,7 +32,7 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string; ste
       : { href: url('/contacts/'), label: 'Обсудить проект', short: 'Обсудить' }}
   />
 
-  <ol class="ps__list" data-stagger>
+  <ol class="ps__list">
     {
       list.map((s, i) => (
         <li class="ps__step">
@@ -78,14 +78,20 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string; ste
     padding: 0;
   }
 
-  /* Номер шага: тонкие крупные цифры акцентом. */
+  /* Номер шага: тонкие крупные цифры цветом текста; синий — только у финального этапа. */
   .ps__num {
     font-family: var(--font-head);
     font-weight: 300;
     font-size: clamp(2.25rem, 1.4rem + 2vw, 3.25rem);
     line-height: 0.9;
     letter-spacing: -0.05em;
-    color: var(--accent-text);
+  }
+
+  /* Страница услуг: семь номеров в строках списка — на шаг мельче, чем четыре карточки главной. */
+  .ps--full .ps__num {
+    font-size: var(--fs-3);
+    line-height: 1.1;
+    color: var(--muted);
   }
 
   .ps__head {
@@ -130,7 +136,7 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string; ste
 
   .ps__you span {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 500;
     font-size: var(--fs-xs);
     letter-spacing: 0;
     color: var(--muted);
@@ -354,8 +360,8 @@ const list: (Pick<Stage, 'name' | 'text' | 'duration'> & { fromYou?: string; ste
 
     .ps--full.is-accordion .ps__step.is-open .ps__name-i {
       rotate: 45deg;
-      background: var(--accent);
-      color: var(--accent-ink);
+      background: var(--ink);
+      color: var(--paper);
     }
   }
 

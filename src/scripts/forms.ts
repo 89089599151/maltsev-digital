@@ -104,8 +104,12 @@ function composeBrief(form: HTMLFormElement, fields: Field[]): string {
     const value = el.value.trim();
     if (value) lines.push(`${fieldLabel(el)}: ${value}`);
   }
-  const estimate = form.querySelector<HTMLInputElement>('[data-estimate-field]')?.value.trim();
-  if (estimate) lines.push(`Расчёт с сайта: ${estimate}`);
+  // Бриф уже подставляет расчёт в описание задачи. Не дублируем его в готовом письме,
+  // но сохраняем отдельную строку, если посетитель удалил подстановку или пишет из короткой формы.
+  const estimate = form.querySelector<HTMLInputElement>('[data-estimate-field]')?.value
+    .replace(/^(?:Расчёт с сайта:\s*)+/iu, '').trim();
+  const inMessage = estimate && fields.some((el) => el.name === 'message' && el.value.includes(estimate));
+  if (estimate && !inMessage) lines.push(`Расчёт с сайта: ${estimate}`);
   return lines.join('\n');
 }
 
@@ -163,10 +167,11 @@ export function initLeadForms(): void {
       const channel = (): 'telegram' | 'mail' =>
         channels.find((el) => el.checked)?.value === 'telegram' && tgUrl ? 'telegram' : 'mail';
 
-      // Подпись кнопки говорит, что произойдёт: «Отправить в Telegram» или «Отправить на почту».
+      // Подпись кнопки говорит, что произойдёт на самом деле: заявка не уходит с сайта, а копируется
+      // в чат Telegram или открывается готовым письмом.
       const syncChannel = () => {
         const current = channel();
-        if (label) label.textContent = current === 'telegram' ? 'Отправить в Telegram' : 'Отправить на почту';
+        if (label) label.textContent = current === 'telegram' ? 'Скопировать заявку и открыть Telegram' : 'Открыть письмо с заявкой';
         if (hint) hint.textContent = (current === 'telegram' ? hint.dataset.hintTelegram : hint.dataset.hintMail) ?? '';
         if (status) status.textContent = '';
       };

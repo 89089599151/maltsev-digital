@@ -54,7 +54,7 @@ export function initWriteSheet(): void {
   /** Расчёт из калькулятора попадает в сообщение Telegram, в письмо, в заявку и в адрес брифа. */
   const applyEstimate = () => {
     if (estimateBox) estimateBox.hidden = !estimate;
-    if (estimateText) estimateText.textContent = estimate ? `${estimate.plan} · ${fullSum(estimate.sum)}` : '';
+    if (estimateText) estimateText.textContent = estimate ? `${fullSum(estimate.sum)}, ${estimate.plan}` : '';
     if (estimateField) estimateField.value = estimate ? `Расчёт с сайта: ${estimate.summary}` : '';
     const text = estimate ? `Здравствуйте! Расчёт с сайта: ${estimate.summary}.` : '';
     if (telegram) telegram.href = text ? `${base.telegram}?text=${encodeURIComponent(text)}` : base.telegram;

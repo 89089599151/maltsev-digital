@@ -4,13 +4,12 @@ import PageHero from '@/components/PageHero.astro';
 import { Image } from 'astro:assets';
 import { genImage } from '@/lib/gen';
 import { url } from '@/lib/url';
-import Icon from '@/components/Icon.astro';
 
 // Стеклянный спасательный круг: заблудились — вот выход.
 const buoy = genImage('notfound-buoy');
 
+// Одна кнопка — на главную; остальные разделы — тихими ссылками рядом.
 const links = [
-  { href: '/', label: 'Главная' },
   { href: '/services/', label: 'Услуги и цены' },
   { href: '/portfolio/', label: 'Работы' },
   { href: '/contacts/', label: 'Контакты' },
@@ -20,17 +19,18 @@ const links = [
 <Base title="Страница не найдена" description="Такой страницы нет. Перейдите на главную или в другой раздел." noindex>
   <PageHero id="nf-title" title="Такой страницы нет" lead="Ошибка 404: адрес изменился или в нём опечатка. Вот куда можно перейти.">
     <Fragment slot="actions">
-      <ul class="nf__links">
-        {
-          links.map((l) => (
-            <li>
-              <a class="btn btn--ghost" href={url(l.href)}>
-                {l.label} <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+      <div class="nf__actions">
+        <a class="btn btn--ink" href={url('/')}>На главную</a>
+        <ul class="nf__links">
+          {
+            links.map((l) => (
+              <li>
+                <a href={url(l.href)}>{l.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
     </Fragment>
     {buoy && <Image class="nf-object" src={buoy.src} alt="" widths={[320, 480, 640, 900]} sizes="(max-width: 1023px) 60vw, 34vw" quality={80} loading="eager" />}
   </PageHero>
@@ -41,7 +41,14 @@ const links = [
     width: min(100%, 460px);
     height: auto;
     justify-self: center;
-    filter: drop-shadow(0 30px 32px rgba(26, 47, 251, 0.18));
+    filter: var(--object-shadow);
+  }
+
+  .nf__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 28px;
   }
 
   .nf__links {
@@ -49,7 +56,22 @@ const links = [
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 4px 20px;
+  }
+
+  .nf__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  .nf__links a:is(:hover, :focus-visible) {
+    color: var(--accent-text);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
   }
 
   @media (max-width: 1023px) {

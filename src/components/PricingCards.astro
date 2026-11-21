@@ -7,26 +7,31 @@
  */
 import SectionHead from './SectionHead.astro';
 import Icon from './Icon.astro';
-import { plans, formatPrice, pricingConfirmed } from '@/config/pricing';
+import { plans, addons, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
 
 // Объём — в строке «Объём», поэтому первый пункт списка (он о том же) в карточке не повторяется.
 const scopes: Record<string, string> = { start: 'Одна страница, до 8 блоков', business: 'До 8 страниц', premium: 'До 15 страниц' };
+// Тексты и фото во всех пакетах — от клиента: говорим об этом один раз, в пояснении к разделу.
+const copyPrice = formatPrice(addons.find((a) => a.id === 'copy')?.price ?? 0);
 ---
 
 <section class="pl section" id="plans" data-island-section="Пакеты" aria-labelledby="detail-title">
   <SectionHead
     id="detail-title"
     title="Три пакета"
-    text={`Цена записывается в договоре и меняется, только если меняется задача. Оплата, сроки и возврат — в условиях ниже.${pricingConfirmed ? '' : ' Цены предварительные.'}`}
+    text={`Цена записывается в договор и меняется, только если меняется задача. Тексты и фото готовите вы, написать тексты могу за ${copyPrice}.${pricingConfirmed ? '' : ' Цены предварительные.'}`}
   />
 
-  <div class="pl__grid" data-stagger>
+  <div class="pl__grid">
     {
       plans.map((p) => (
         <article class={`pl__card pl__card--${p.id}`} id={`plan-${p.id}`} aria-labelledby={`col-${p.id}`}>
           <header class="pl__head">
-            <h3 id={`col-${p.id}`} class="pl__name">{p.name}</h3>
+            <div class="pl__title">
+              <h3 id={`col-${p.id}`} class="pl__name">{p.name}</h3>
+              {p.id === 'business' && <p class="pl__badge">Рекомендую</p>}
+            </div>
             <p class="pl__for">{p.forWhom}</p>
           </header>
 
@@ -41,11 +46,10 @@ const scopes: Record<string, string> = { start: 'Одна страница, до
             {p.highlights.slice(1).map((item) => (
               <li><Icon name="check" /><span>{item}</span></li>
             ))}
-            <li class="pl__need"><Icon name="minus" /><span>Тексты и фото — от вас</span></li>
           </ul>
 
-          <a class="btn pl__btn" href={url(`/contacts/?plan=${p.id}`)}>
-            Заказать {p.name} <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+          <a class="btn pl__btn" href={url(`/contacts/?plan=${p.id}`)} aria-label={`Выбрать пакет ${p.name}`}>
+            Выбрать {p.name}
           </a>
 
           <details class="pl__more">
@@ -106,6 +110,24 @@ const scopes: Record<string, string> = { start: 'Одна страница, до
     gap: 10px;
   }
 
+  .pl__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+  }
+
+  /* Метка рекомендуемого пакета — та же, что на главной: белая пилюля с синим текстом. */
+  .pl__badge {
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    color: var(--accent-text);
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
   .pl__name {
     font-weight: 300;
     font-size: var(--fs-4);
@@ -122,7 +144,7 @@ const scopes: Record<string, string> = { start: 'Одна страница, до
 
   .pl__price {
     font-family: var(--font-head);
-    font-weight: 400;
+    font-weight: 300;
     font-size: var(--fs-4);
     line-height: 1;
     letter-spacing: -0.05em;
@@ -176,22 +198,9 @@ const scopes: Record<string, string> = { start: 'Одна страница, до
     line-height: 1.4;
   }
 
+  /* Галочки — цветом второстепенного текста карточки, без синего. */
   .pl__list :global(.icon) {
     margin-top: 0.2em;
-    color: var(--accent-text);
-  }
-
-  .pl__card--business .pl__list :global(.icon) {
-    color: inherit;
-  }
-
-  .pl__card--premium .pl__list :global(.icon) {
-    color: var(--accent-on-dark);
-  }
-
-  /* То, чего в пакете нет, — тем же списком, но приглушённо. */
-  .pl__list .pl__need,
-  .pl__list .pl__need :global(.icon) {
     color: var(--pl-muted);
   }
 
@@ -222,7 +231,8 @@ const scopes: Record<string, string> = { start: 'Одна страница, до
     background: var(--accent-hover);
   }
 
-  .pl__card--business :global(:focus-visible) {
+  .pl__card--business :global(:focus-visible),
+  .pl__card--premium :global(:focus-visible) {
     outline-color: var(--paper);
   }
 

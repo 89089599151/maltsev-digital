@@ -47,12 +47,12 @@ const href = isTg ? telegramUrl() : emailUrl('Заявка на разработ
     transition: background-color var(--dur-fast) var(--ease-out);
   }
 
-  a.cl:hover {
+  a.cl:focus-visible {
     background: var(--accent);
     color: var(--accent-ink);
   }
 
-  a.cl:hover .cl__label {
+  a.cl:focus-visible .cl__label {
     color: inherit;
   }
 
@@ -80,8 +80,19 @@ const href = isTg ? telegramUrl() : emailUrl('Заявка на разработ
     transition: transform var(--dur-fast) var(--ease-out);
   }
 
-  a.cl:hover .cl__arrow {
-    transform: translate(3px, -3px);
+  @media (hover: hover) and (pointer: fine) {
+    a.cl:hover {
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    a.cl:hover .cl__label {
+      color: inherit;
+    }
+
+    a.cl:hover .cl__arrow {
+      transform: translate(3px, -3px);
+    }
   }
 
   .cl--pending .cl__value {

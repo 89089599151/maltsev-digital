@@ -23,18 +23,18 @@
   --accent-deep: #1020c8;
   --accent-hover: #3d4fff;
   --accent-soft: #dfe3ff;
-  /* Большие синие поверхности (рекомендуемый пакет, призыв в конце страницы): чуть светлее сверху
-     и с мягким бликом — сплошной электрик на большой площади на телефоне выглядит тёмным. */
-  --accent-surface:
-    radial-gradient(120% 80% at 15% 0%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 55%),
-    linear-gradient(155deg, #3a54ff 0%, #1a2ffb 55%, #1828e8 100%);
-  /* Синий текст на светлом и значимая синяя графика. */
+  /* Большие синие поверхности — только рекомендуемый пакет и финальный этап «Запуск».
+     Плоско, без бликов: чуть светлее сверху, чтобы сплошной электрик на большой площади
+     на телефоне не выглядел тёмным. */
+  --accent-surface: linear-gradient(180deg, #2a42ff 0%, #1a2ffb 100%);
+  /* Акцент для полупрозрачных оттенков: rgb(var(--accent-rgb) / 0.1). */
+  --accent-rgb: 26 47 251;
+  /* Синий текст на светлом: ссылки при наведении и фокусе. Остальной текст — чернила. */
   --accent-text: #1426d9;
-  --accent-graphic: #1a2ffb;
   /* Синий на тёмных плашках: основной там не читается. */
   --accent-on-dark: #8d99ff;
-  /* Приглушённый текст на синем и тонкие разделители: не ниже 4,5:1 даже на самом светлом краю
-     синей заливки (#3a54ff). */
+  /* Приглушённый текст на синем и тонкие разделители: не ниже 4,5:1 даже на светлом верхнем
+     краю синей заливки (#2a42ff). */
   --on-accent-muted: #ebedff;
   /* Полупрозрачная — одинаково читается на фоне, поверхностях и сценах. */
   --line: rgba(10, 11, 20, 0.12);
@@ -47,7 +47,6 @@
   --stage-2: #dde1f3;
   --stage-glow: #ffffff;
   --paper: #ffffff;
-  --paper-2: #f1f2fa;
   --paper-ink: #0a0b14;
   --paper-muted: #55586b;
   --night: #0a0b14;
@@ -56,26 +55,26 @@
   --danger: #c62f22;
   --success: #1f7a3a;
 
-  /* Шкала этапов: чернила → синий. */
-  --tone-1: #0a0b14;
+  /* Плашка предпросмотра. */
   --tone-2: #14173a;
-  --tone-3: #1a2070;
-  --tone-4: #1626b8;
-  --tone-5: #1a2ffb;
-  --tone-6: #7482ff;
   --tone-7: #cfd4ff;
 
-  /* Глубина: плоские поверхности, мягкие тени только у поднятых элементов. */
+  /* Глубина: поверхности плоские, разделяются тонкой линией. Тень — только у того, что
+     действительно парит над страницей, и всегда нейтральная, без синего свечения.
+     --shadow-1 — плашка над сценой; --shadow-2 — плавающие слои (остров, шторки, увеличенный пакет).
+     --object-shadow — одна тень под стеклянными объектами всех страниц. */
   --glass-blur: none;
   --glass-edge: rgba(10, 11, 20, 0.06);
-  --glass-top: rgba(255, 255, 255, 0.7);
-  --glass-shadow: 0 1px 2px rgba(10, 11, 20, 0.06), 0 18px 36px -24px rgba(10, 11, 20, 0.28);
-  --shadow-lift: 0 2px 4px rgba(10, 11, 20, 0.08), 0 28px 50px -26px rgba(10, 11, 20, 0.4);
+  --shadow-1: 0 1px 2px rgba(10, 11, 20, 0.06), 0 8px 24px -12px rgba(10, 11, 20, 0.16);
+  --shadow-2: 0 2px 4px rgba(10, 11, 20, 0.06), 0 24px 48px -24px rgba(10, 11, 20, 0.26);
+  --glass-shadow: var(--shadow-1);
+  --object-shadow: drop-shadow(0 28px 32px rgba(10, 11, 20, 0.16));
 
-  /* Типографика. */
-  --font-head: 'Onest Variable', 'Segoe UI', system-ui, sans-serif;
-  --font-display: 'Onest Variable', 'Segoe UI', system-ui, sans-serif;
-  --font-text: 'Onest Variable', 'Segoe UI', system-ui, sans-serif;
+  /* Типографика: один шрифт на весь сайт. Старые имена оставлены как синонимы. */
+  --font: 'Onest Variable', 'Onest Fallback', 'Segoe UI', system-ui, sans-serif;
+  --font-head: var(--font);
+  --font-display: var(--font);
+  --font-text: var(--font);
 
   /* Шкала размеров: модуль ×1,25 от 16px, восемь шагов. Новые стили берут размеры только отсюда. */
   --fs-xs: 0.8125rem; /* 13 — подписи, метки */
@@ -85,7 +84,6 @@
   --fs-3: clamp(1.5rem, 1.2rem + 1vw, 1.9375rem); /* 24→31 — цены, названия */
   --fs-4: clamp(2rem, 1.1rem + 3vw, 3.0625rem); /* 32→49 — H2 */
   --fs-5: clamp(2rem, 0.9rem + 3.6vw, 3.5rem); /* 32→56 — заголовок раздела */
-  --fs-6: clamp(3rem, 1rem + 5.4vw, 6rem); /* 48→96 — дисплей */
   /* Заголовок страницы: на шаг меньше главного заголовка главной (42→78), на шаг крупнее раздела. */
   --fs-page: clamp(2.375rem, 0.9rem + 3.7vw, 4.25rem); /* 38→68 */
   --step-small: 0.9375rem; /* 15 — подписи полей, мелкий текст */
@@ -96,7 +94,6 @@
   --step-display: var(--fs-page);
 
   /* Базовая шкала: 4 px для деталей, 8 px для основных групп. */
-  --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
@@ -140,7 +137,6 @@
   --dur-fast: 180ms;
   --dur: 450ms;
   --dur-spring: 560ms;
-  --dur-slow: 900ms;
 
   color-scheme: light;
 }
@@ -256,8 +252,8 @@ dd {
   text-wrap: pretty;
 }
 
-/* Четыре насыщенности на весь сайт: 300 — крупные заголовки, 400 — текст, 500 — интерфейс,
-   600 — кнопки и выделение. Жирный по умолчанию (700) выбивается из шкалы. */
+/* Насыщенности на весь сайт: 300 — крупные заголовки и цифры, 400 — текст, 500 — интерфейс
+   (подписи, названия, меню), 600 — только кнопки и выделение в тексте. Жирный (700) выбивается. */
 strong,
 b {
   font-weight: 600;
@@ -300,7 +296,7 @@ b {
   background: var(--accent);
   color: var(--accent-ink);
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 500;
   border-radius: var(--radius);
   text-decoration: none;
 }
@@ -333,51 +329,6 @@ b {
   min-width: 0;
 }
 
-.tile--bare {
-  padding: 0;
-}
-
-.tile--dark {
-  background: var(--paper);
-}
-
-/* Тёмно-синее «ночное» стекло — один-два акцентных блока на экран. */
-.tile--deep {
-  background: var(--night);
-  color: var(--night-ink);
-}
-
-.tile--deep .muted {
-  color: var(--night-muted);
-}
-
-.tile--raised {
-  background: var(--bg);
-}
-
-.tile--paper {
-  background: var(--paper);
-  color: var(--paper-ink);
-}
-
-.tile--accent {
-  background: var(--accent-surface);
-  color: var(--accent-ink);
-}
-
-.tile--photo {
-  padding: 0;
-  background: var(--surface-2);
-}
-
-.tile--photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Фон страницы: глянцевые сине-голубые волны под стеклом. */
-
 .section {
   margin-top: var(--section-gap);
 }
@@ -405,7 +356,7 @@ b {
 
 .head-sm {
   font-family: var(--font-head);
-  font-weight: 600;
+  font-weight: 500;
   font-size: var(--fs-3);
   line-height: 1.12;
   letter-spacing: -0.025em;
@@ -416,14 +367,6 @@ b {
   line-height: 1.35;
 }
 
-.statement {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--fs-2);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-}
-
 .small {
   font-size: var(--step-small);
   line-height: 1.45;
@@ -431,14 +374,6 @@ b {
 
 .muted {
   color: var(--muted);
-}
-
-.tile--paper .muted {
-  color: var(--paper-muted);
-}
-
-.tile--accent .muted {
-  color: var(--on-accent-muted);
 }
 
 .prose {
@@ -491,8 +426,8 @@ b {
 .btn {
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px;
+  justify-content: center;
+  gap: 10px;
   min-height: 52px;
   padding: 14px 24px;
   border-radius: var(--radius-pill);
@@ -522,7 +457,7 @@ b {
   color: var(--accent-ink);
 }
 
-.btn--accent:is(:hover, :focus-visible) {
+.btn--accent:focus-visible {
   background: var(--accent-hover);
 }
 
@@ -531,7 +466,7 @@ b {
   color: var(--bg);
 }
 
-.btn--ink:is(:hover, :focus-visible) {
+.btn--ink:focus-visible {
   background: var(--ink-hover);
 }
 
@@ -541,18 +476,24 @@ b {
   box-shadow: inset 0 0 0 1px rgba(10, 11, 20, 0.22);
 }
 
-.btn--ghost:is(:hover, :focus-visible) {
+.btn--ghost:focus-visible {
   background: var(--paper);
   box-shadow: inset 0 0 0 1px var(--ink);
 }
 
-.btn--dark {
-  background: var(--night);
-  color: var(--night-ink);
-}
+@media (hover: hover) and (pointer: fine) {
+  .btn--accent:hover {
+    background: var(--accent-hover);
+  }
 
-.btn--dark:is(:hover, :focus-visible) {
-  background: var(--ink-hover);
+  .btn--ink:hover {
+    background: var(--ink-hover);
+  }
+
+  .btn--ghost:hover {
+    background: var(--paper);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
 }
 
 .btn[disabled],
@@ -561,54 +502,38 @@ b {
   opacity: 0.6;
 }
 
-.btn .arrow {
+/* У кнопок-пилюль нет значков: подпись по центру. Стрелка остаётся только у текстовых ссылок,
+   которые ведут дальше (ссылка раздела, «Обо мне», строка «Ещё N вопросов»). */
+.arrow {
   display: inline-block;
   transition: transform var(--dur-fast) var(--ease-out);
 }
 
-.btn:is(:hover, :focus-visible) .arrow,
-a:is(:hover, :focus-visible) > .arrow {
-  transform: translateX(4px);
+@media (hover: hover) and (pointer: fine) {
+  a:is(:hover, :focus-visible) > .arrow {
+    transform: translateX(4px);
+  }
 }
 
 /* --- Движение ---------------------------------------------------------- */
 
-/* Одна система на весь сайт (src/scripts/motion.ts только ставит классы):
-   блок появляется один раз, когда заходит в окно, — 22px вверх и из прозрачности, 800мс;
-   дети [data-stagger] идут по очереди с шагом 70мс; заголовок [data-split] поднимается из-под маски.
-   Анимация, а не переход: она не перебивает собственные переходы элемента (наведение, фокус).
-   Без скрипта и при reduced-motion всё видно сразу. */
+/* Текст при прокрутке не анимируется: заголовки и блоки стоят на месте, и переход по якорю
+   сразу приводит к готовому содержимому. Мягко проявляются только крупные изображения
+   ([data-reveal]: сцена работ, карточки проектов, экраны кейса) — одной прозрачностью, без сдвига.
+   Класс ставит src/scripts/motion.ts. Без скрипта и при reduced-motion всё видно сразу. */
 @media (prefers-reduced-motion: no-preference) {
-  .motion-ready :is([data-reveal], [data-split]):not(.is-in) {
+  .motion-ready [data-reveal]:not(.is-in) {
     opacity: 0;
   }
 
   .motion-ready [data-reveal].is-in:not(.is-static) {
-    animation: reveal-up 800ms var(--ease-out) calc(var(--i, 0) * 70ms) backwards;
-  }
-
-  .motion-ready [data-split].is-in:not(.is-static) {
-    animation: head-rise 900ms var(--ease-out) backwards;
+    animation: reveal-fade 400ms var(--ease-out) backwards;
   }
 }
 
-@keyframes reveal-up {
+@keyframes reveal-fade {
   from {
     opacity: 0;
-    translate: 0 22px;
-  }
-}
-
-/* Маска шире блока сверху и по бокам: не срезает бревис Й и выносные элементы. */
-@keyframes head-rise {
-  from {
-    translate: 0 60%;
-    clip-path: inset(-0.2em -0.1em 60% -0.1em);
-  }
-
-  to {
-    translate: 0 0;
-    clip-path: inset(-0.2em -0.1em -0.2em -0.1em);
   }
 }
 
@@ -645,16 +570,16 @@ a:is(:hover, :focus-visible) > .arrow {
   navigation: auto;
 }
 
-/* Старая страница быстро гаснет, новая поднимается на 14px и проявляется. Шапка (site-header)
+/* Старая страница быстро гаснет, новая проявляется с едва заметным подъёмом. Шапка (site-header)
    и нижний остров (site-island) в смене не участвуют — стоят на месте, как панели приложения;
-   тёмная плашка текущего пункта меню (nav-current) переезжает к новому пункту. */
-/* Новая страница начинает появляться, когда старая почти погасла, — без «двойной экспозиции». */
+   тёмная плашка текущего пункта меню (nav-current) переезжает к новому пункту.
+   Новая страница начинает появляться, когда старая почти погасла, — без «двойной экспозиции». */
 ::view-transition-old(root) {
-  animation: vt-page-out 160ms ease-in both;
+  animation: vt-page-out 120ms ease-in both;
 }
 
 ::view-transition-new(root) {
-  animation: vt-page-in 480ms var(--ease-out) 110ms both;
+  animation: vt-page-in 300ms var(--ease-out) 70ms both;
 }
 
 /* На главной шапка стоит ниже, чем на остальных страницах: шапка и плашка пункта меню едут
@@ -679,7 +604,7 @@ a:is(:hover, :focus-visible) > .arrow {
 @keyframes vt-page-in {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(8px);
   }
 }
 
@@ -770,12 +695,6 @@ html {
   background: transparent;
 }
 
-/* Объекты ретро-набора (оранжевый пластик) до замены на новые: оранжевый уводится в синий акцент,
-   светлый пластик остаётся почти белым. */
-.is-cooled {
-  filter: hue-rotate(208deg) saturate(1.25) drop-shadow(0 14px 16px rgba(10, 11, 20, 0.14));
-}
-
 /* --- Общие раскладки -------------------------------------------------- */
 
 /* Заголовок слева, содержание справа — та же пропорция, что у заголовков секций. */
@@ -814,12 +733,11 @@ html {
   color: var(--muted);
 }
 
-/* Цифры результата (скорость, экраны, страницы) — тонко и синим, одинаково в работах и в кейсе. */
+/* Цифры результата (скорость, экраны, страницы) — тонко и крупно, одинаково в работах и в кейсе. */
 .rows__k--metric {
-  font-weight: 400;
+  font-weight: 300;
   font-size: var(--fs-3);
   letter-spacing: -0.04em;
-  color: var(--accent-text);
 }
 
 @media (max-width: 1023px) {
@@ -832,11 +750,6 @@ html {
   .rows > * {
     grid-template-columns: 1fr;
   }
-}
-
-/* Двухтонный заголовок: приглушённая часть фразы рядом с основной. */
-.tone-mute {
-  color: var(--muted);
 }
 
 /* Чип-пилюля: короткая подпись или счётчик. */
@@ -863,10 +776,6 @@ html {
   box-shadow: inset 0 0 0 1px rgba(10, 11, 20, 0.2);
 }
 
-.chip--accent {
-  background: var(--accent);
-  color: var(--accent-ink);
-}
 
 /* --- Поле с подписью внутри ---------------------------------------------
    Подпись лежит в поле, как в iOS: пока поле пустое — на месте значения, при вводе уменьшается

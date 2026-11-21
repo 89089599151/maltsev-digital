@@ -79,9 +79,7 @@ const kind = d.isConcept ? 'Концепт' : d.category === 'personal' ? 'Ли�
     place-items: center;
     padding: clamp(28px, 5vw, 72px) clamp(36px, 9vw, 160px) clamp(32px, 5vw, 80px);
     border-radius: var(--radius-lg);
-    background:
-      radial-gradient(60% 70% at 50% 40%, var(--stage-glow) 0%, rgba(255, 255, 255, 0) 70%),
-      linear-gradient(180deg, var(--stage-1), var(--stage-2));
+    background: linear-gradient(180deg, var(--stage-1), var(--stage-2));
     overflow: hidden;
     -webkit-tap-highlight-color: transparent;
   }
@@ -99,9 +97,10 @@ const kind = d.isConcept ? 'Концепт' : d.category === 'personal' ? 'Ли�
     width: clamp(64px, 13vw, 180px);
     border-radius: 14px;
     background: var(--paper);
+    /* Телефон лежит поверх окна браузера — единственное, что здесь действительно «парит». */
     box-shadow:
       0 0 0 1px rgba(10, 11, 20, 0.08),
-      0 40px 70px -40px rgba(16, 32, 200, 0.45);
+      var(--shadow-1);
     overflow: hidden;
     transition: transform 900ms var(--ease-out);
   }
@@ -168,9 +167,24 @@ const kind = d.isConcept ? 'Концепт' : d.category === 'personal' ? 'Ли�
     transition: color var(--dur-fast) var(--ease-out);
   }
 
-  .wf__link:is(:hover, :focus-visible),
-  .wf__item:has(.wf__visual:hover) .wf__link {
+  /* На телефоне название — цель для пальца не ниже 44px. */
+  @media (max-width: 767px) {
+    .wf__link {
+      display: inline-block;
+      padding-block: 7px;
+      margin-block: -7px;
+    }
+  }
+
+  .wf__link:focus-visible {
     color: var(--accent-text);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .wf__link:hover,
+    .wf__item:has(.wf__visual:hover) .wf__link {
+      color: var(--accent-text);
+    }
   }
 
   @media (max-width: 767px) {

@@ -32,10 +32,11 @@ export function applyBriefParams(): void {
       addons ? `дополнительно: ${addons}` : '',
       sum ? `ориентир ${fmt(sum)}` : '',
     ].filter(Boolean);
-    const summary = `Расчёт с сайта: ${parts.join(', ')}`;
+    const estimate = parts.join(', ');
+    const summary = `Расчёт с сайта: ${estimate}`;
 
     const hidden = form.querySelector<HTMLInputElement>('[data-estimate-field]');
-    if (hidden) hidden.value = summary;
+    if (hidden) hidden.value = estimate;
     const task = form.querySelector<HTMLTextAreaElement>('textarea[name="message"]');
     if (task && !task.value) task.value = `${summary}.\n\n`;
   }

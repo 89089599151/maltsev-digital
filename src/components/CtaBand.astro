@@ -1,9 +1,9 @@
 ---
 /**
- * Синяя полоса-призыв в конце внутренних страниц: вопрос, одна фраза и кнопка.
- * Один компонент для «Услуг», «Работ» и «Обо мне» — одинаковый финал на каждой странице.
+ * Тёмная полоса-призыв в конце внутренних страниц: вопрос, одна фраза и кнопка.
+ * Один компонент для «Услуг», «Работ» и «Обо мне» — тот же тёмный финал, что у главной
+ * (блок «Расскажите о задаче»). Синие заливки остаются только у рекомендуемого пакета и этапа «Запуск».
  */
-import Icon from './Icon.astro';
 
 interface Props {
   id: string;
@@ -16,13 +16,13 @@ interface Props {
 const { id, title, text, action, more } = Astro.props;
 ---
 
-<section class="cb section" aria-labelledby={id} data-reveal>
+<section class="cb section" aria-labelledby={id}>
   <h2 id={id} class="cb__title">{title}</h2>
   <div class="cb__side">
     <p class="cb__text">{text}</p>
     <div class="cb__actions">
       <a class="btn cb__btn" href={action.href}>
-        {action.label} <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+        {action.label}
       </a>
       {more && <a class="cb__more" href={more.href}>{more.label}</a>}
     </div>
@@ -37,15 +37,15 @@ const { id, title, text, action, more } = Astro.props;
     align-items: end;
     padding: clamp(28px, 4vw, 64px);
     border-radius: var(--radius-lg);
-    background: var(--accent-surface);
-    color: var(--accent-ink);
+    background: var(--night);
+    color: var(--night-ink);
   }
 
   .cb__title {
     max-width: 14ch;
     font-size: var(--fs-5);
     line-height: 1.02;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.045em;
   }
 
   .cb__side {
@@ -57,7 +57,7 @@ const { id, title, text, action, more } = Astro.props;
   .cb__text {
     max-width: 40ch;
     font-size: var(--step-body);
-    color: var(--on-accent-muted);
+    color: var(--night-muted);
   }
 
   .cb__actions {

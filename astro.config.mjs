@@ -29,7 +29,7 @@ export default defineConfig({
     responsiveStyles: false,
   },
   prefetch: {
-    prefetchAll: false,
+    prefetchAll: true,
     defaultStrategy: 'hover',
   },
 });

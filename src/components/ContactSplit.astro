@@ -1,56 +1,54 @@
 ---
 /**
- * Финал главной: тёмная сцена. Слева — прямые контакты крупными кнопками,
- * справа — короткая форма заявки (Formspree; без подключённого сервиса форма честно отключена).
+ * Финал главной: одна тёмная сцена. Слева — заголовок, пояснение и подпись исполнителя.
+ * Справа — главное действие: белая кнопка «Написать в Telegram» (самый быстрый путь), под ней
+ * строки почты и заявки с выбором пакета, в том же виде, что контакты в подвале.
+ * Когда подключён сервис отправки заявок, справа появляется короткая форма (LeadForm),
+ * а Telegram и почта переходят строками в левую колонку.
  */
 import { Image } from 'astro:assets';
-import ContactIcon from './ContactIcon.astro';
-import ChannelSwitch from './ChannelSwitch.astro';
+import LeadForm from './LeadForm.astro';
+import Icon from './Icon.astro';
 import { site, telegramUrl, emailUrl } from '@/config/site';
 import { url } from '@/lib/url';
 // Портрет шире обычного аватара: голова, плечи и огни города, а не одно крупное лицо.
 import avatar from '@/assets/photos/owner-avatar-wide.webp';
-import Icon from './Icon.astro';
 
-const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.formspreeId}` : '';
+const hasForm = Boolean(site.forms.formspreeId);
 const tg = telegramUrl();
 const mail = emailUrl('Заявка на разработку сайта');
 ---
 
 <section class="ct section" id="contact" data-island-section="Заявка" aria-labelledby="ct-title">
-  <div class="ct__stage">
+  <div class:list={['ct__stage', { 'ct__stage--form': hasForm }]}>
     <div class="ct__info">
-      <h2 id="ct-title" class="ct__title" data-split>Расскажите о задаче</h2>
+      <h2 id="ct-title" class="ct__title">Расскажите о задаче</h2>
       <p class="ct__sub">
         Задам пару вопросов и пришлю план со сроками и ценой. Отвечаю {site.contacts.hours}.
       </p>
 
-      <div class="ct__direct">
-        {
-          tg && (
-            <a class="ct__link" href={tg} target="_blank" rel="noopener">
-              <span class="ct__ico"><ContactIcon kind="telegram" /></span>
-              <span class="ct__lt">
-                <span class="ct__ll">Telegram</span>
-                <span class="ct__lv">@{site.contacts.telegram.value}</span>
-              </span>
-              <span class="ct__arr" aria-hidden="true"><Icon name="arrow-ne" /></span>
-            </a>
-          )
-        }
-        {
-          mail && (
-            <a class="ct__link" href={mail}>
-              <span class="ct__ico"><ContactIcon kind="email" /></span>
-              <span class="ct__lt">
-                <span class="ct__ll">Почта</span>
-                <span class="ct__lv">{site.contacts.email.value}</span>
-              </span>
-              <span class="ct__arr" aria-hidden="true"><Icon name="arrow-ne" /></span>
-            </a>
-          )
-        }
-      </div>
+      {hasForm && (
+        <ul class="ct__rows">
+          {tg && (
+            <li>
+              <a class="ct__row" href={tg} target="_blank" rel="noopener">
+                <span class="ct__row-l">Telegram</span>
+                <span class="ct__row-v">@{site.contacts.telegram.value}</span>
+                <span class="ct__row-i" aria-hidden="true"><Icon name="arrow-ne" /></span>
+              </a>
+            </li>
+          )}
+          {mail && (
+            <li>
+              <a class="ct__row" href={mail}>
+                <span class="ct__row-l">Почта</span>
+                <span class="ct__row-v">{site.contacts.email.value}</span>
+                <span class="ct__row-i" aria-hidden="true"><Icon name="arrow-ne" /></span>
+              </a>
+            </li>
+          )}
+        </ul>
+      )}
 
       <div class="ct__person">
         <Image class="ct__avatar" src={avatar} alt="" width={56} height={56} loading="lazy" />
@@ -61,162 +59,78 @@ const mail = emailUrl('Заявка на разработку сайта');
       </div>
     </div>
 
-    <div class="ct__card">
-      <p class="ct__card-t">Короткая заявка</p>
-
-      <form class="ct__form" data-lead-form data-endpoint={endpoint} data-mailto={endpoint ? undefined : site.contacts.email.value} data-telegram={endpoint ? undefined : tg} method="post" action={endpoint || undefined}>
-        <fieldset>
-          <legend class="sr-only">Короткая заявка</legend>
-          <input type="hidden" name="_subject" value="Короткая заявка с главной" />
-          <input type="hidden" name="source" value="Главная, блок контактов" />
-          <div class="hp" aria-hidden="true"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></div>
-
-          <label class="ct__field fl">
-            <span class="ct__label fl-label">Ваше имя</span>
-            <input name="name" type="text" autocomplete="name" required minlength="2" placeholder=" " data-error-id="ct-name-err" aria-describedby="ct-name-err" />
-          </label>
-          <span class="ct__err" id="ct-name-err"></span>
-
-          <label class="ct__field fl">
-            <span class="ct__label fl-label">Как с вами связаться</span>
-            <input name="contact" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" required minlength="4" placeholder="Telegram, телефон или почта" data-error-id="ct-contact-err" aria-describedby="ct-contact-err" />
-          </label>
-          <span class="ct__err" id="ct-contact-err"></span>
-
-          <label class="ct__field fl">
-            <span class="ct__label fl-label">Задача <span class="ct__opt">— по желанию</span></span>
-            <textarea name="message" rows="3" placeholder="Чем занимаетесь и какой сайт нужен"></textarea>
-          </label>
-
-          <label class="ct__consent">
-            <input type="checkbox" name="consent" value="Согласие получено" required data-error-id="ct-consent-err" aria-describedby="ct-consent-err" />
-            <span>Согласен на обработку персональных данных по <a href={url('/privacy/')}>политике</a></span>
-          </label>
-          <span class="ct__err" id="ct-consent-err"></span>
-
-          {!endpoint && <ChannelSwitch id="ct" />}
-
-          <button class="btn btn--accent ct__submit" type="submit">
-            <span data-label>{endpoint ? 'Отправить заявку' : 'Отправить на почту'}</span>
-            <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
-          </button>
-          <p class="ct__status" data-status role="status" aria-live="polite"></p>
-        </fieldset>
-      </form>
-      <div class="ct__success" data-success hidden tabindex="-1">
-        <p class="head-sm">Заявка получена</p>
-        <p>Спасибо! Свяжусь с вами {site.contacts.responseTime.value} по указанному контакту.</p>
+    {hasForm ? (
+      <LeadForm />
+    ) : (
+      <div class="ct__actions">
+        {tg && (
+          <a class="btn ct__tg" href={tg} target="_blank" rel="noopener">Написать в Telegram</a>
+        )}
+        <ul class="ct__rows">
+          {mail && (
+            <li>
+              <a class="ct__row" href={mail}>
+                <span class="ct__row-l">Почта</span>
+                <span class="ct__row-v">{site.contacts.email.value}</span>
+                <span class="ct__row-i" aria-hidden="true"><Icon name="arrow-ne" /></span>
+              </a>
+            </li>
+          )}
+          <li>
+            <a class="ct__row" href={url('/contacts/')}>
+              <span class="ct__row-l">Заявка</span>
+              <span class="ct__row-v">С выбором пакета и сроков</span>
+              <span class="ct__row-i" aria-hidden="true"><Icon name="arrow" /></span>
+            </a>
+          </li>
+        </ul>
       </div>
-
-      <a class="ct__brief" href={url('/contacts/')}>Заполнить подробный бриф <span aria-hidden="true"><Icon name="arrow" /></span></a>
-    </div>
+    )}
   </div>
 </section>
 
-<script>
-  import { initLeadForms } from '@/scripts/forms';
-  initLeadForms();
-</script>
-
 <style>
-  /* Одна тёмная сцена на оба столбца: белая карточка формы вложена в неё, как скриншоты в блоке «Работы». */
+  /* Одна тёмная сцена, плоская: без пятен и свечения. */
   .ct__stage {
     display: grid;
     grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
     gap: clamp(24px, 3vw, 56px);
-    align-items: stretch;
-    padding: clamp(12px, 1.2vw, 18px);
-    padding-left: clamp(24px, 4vw, 64px);
+    align-items: end;
+    padding: clamp(32px, 4.4vw, 64px);
     border-radius: var(--radius-lg);
-    background:
-      radial-gradient(70% 90% at 0% 100%, rgba(26, 47, 251, 0.34) 0%, rgba(26, 47, 251, 0) 68%),
-      var(--night);
+    background: var(--night);
     color: var(--night-ink);
+  }
+
+  /* С формой: белая карточка вложена с равным отступом 16px со всех сторон. */
+  .ct__stage--form {
+    align-items: stretch;
+    padding: 16px;
+    padding-left: clamp(24px, 4vw, 64px);
+  }
+
+  .ct__stage--form .ct__info {
+    padding-block: clamp(24px, 3.4vw, 48px);
   }
 
   .ct__info {
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
-    padding-block: clamp(24px, 3.4vw, 56px);
+    min-width: 0;
   }
 
   .ct__title {
-    font-size: var(--fs-page);
-    line-height: 1;
+    font-size: var(--fs-5);
+    line-height: 1.02;
     letter-spacing: -0.045em;
-    max-width: 10ch;
+    max-width: 12ch;
   }
 
   .ct__sub {
     max-width: 44ch;
     font-size: var(--step-body);
     color: var(--night-muted);
-  }
-
-  .ct__direct {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    max-width: 520px;
-    gap: var(--space-3);
-    margin-top: var(--space-2);
-  }
-
-  .ct__link {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: var(--space-4);
-    align-items: center;
-    min-height: 76px;
-    padding: 14px 18px;
-    border-radius: var(--radius);
-    background: rgba(241, 242, 250, 0.08);
-    color: var(--night-ink);
-    text-decoration: none;
-    transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
-  }
-
-  .ct__link:hover {
-    background: var(--accent);
-    color: var(--accent-ink);
-  }
-
-  .ct__ico {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: var(--accent-ink);
-  }
-
-  .ct__link:hover .ct__ico {
-    background: var(--paper);
-    color: var(--accent-text);
-  }
-
-  .ct__lt {
-    display: grid;
-    gap: 2px;
-    min-width: 0;
-  }
-
-  .ct__ll {
-    font-size: var(--fs-xs);
-    opacity: 0.8;
-  }
-
-  /* Адрес почты не рвётся посреди слова: на узком экране кегль чуть меньше. */
-  .ct__lv {
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: clamp(0.875rem, 3.7vw, 1.0625rem);
-    overflow-wrap: anywhere;
-  }
-
-  .ct__arr {
-    font-size: var(--step-body);
   }
 
   /* Подпись исполнителя прижата к низу сцены — столбцы заканчиваются на одной линии. */
@@ -232,7 +146,7 @@ const mail = emailUrl('Заявка на разработку сайта');
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    box-shadow: 0 0 0 3px var(--accent);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16);
   }
 
   .ct__person p {
@@ -242,206 +156,135 @@ const mail = emailUrl('Заявка на разработку сайта');
   }
 
   .ct__person strong {
-    font-family: var(--font-display);
+    font-weight: 500;
     color: var(--night-ink);
   }
 
-  /* Карточка формы */
-  .ct__card {
+  /* Действия: белая кнопка на тёмном (обратный цвет поверхности), под ней строки. */
+  .ct__actions {
     display: grid;
     gap: var(--space-4);
-    align-content: start;
-    padding: clamp(var(--space-6), 2.6vw, 40px);
-    border-radius: calc(var(--radius-lg) - 8px);
+    min-width: 0;
+  }
+
+  .ct__tg {
+    justify-self: stretch;
     background: var(--paper);
     color: var(--ink);
   }
 
-  .ct__card-t {
-    font-family: var(--font-head);
-    font-weight: 500;
-    font-size: var(--fs-2);
-    letter-spacing: -0.03em;
-    line-height: 1.2;
+  .ct__tg:is(:hover, :focus-visible) {
+    background: var(--bg);
   }
 
-
-  .ct__form {
-    width: 100%;
+  .ct__tg:focus-visible,
+  .ct__row:focus-visible {
+    outline-color: var(--paper);
   }
 
-  fieldset {
-    display: grid;
-    gap: var(--space-4);
-    min-width: 0;
-    margin: 0;
+  /* Строки контактов — как в подвале: подпись мелко, значение крупнее, стрелка справа. */
+  .ct__rows {
+    list-style: none;
     padding: 0;
-    border: 0;
+    border-top: 1px solid rgba(241, 242, 250, 0.14);
   }
 
-  fieldset:disabled {
-    opacity: 0.62;
+  .ct__rows li {
+    border-bottom: 1px solid rgba(241, 242, 250, 0.14);
   }
 
-  .ct__field {
+  .ct__row {
     display: grid;
-    gap: var(--space-2);
-  }
-
-  .ct__opt {
-    font-weight: 400;
-    color: var(--muted);
-  }
-
-  .ct__field input,
-  .ct__field textarea {
-    width: 100%;
-    min-height: 60px;
-    padding: 26px 22px 8px;
-    border: 1.5px solid var(--field-line);
-    border-radius: var(--radius-pill);
-    background: var(--field);
-    color: var(--ink);
-    font: inherit;
-    font-family: var(--font-display);
-    transition: border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
-  }
-
-  .ct__field textarea {
-    resize: vertical;
-    min-height: 92px;
-    border-radius: var(--radius-sm);
-  }
-
-  .ct__field input:hover,
-  .ct__field textarea:hover {
-    border-color: var(--field-line-hover);
-  }
-
-  .ct__field input:focus,
-  .ct__field textarea:focus {
-    outline: none;
-    background: var(--surface-solid);
-    border-color: var(--accent);
-    box-shadow: 0 0 0 4px var(--accent-soft);
-  }
-
-  .ct__field input[aria-invalid='true'] {
-    border-color: var(--danger);
-  }
-
-  .ct__err {
-    font-family: var(--font-display);
-    font-size: var(--step-small);
-    font-weight: 600;
-    color: var(--danger);
-  }
-
-  .ct__err:empty {
-    display: none;
-  }
-
-  .ct__consent {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    margin-top: 6px;
-    font-size: var(--step-small);
-    color: var(--muted);
-    cursor: pointer;
-  }
-
-  .ct__consent input {
-    width: 24px;
-    height: 24px;
-    flex: none;
-    accent-color: var(--accent);
-  }
-
-  /* Та же кнопка, что в брифе на странице контактов: пилюля с подписью и стрелкой. */
-  .ct__submit {
-    width: 100%;
-    min-height: 56px;
-    margin-top: 8px;
-  }
-
-  .ct__submit:disabled {
-    cursor: not-allowed;
-  }
-
-  .ct__status {
-    font-family: var(--font-display);
-    font-weight: 600;
-  }
-
-  .ct__status:empty {
-    display: none;
-  }
-
-  .ct__success {
-    display: grid;
-    gap: 8px;
-    padding: 20px;
-    border-radius: var(--radius);
-    background: var(--accent-soft);
-  }
-
-  .ct__brief {
-    justify-self: start;
-    display: inline-flex;
-    align-items: flex-end;
-    gap: 6px;
-    min-height: 44px;
-    font-family: var(--font-display);
-    font-weight: 500;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'label icon'
+      'value icon';
+    gap: 2px 16px;
+    align-items: center;
+    min-height: 68px;
+    padding-block: 12px;
+    color: var(--night-ink);
     text-decoration: none;
-    border-bottom: 2px solid var(--accent);
-    padding-bottom: 2px;
+  }
+
+  .ct__row-l {
+    grid-area: label;
+    font-size: var(--fs-xs);
+    color: var(--night-muted);
+  }
+
+  /* Адрес почты не рвётся посреди слова: на узком экране кегль чуть меньше. */
+  .ct__row-v {
+    grid-area: value;
+    font-weight: 500;
+    font-size: clamp(0.9375rem, 3.9vw, 1.0625rem);
+    overflow-wrap: anywhere;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  .ct__row-i {
+    grid-area: icon;
+    color: var(--night-muted);
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  .ct__row:is(:hover, :focus-visible) :is(.ct__row-v, .ct__row-i) {
+    color: var(--paper);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ct__row:hover .ct__row-i {
+      transform: translateX(3px);
+    }
+  }
+
+  .ct__info .ct__rows {
+    max-width: 440px;
   }
 
   @media (max-width: 1023px) {
     .ct__stage {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding: clamp(24px, 5vw, 40px);
+    }
+
+    .ct__stage--form {
       gap: 0;
-      padding: clamp(10px, 1.6vw, 16px);
+      padding: 12px;
     }
 
-    .ct__info {
-      padding: clamp(16px, 3vw, 32px) clamp(10px, 2.4vw, 28px) clamp(24px, 3.4vw, 40px);
+    .ct__stage--form .ct__info {
+      padding: 20px 12px 28px;
     }
 
-    .ct__person {
+    /* Подпись исполнителя уходит в конец блока, после кнопки и строк. */
+    .ct__stage:not(.ct__stage--form) .ct__info {
+      display: contents;
+    }
+
+    .ct__stage:not(.ct__stage--form) .ct__person {
+      order: 3;
+      margin-top: 0;
+      padding-top: 0;
+    }
+
+    .ct__stage:not(.ct__stage--form) .ct__actions {
+      order: 2;
+    }
+
+    .ct__stage--form .ct__person {
       margin-top: 0;
       padding-top: 0;
     }
   }
 
   @media (max-width: 767px) {
-    .ct__stage {
-      border-radius: var(--radius-lg);
-    }
-
-    .ct__card {
-      padding: 20px;
-      border-radius: calc(var(--radius-lg) - 12px);
-    }
-  }
-
-  /* На телефоне адрес почты должен встать в одну строку: стрелка уходит, поля плашки меньше. */
-  @media (max-width: 479px) {
-    .ct__link {
-      grid-template-columns: auto minmax(0, 1fr);
-      gap: 8px;
-      padding-inline: 8px;
-    }
-
-    .ct__ico {
-      width: 32px;
-      height: 32px;
-    }
-
-    .ct__arr {
-      display: none;
+    .ct__stage:not(.ct__stage--form) {
+      gap: 20px;
+      padding: 28px 20px 24px;
     }
   }
 </style>

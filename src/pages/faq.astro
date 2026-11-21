@@ -5,7 +5,6 @@ import PageHero from '@/components/PageHero.astro';
 import FaqList from '@/components/FaqList.astro';
 import { faq } from '@/data/content';
 import { url } from '@/lib/url';
-import Icon from '@/components/Icon.astro';
 import { genImage } from '@/lib/gen';
 
 // Стеклянный морской конёк: силуэт сам напоминает знак вопроса.
@@ -32,7 +31,7 @@ const schema = {
     lead="О цене, сроках, договоре и правах на сайт."
   >
     <Fragment slot="actions">
-      <a class="btn btn--ink" href={url('/contacts/')}>Задать свой вопрос <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
+      <a class="btn btn--ink" href={url('/contacts/')}>Задать свой вопрос</a>
     </Fragment>
     {sculpture && (
       <Image
@@ -52,9 +51,9 @@ const schema = {
   <div class="section">
     <FaqList items={faq} heading="Список вопросов" headingId="fq-list-title" group="faq-page" headingHidden>
       <Fragment slot="side">
-        <p>Если ответа нет — напишите. Отвечаю сам, без шаблонов и ботов.</p>
+        <p>Не нашли свой вопрос? Напишите, отвечу сам в течение 15 минут в рабочее время.</p>
         <a class="btn btn--ghost" href={url('/services/')} style="justify-self:start">
-          Пакеты и калькулятор <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+          Пакеты и калькулятор
         </a>
       </Fragment>
     </FaqList>
@@ -67,18 +66,7 @@ const schema = {
     width: min(100%, 240px);
     height: auto;
     justify-self: center;
-    filter: drop-shadow(0 24px 30px rgba(26, 47, 251, 0.13));
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .fq-object {
-      animation: fq-float 9s ease-in-out infinite;
-    }
-  }
-
-  @keyframes fq-float {
-    0%, 100% { transform: translateY(-5px) rotate(0.6deg); }
-    50% { transform: translateY(5px) rotate(-0.6deg); }
+    filter: var(--object-shadow);
   }
 
   @media (max-width: 1023px) {

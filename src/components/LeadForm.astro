@@ -1,0 +1,221 @@
+---
+/**
+ * Короткая заявка для финала главной — белая карточка с формой.
+ * Показывается, только когда подключён сервис отправки (site.forms.formspreeId): без него форма
+ * не отправляет заявку, а лишь копирует текст в Telegram или письмо, — это лишний путь к тому же
+ * чату, что и прямая кнопка. Пока сервиса нет, компонент на страницу не попадает вместе со скриптом.
+ */
+import ChannelSwitch from './ChannelSwitch.astro';
+import Icon from './Icon.astro';
+import { site, telegramUrl } from '@/config/site';
+import { url } from '@/lib/url';
+
+const endpoint = site.forms.formspreeId ? `https://formspree.io/f/${site.forms.formspreeId}` : '';
+const tg = telegramUrl();
+---
+
+<div class="lf">
+  <p class="lf__title">Короткая заявка</p>
+
+  <form class="lf__form" data-lead-form data-endpoint={endpoint} data-mailto={endpoint ? undefined : site.contacts.email.value} data-telegram={endpoint ? undefined : tg} method="post" action={endpoint || undefined}>
+    <fieldset>
+      <legend class="sr-only">Короткая заявка</legend>
+      <input type="hidden" name="_subject" value="Короткая заявка с главной" />
+      <input type="hidden" name="source" value="Главная, блок контактов" />
+      <div class="hp" aria-hidden="true"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></div>
+
+      <label class="lf__field fl">
+        <span class="fl-label">Ваше имя</span>
+        <input name="name" type="text" autocomplete="name" required minlength="2" placeholder=" " data-error-id="ct-name-err" aria-describedby="ct-name-err" />
+      </label>
+      <span class="ct__err" id="ct-name-err"></span>
+
+      <label class="lf__field fl">
+        <span class="fl-label">Как с вами связаться</span>
+        <input name="contact" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" required minlength="4" placeholder="Telegram, телефон или почта" data-error-id="ct-contact-err" aria-describedby="ct-contact-err" />
+      </label>
+      <span class="ct__err" id="ct-contact-err"></span>
+
+      <label class="lf__field fl">
+        <span class="fl-label">Задача <span class="lf__opt">— по желанию</span></span>
+        <textarea name="message" rows="3" placeholder="Чем занимаетесь и какой сайт нужен"></textarea>
+      </label>
+
+      <label class="lf__consent">
+        <input type="checkbox" name="consent" value="Согласие получено" required data-error-id="ct-consent-err" aria-describedby="ct-consent-err" />
+        <span>Согласен на обработку персональных данных по <a href={url('/privacy/')}>политике</a></span>
+      </label>
+      <span class="ct__err" id="ct-consent-err"></span>
+
+      {!endpoint && <ChannelSwitch id="ct" />}
+
+      <button class="btn btn--accent lf__submit" type="submit">
+        <span data-label>{endpoint ? 'Отправить заявку' : 'Отправить на почту'}</span>
+      </button>
+      <p class="lf__status" data-status role="status" aria-live="polite"></p>
+    </fieldset>
+  </form>
+  <div class="lf__success" data-success hidden tabindex="-1">
+    <p class="head-sm">Заявка получена</p>
+    <p>Спасибо! Свяжусь с вами {site.contacts.responseTime.value} по указанному контакту.</p>
+  </div>
+
+  <a class="lf__brief" href={url('/contacts/')}>Заявка с выбором пакета <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
+</div>
+
+<script>
+  import { initLeadForms } from '@/scripts/forms';
+  initLeadForms();
+</script>
+
+<style>
+  /* Белая карточка внутри тёмной сцены: отступ одинаковый со всех сторон, угол — внешний минус отступ. */
+  .lf {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+    padding: clamp(var(--space-6), 2.6vw, 40px);
+    border-radius: calc(var(--radius-lg) - 16px);
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  .lf__title {
+    font-family: var(--font-head);
+    font-weight: 500;
+    font-size: var(--fs-2);
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+  }
+
+  .lf__form {
+    width: 100%;
+  }
+
+  fieldset {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  fieldset:disabled {
+    opacity: 0.62;
+  }
+
+  .lf__field {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .lf__opt {
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .lf__field input,
+  .lf__field textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: 26px 22px 8px;
+    border: 1.5px solid var(--field-line);
+    border-radius: var(--radius-pill);
+    background: var(--field);
+    color: var(--ink);
+    font: inherit;
+    transition: border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .lf__field textarea {
+    resize: vertical;
+    min-height: 92px;
+    border-radius: var(--radius-sm);
+  }
+
+  .lf__field input:hover,
+  .lf__field textarea:hover {
+    border-color: var(--field-line-hover);
+  }
+
+  .lf__field input:focus,
+  .lf__field textarea:focus {
+    outline: none;
+    background: var(--surface-solid);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+
+  .lf__field input[aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+
+  .ct__err {
+    font-size: var(--step-small);
+    font-weight: 500;
+    color: var(--danger);
+  }
+
+  .ct__err:empty {
+    display: none;
+  }
+
+  .lf__consent {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 6px;
+    font-size: var(--step-small);
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .lf__consent input {
+    width: 24px;
+    height: 24px;
+    flex: none;
+    accent-color: var(--accent);
+  }
+
+  .lf__submit {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .lf__submit:disabled {
+    cursor: not-allowed;
+  }
+
+  .lf__status {
+    font-weight: 500;
+  }
+
+  .lf__status:empty {
+    display: none;
+  }
+
+  .lf__success {
+    display: grid;
+    gap: 8px;
+    padding: 20px;
+    border-radius: var(--radius);
+    background: var(--accent-soft);
+  }
+
+  .lf__brief {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  @media (max-width: 767px) {
+    .lf {
+      padding: 20px;
+    }
+  }
+</style>

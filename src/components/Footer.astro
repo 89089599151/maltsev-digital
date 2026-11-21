@@ -380,19 +380,23 @@ const columns = [
       color var(--dur-fast) var(--ease-out);
   }
 
-  .ftr__up:hover .ftr__up-icon {
-    background: var(--accent);
-    color: var(--accent-ink);
-  }
 
   /* На главной блок заявки с Telegram и почтой стоит прямо над подвалом, на странице контактов они
-     в первом экране — подвал их не повторяет. */
+     в первом экране — подвал их не повторяет. Сетка подвала та же, что на остальных страницах:
+     колонки ссылок стоят на своих местах, место контактов остаётся пустым. */
   :global(body:has(#contact, .ct-direct)) .ftr__contacts {
-    display: none;
+    visibility: hidden;
   }
 
-  :global(body:has(#contact, .ct-direct)) .ftr__top {
-    grid-template-columns: minmax(0, 1fr);
+  @media (max-width: 699px) {
+    :global(body:has(#contact, .ct-direct)) .ftr__contacts {
+      display: none;
+    }
+  }
+
+  .ftr__up:hover .ftr__up-icon {
+    background: var(--ink);
+    color: var(--paper);
   }
 
   @media (max-width: 699px) {

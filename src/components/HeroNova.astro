@@ -27,7 +27,7 @@ const object = genImage('hero-glass-wave') ?? genImage('hero-object-v2');
 const phoneObject = genImage('hero-object-v2');
 const phoneSet =
   object && phoneObject && phoneObject.src !== object.src
-    ? await getImage({ src: phoneObject.src, widths: [480, 768, 1100], format: 'webp', quality: 82 })
+    ? await getImage({ src: phoneObject.src, widths: [480, 768], format: 'webp', quality: 82 })
     : null;
 // В карточке цены — свой объект; пока файла нет, там уменьшенная копия главного.
 const pearl = genImage('price-pearl');
@@ -36,7 +36,7 @@ const mail = emailUrl('Заявка на разработку сайта');
 const fastest = plans[0];
 ---
 
-<section class="hn" aria-labelledby="hn-title" data-float-area>
+<section class="hn" aria-labelledby="hn-title">
   <div class="hn__stage">
     <div class="hn__head">
       <h1 id="hn-title" class="hn__title">
@@ -63,7 +63,7 @@ const fastest = plans[0];
     </div>
 
     <div class="hn__object" aria-hidden="true">
-      <div class="hn__float" data-float="26">
+      <div class="hn__float">
         {
           object && (
             <picture>
@@ -87,7 +87,7 @@ const fastest = plans[0];
     <!-- Факты и цена. На телефоне — одна стеклянная пластина поверх щупалец медузы,
          на широком экране обёртка не участвует в раскладке. -->
     <div class="hn__plate">
-      <ul class="hn__stats">
+      <ul class="hn__stats" data-island-hold>
         <li class="hn__stat">
           <p class="hn__stat-v"><span>от</span> 7</p>
           <p class="hn__stat-l">рабочих дней до запуска</p>
@@ -103,7 +103,7 @@ const fastest = plans[0];
       <a class="hn__card lift" href={url('/#pricing')}>
         <span class="hn__card-pic" aria-hidden="true">
           {pearl ? (
-            <Image class="hn__card-pearl" src={pearl.src} alt="" widths={[240, 360, 520]} sizes="220px" loading="eager" />
+            <Image class="hn__card-pearl" src={pearl.src} alt="" widths={[120, 240, 360, 520]} sizes="(max-width: 639px) 56px, 220px" loading="eager" />
           ) : (
             object && <Image src={object.src} alt="" widths={[320, 520]} sizes="260px" loading="eager" />
           )}
@@ -118,7 +118,7 @@ const fastest = plans[0];
             Лендинг, сайт компании или индивидуальный проект.{!pricingConfirmed && ' Цены предварительные.'}
           </span>
           <span class="hn__card-who">
-            <Image src={avatar} alt="" width={36} height={36} loading="eager" />
+            <Image src={avatar} alt="" width={36} height={36} loading="lazy" />
             <span>{site.brand.owner.value}<br /><i>делаю сам, без посредников</i></span>
           </span>
         </span>
@@ -150,7 +150,7 @@ const fastest = plans[0];
 
   </div>
 
-  <a class="hn__scroll" href="#work">
+  <a class="hn__scroll" href="#pricing">
     <i aria-hidden="true"></i>
     <i aria-hidden="true"></i>
     <span>Листайте дальше</span>
@@ -263,12 +263,14 @@ const fastest = plans[0];
     transition: transform var(--dur) var(--ease-out);
   }
 
-  .hn__btn:hover {
-    background: var(--ink-hover);
-  }
+  @media (hover: hover) and (pointer: fine) {
+    .hn__btn:hover {
+      background: var(--ink-hover);
+    }
 
-  .hn__btn:hover .hn__btn-go {
-    transform: rotate(-45deg);
+    .hn__btn:hover .hn__btn-go {
+      transform: rotate(-45deg);
+    }
   }
 
   .hn__cta-note {
@@ -408,10 +410,12 @@ const fastest = plans[0];
       transform var(--dur-fast) var(--ease-out);
   }
 
-  .hn__social a:hover {
-    background: var(--accent);
-    box-shadow: inset 0 0 0 1px var(--accent);
-    color: var(--accent-ink);
+  @media (hover: hover) and (pointer: fine) {
+    .hn__social a:hover {
+      background: var(--accent);
+      box-shadow: inset 0 0 0 1px var(--accent);
+      color: var(--accent-ink);
+    }
   }
 
   .hn__social a:active {
@@ -460,8 +464,10 @@ const fastest = plans[0];
     transition: transform 900ms var(--ease-out);
   }
 
-  .hn__card:hover .hn__card-pic img {
-    transform: scale(1.08) rotate(-4deg);
+  @media (hover: hover) and (pointer: fine) {
+    .hn__card:hover .hn__card-pic img {
+      transform: scale(1.08) rotate(-4deg);
+    }
   }
 
   /* Раковина с жемчужиной вписана целиком, с полями: главное в ней — светлая точка в центре. */
@@ -478,8 +484,10 @@ const fastest = plans[0];
     object-fit: contain;
   }
 
-  .hn__card:hover .hn__card-pic img.hn__card-pearl {
-    transform: scale(1.06);
+  @media (hover: hover) and (pointer: fine) {
+    .hn__card:hover .hn__card-pic img.hn__card-pearl {
+      transform: scale(1.06);
+    }
   }
 
   .hn__card-body {
@@ -564,8 +572,10 @@ const fastest = plans[0];
     text-decoration: none;
   }
 
-  .hn__scroll:hover {
-    color: var(--accent-text);
+  @media (hover: hover) and (pointer: fine) {
+    .hn__scroll:hover {
+      color: var(--accent-text);
+    }
   }
 
   /* Крестик «+»: две линии по 1,5px. */
@@ -860,8 +870,12 @@ const fastest = plans[0];
       transition: transform var(--dur) var(--ease-out);
     }
 
-    .hn__card:hover .hn__card-go {
-      transform: rotate(-45deg);
+    @media (hover: hover) and (pointer: fine) {
+    @media (hover: hover) and (pointer: fine) {
+      .hn__card:hover .hn__card-go {
+        transform: rotate(-45deg);
+      }
+      }
     }
   }
 

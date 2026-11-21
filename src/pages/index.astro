@@ -13,8 +13,11 @@ import { url } from '@/lib/url';
 import Icon from '@/components/Icon.astro';
 
 const [featured] = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
-// На главной — три главных вопроса, остальные в разделе «Вопросы».
-const homeFaq = faq.filter((f) => f.home).slice(0, 3);
+// На главной — три вопроса о цене и рисках (сроки уже видны в пакетах и этапах), остальные в разделе «Вопросы».
+const homeFaq = faq
+  .filter((f) => f.home)
+  .sort((a, b) => (a.home ?? 0) - (b.home ?? 0))
+  .slice(0, 3);
 const moreFaq = faq.length - homeFaq.length;
 const plural = (n: number) =>
   n % 10 === 1 && n % 100 !== 11 ? 'вопрос' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'вопроса' : 'вопросов';
@@ -22,8 +25,9 @@ const plural = (n: number) =>
 
 <Base>
   <HeroNova />
-  {featured && <WorkFeature project={featured} />}
+  {/* Цена, обещанная на первом экране, — сразу под ним; работа — доказательство после выбора пакета. */}
   <Packages />
+  {featured && <WorkFeature project={featured} />}
   <ProcessSteps compact />
   <ManifestSplit owner />
 
@@ -32,7 +36,7 @@ const plural = (n: number) =>
       <a slot="after" class="faq__more" href={url('/faq/')}>
         <span class="faq__more-t">
           Ещё {moreFaq} {plural(moreFaq)}
-          <small>О договоре, правках, домене и поддержке</small>
+          <small>О сроках, договоре, домене и поддержке</small>
         </span>
         <span class="faq__more-i" aria-hidden="true"><Icon name="arrow" /></span>
       </a>

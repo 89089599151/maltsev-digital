@@ -14,20 +14,15 @@ import SectionHead from './SectionHead.astro';
 import { plans, formatPrice, pricingConfirmed } from '@/config/pricing';
 import { url } from '@/lib/url';
 
-/** Одно короткое пояснение вместо подзаголовка и повторяющего его абзаца. */
-const types: Record<string, string> = {
-  start: 'Лендинг или сайт специалиста',
-  business: 'Сайт компании с разделами и каталогом',
-  premium: 'Авторский дизайн и нестандартная логика',
-};
-const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
+// Пояснение под названием — из pricing.ts (short), то же, что на странице услуг.
+const rows = plans;
 ---
 
 <section class="pk section" id="pricing" data-island-section="Пакеты" aria-labelledby="pk-title">
   {/* Одна ссылка раздела — в заголовке: на странице услуг и состав пакетов, и калькулятор. */}
   <SectionHead id="pk-title" title="Пакеты и цены" link={{ href: url('/services/'), label: 'Состав и калькулятор', short: 'Подробнее' }} />
 
-  <ul class="pk__list" data-stagger>
+  <ul class="pk__list">
     {
       rows.map((p) => (
         <li class:list={['pk__row', `pk__row--${p.id}`, { 'pk__row--featured': p.id === 'business' }]}>
@@ -37,8 +32,12 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
             <p class:list={['pk__badge', { 'pk__badge--ghost': p.id !== 'business' }]}>Рекомендую</p>
           </div>
           <div class="pk__head">
-            <h3 class="pk__name">{p.name}</h3>
-            <p class="pk__types">{p.types}</p>
+            <div class="pk__title">
+              <h3 class="pk__name">{p.name}</h3>
+              {/* На телефоне и планшете метка стоит рядом с названием; на компьютере — строкой выше. */}
+              {p.id === 'business' && <p class="pk__badge pk__badge--inline">Рекомендую</p>}
+            </div>
+            <p class="pk__types">{p.short}</p>
             {/* Пункты состава видны у большой карточки (только на компьютере). */}
             <div class="pk__more">
               <ul class="pk__points">
@@ -54,8 +53,8 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
               <p class="pk__price">
                 <span>от</span> {formatPrice(p.price)}
               </p>
-              <a class:list={['btn', 'pk__cta', p.id === 'business' ? 'pk__cta--light' : p.id === 'premium' ? 'btn--accent' : 'btn--ink']} href={url(`/contacts/?plan=${p.id}`)} aria-label={`Заказать пакет ${p.name}`}>
-                Заказать <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>
+              <a class:list={['btn', 'pk__cta', p.id === 'business' ? 'pk__cta--light' : p.id === 'premium' ? 'btn--accent' : 'btn--ink']} href={url(`/contacts/?plan=${p.id}`)} aria-label={`Выбрать пакет ${p.name}`}>
+                Выбрать
               </a>
             </div>
           </div>
@@ -64,7 +63,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     }
   </ul>
 
-  <div class="pk__footer" data-reveal>
+  <div class="pk__footer">
     {/* Гарантии из «Условий» на странице услуг — рядом с ценами, где решают, платить ли. */}
     <ul class="pk__terms" aria-label="Условия">
       <li><Icon name="check" /><span>Цена и срок в договоре{pricingConfirmed ? '' : ', цены предварительные'}</span></li>
@@ -75,11 +74,12 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
 </section>
 
 <style>
-  /* Три гарантии — по колонке под каждой карточкой пакета: последняя строка раздела. */
+  /* Три гарантии — одна строка под карточками, последняя строка раздела. Не привязана к колонкам
+     карточек: они меняют ширину при наведении, а строка стоит на месте. */
   .pk__terms {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px var(--gap);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 32px;
     padding: 0;
     list-style: none;
     font-size: var(--step-small);
@@ -95,7 +95,24 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   .pk__terms :global(.icon) {
     flex: none;
     margin-top: 0.2em;
+  }
+
+  .pk__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+  }
+
+  /* Метка рекомендуемого пакета: белая пилюля с синим текстом на синей карточке (контраст выше 4,5:1). */
+  .pk__badge {
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
     color: var(--accent-text);
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    line-height: 1.2;
   }
 
   .pk__list {
@@ -140,8 +157,8 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     color: var(--night-muted);
   }
 
-  .pk__row--premium .pk__price {
-    color: var(--accent-on-dark);
+  .pk__row--premium :focus-visible {
+    outline-color: var(--paper);
   }
 
   .pk__name {
@@ -185,7 +202,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
 
   .pk__price {
     font-family: var(--font-head);
-    font-weight: 400;
+    font-weight: 300;
     font-size: var(--fs-4);
     letter-spacing: -0.045em;
     white-space: nowrap;
@@ -197,8 +214,11 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     letter-spacing: 0;
   }
 
+  /* Кнопка по размеру подписи: при смене ширины карточек она не растягивается. */
   .pk__cta {
+    justify-self: start;
     min-height: 52px;
+    padding-inline: 28px;
   }
 
   /* Кнопка BUSINESS — белая, как на странице услуг. */
@@ -214,14 +234,6 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   .pk__footer {
     margin-top: 24px;
   }
-
-  @media (max-width: 1023px) {
-    .pk__terms {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-
-
 
   @media (max-width: 1023px) {
     .pk__list {
@@ -269,19 +281,21 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
 
     .pk__cta {
       min-height: 44px;
-      padding: 12px 16px;
+      padding: 12px 20px;
       font-size: var(--step-small);
-    }
-
-    .pk__cta .arrow {
-      display: none;
     }
   }
 
-  /* Метка и пункты состава нужны только «большой» карточке на компьютере. */
+  /* Строка метки и пункты состава нужны только «большой» карточке на компьютере. */
   .pk__flag,
   .pk__more {
     display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .pk__badge--inline {
+      display: none;
+    }
   }
 
   /* --- Компьютер: большая карточка и смена при наведении -------------------- */
@@ -289,46 +303,35 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
   @media (min-width: 1024px) {
     /* Большая колонка в 1,24 раза шире соседних; карточки выровнены по центру, большая выступает
        сверху и снизу. Ширина колонок и размеры внутри меняются пружиной; возврат к исходному
-       виду ждёт 140 мс — пока курсор пересекает зазор между карточками, ничего не дёргается. */
+       виду ждёт 140 мс — пока курсор пересекает зазор между карточками, ничего не дёргается.
+       Тень — только у большой карточки: она одна «поднята» над остальными. */
     .pk__list {
+      --pk-dur: 560ms;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1.24fr) minmax(0, 1fr);
       align-items: center;
-      transition: grid-template-columns 720ms var(--ease-spring) 140ms;
+      transition: grid-template-columns var(--pk-dur) var(--ease-spring) 140ms;
     }
 
     .pk__row {
       --pk-price-small: var(--fs-4);
       --pk-name: var(--fs-4);
       --pk-price: var(--pk-price-small);
-      --pk-pad: clamp(24px, 2.4vw, 36px);
       --pk-more: 0fr;
       --pk-more-o: 0;
       --pk-shadow: 0 0 0 transparent;
-      --pk-big-shadow: 0 34px 60px -34px rgba(10, 11, 20, 0.35);
       position: relative;
-      padding-block: var(--pk-pad);
       box-shadow: var(--pk-shadow);
-      transition:
-        padding 720ms var(--ease-spring) 140ms,
-        box-shadow 720ms var(--ease-out) 140ms;
-    }
-
-    .pk__row--business {
-      --pk-big-shadow: 0 40px 70px -30px rgba(16, 32, 200, 0.45);
-    }
-
-    .pk__row--premium {
-      --pk-big-shadow: 0 40px 70px -32px rgba(10, 11, 20, 0.55);
+      transition: box-shadow var(--pk-dur) var(--ease-out) 140ms;
     }
 
     .pk__name {
       font-size: var(--pk-name);
-      transition: font-size 720ms var(--ease-spring) 140ms;
+      transition: font-size var(--pk-dur) var(--ease-spring) 140ms;
     }
 
     .pk__price {
       font-size: var(--pk-price);
-      transition: font-size 720ms var(--ease-spring) 140ms;
+      transition: font-size var(--pk-dur) var(--ease-spring) 140ms;
     }
 
     /* Описание — две строки у всех карточек: высота не скачет, когда меняется ширина. */
@@ -342,22 +345,15 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
       opacity: var(--pk-more-o);
       margin-bottom: -32px;
       transition:
-        grid-template-rows 720ms var(--ease-spring) 140ms,
+        grid-template-rows var(--pk-dur) var(--ease-spring) 140ms,
         opacity 420ms var(--ease-out) 140ms;
     }
 
-    .pk__badge {
+    .pk__flag .pk__badge {
       justify-self: start;
       min-height: 0;
       overflow: hidden;
       margin-bottom: 32px;
-      padding: 5px 12px;
-      border-radius: var(--radius-pill);
-      background: rgba(255, 255, 255, 0.18);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32);
-      font-size: var(--fs-xs);
-      font-weight: 500;
-      line-height: 1.2;
     }
 
     .pk__badge--ghost {
@@ -370,7 +366,7 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
       grid-template-rows: var(--pk-more);
       opacity: var(--pk-more-o);
       transition:
-        grid-template-rows 720ms var(--ease-spring) 140ms,
+        grid-template-rows var(--pk-dur) var(--ease-spring) 140ms,
         opacity 420ms var(--ease-out) 140ms;
     }
 
@@ -389,31 +385,30 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      white-space: nowrap;
     }
 
+    /* Галочки — цветом второстепенного текста своей карточки, без синего. */
     .pk__points :global(.icon) {
       flex: none;
       margin-top: 0.15em;
-      color: var(--accent-text);
+      color: var(--muted);
     }
 
     .pk__row--business .pk__points :global(.icon) {
-      color: var(--accent-ink);
+      color: var(--on-accent-muted);
     }
 
     .pk__row--premium .pk__points :global(.icon) {
-      color: var(--accent-on-dark);
+      color: var(--night-muted);
     }
 
     /* Большая карточка: по умолчанию — рекомендуемая. */
     .pk__row--featured {
       --pk-name: clamp(2.75rem, 1rem + 3.2vw, 4rem);
       --pk-price: clamp(2.5rem, 1rem + 2.6vw, 3.75rem);
-      --pk-pad: clamp(32px, 3vw, 44px);
       --pk-more: 1fr;
       --pk-more-o: 1;
-      --pk-shadow: var(--pk-big-shadow);
+      --pk-shadow: var(--shadow-2);
     }
   }
 
@@ -449,16 +444,14 @@ const rows = plans.map((p) => ({ ...p, types: types[p.id] }));
     .pk__row:is(:hover, :focus-within) {
       --pk-name: clamp(2.75rem, 1rem + 3.2vw, 4rem);
       --pk-price: clamp(2.5rem, 1rem + 2.6vw, 3.75rem);
-      --pk-pad: clamp(32px, 3vw, 44px);
       --pk-more: 1fr;
       --pk-more-o: 1;
-      --pk-shadow: var(--pk-big-shadow);
+      --pk-shadow: var(--shadow-2);
     }
 
     .pk__list:has(> .pk__row:is(:hover, :focus-within)) .pk__row--featured:not(:hover, :focus-within) {
       --pk-name: var(--fs-4);
       --pk-price: var(--pk-price-small);
-      --pk-pad: clamp(24px, 2.4vw, 36px);
       --pk-more: 0fr;
       --pk-more-o: 0;
       --pk-shadow: 0 0 0 transparent;

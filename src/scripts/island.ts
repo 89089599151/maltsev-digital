@@ -11,6 +11,8 @@ const COMPACT_FROM = 240;
 const PROBE = 0.45;
 /** Сколько раздел должен оставаться текущим, чтобы подпись сменилась: быстрая прокрутка её не дёргает. */
 const SETTLE_MS = 180;
+/** Нижняя зона экрана, которую занимает остров вместе с отступом. */
+const ISLAND_ZONE = 96;
 
 const EASE = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
 
@@ -40,6 +42,8 @@ export function initIsland(): void {
   const writeLabel = island.querySelector<HTMLElement>('[data-island-write-label]');
   const write = island.querySelector<HTMLElement>('[data-write-open]');
   const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-island-section]'));
+  // Главная: цифры первого экрана, которые остров не должен закрывать.
+  const hold = island.classList.contains('is-held') ? document.querySelector<HTMLElement>('[data-island-hold]') : null;
   const pageLabel = menuLabel?.textContent ?? '';
   const writeText = writeLabel?.textContent ?? '';
   const writeAria = write?.getAttribute('aria-label') ?? '';
@@ -78,7 +82,7 @@ export function initIsland(): void {
     // Расчёт остаётся на виду даже в конце страницы.
     island.classList.toggle('is-compact', compact && !live && !desktop.matches);
     const sum = estimate ? shortSum(estimate.sum) : '';
-    setLabel(menuLabel, estimate ? (narrow.matches ? sum : `${estimate.plan} · ${sum}`) : (section ?? pageLabel));
+    setLabel(menuLabel, estimate ? (narrow.matches ? sum : `${sum}, ${estimate.plan}`) : (section ?? pageLabel));
     setLabel(writeLabel, live ? 'Отправить' : writeText);
     write?.setAttribute('aria-label', live ? 'Отправить расчёт' : writeAria);
   };
@@ -106,10 +110,30 @@ export function initIsland(): void {
     }, SETTLE_MS);
   };
 
+  /**
+   * Остров на главной ждёт, пока цифры под заголовком не поднимутся выше его зоны. Если на первом
+   * экране цифр не видно (низкий экран) или их нет вовсе, остров виден сразу. При возврате
+   * к началу страницы он снова уступает место цифрам.
+   */
+  const updateHold = () => {
+    if (!hold) {
+      island.classList.remove('is-held');
+      return;
+    }
+    const rect = hold.getBoundingClientRect();
+    const zone = window.innerHeight - ISLAND_ZONE;
+    // Положение цифр относительно начала страницы: так правило не зависит от текущей прокрутки.
+    const top = rect.top + window.scrollY;
+    const bottom = rect.bottom + window.scrollY;
+    const onFirstScreen = rect.height > 0 && top < window.innerHeight;
+    island.classList.toggle('is-held', onFirstScreen && window.scrollY < bottom - zone);
+  };
+
   const update = () => {
     ticking = false;
     // При открытом листе страница зафиксирована и её прокрутка обнулена — это не движение читателя.
     if (desktop.matches || root.classList.contains(SHEET_OPEN_CLASS)) return;
+    updateHold();
     if (sections.length) trackSection();
     const range = root.scrollHeight - window.innerHeight;
     const left = range - window.scrollY;
